@@ -44,7 +44,13 @@ Toda contribución debe:
 
 No declarar terminado gameplay que solo existe en código y no puede reproducirse en una escena o prueba.
 
+Validación completa de la fundación en Windows:
+
+```powershell
+$env:GODOT_BIN = "C:\ruta\a\godot_console.exe"
+.\tools\phase0\verify_all.cmd
+```
+
 ## Límites del MVP
 
 El MVP no incluye backend, multijugador, mundo abierto, 4X, city builder, crafting profundo, economía persistente, generación procedural infinita ni el roster completo de mundos y clases. Consultar `docs/DEVELOPMENT_PHASES.md` antes de ampliar alcance.
-

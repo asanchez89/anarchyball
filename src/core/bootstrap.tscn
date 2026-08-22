@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/core/bootstrap.gd" id="1_bootstrap"]
+[ext_resource type="PackedScene" path="res://src/input/input_diagnostics.tscn" id="2_input"]
 
 [node name="Bootstrap" type="Control"]
 layout_mode = 3
@@ -28,10 +29,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -70.0
-offset_right = 280.0
-offset_bottom = 70.0
+offset_left = -330.0
+offset_top = -190.0
+offset_right = 330.0
+offset_bottom = 190.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
@@ -47,6 +48,9 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.78, 0.82, 0.9, 1)
 theme_override_font_sizes/font_size = 18
-text = "Foundation ready · Gameplay begins in Phase 1"
+text = "Foundation harness · Gameplay begins in Phase 1"
 horizontal_alignment = 1
+
+[node name="InputDiagnostics" parent="Content" instance=ExtResource("2_input")]
+layout_mode = 2
 

@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.6.3"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          mkdir -p .tools/godot
+          curl --fail --location --silent --show-error --output ".tools/godot/${archive}" "${release}/${archive}"
+          curl --fail --location --silent --show-error --output .tools/godot/SHA512-SUMS.txt "${release}/SHA512-SUMS.txt"
+          (
+            cd .tools/godot
+            tr -d '\r' < SHA512-SUMS.txt | grep -F "  ${archive}" > SHA512-CHECK.txt
+            sha512sum --check SHA512-CHECK.txt
+            unzip -q "${archive}"
+            chmod +x "Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          )
+          echo "GODOT_BIN=${GITHUB_WORKSPACE}/.tools/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "${GITHUB_ENV}"
+
+      - name: Verify project
+        shell: pwsh
+        run: ./tools/phase0/verify_all.ps1 -GodotBinary $env:GODOT_BIN
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdunit4-reports
+          path: reports/
+          if-no-files-found: ignore

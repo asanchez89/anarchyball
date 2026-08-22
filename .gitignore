@@ -12,6 +12,7 @@ builds/
 logs/
 reports/
 telemetry/
+.tools/
 
 # Editor and operating-system files
 .idea/
@@ -21,4 +22,3 @@ Thumbs.db
 Desktop.ini
 *.bak
 *.tmp
-

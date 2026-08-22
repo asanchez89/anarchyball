@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/input/input_diagnostics.gd" id="1_input"]
+
+[node name="InputDiagnostics" type="PanelContainer"]
+custom_minimum_size = Vector2(620, 230)
+script = ExtResource("1_input")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Heading" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.78, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "Phase 0 · Input diagnostics"
+
+[node name="Hint" type="Label" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.72, 0.8, 1)
+text = "A/D or left stick · IJKL or right stick · mouse pointer · mapped actions"
+
+[node name="Movement" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Rows/Movement"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "Movement axis"
+
+[node name="MovementValue" type="Label" parent="Margin/Rows/Movement"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+0.00"
+
+[node name="DirectionalAim" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Rows/DirectionalAim"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "Directional aim"
+
+[node name="DirectionalAimValue" type="Label" parent="Margin/Rows/DirectionalAim"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "(+0.00, +0.00)"
+
+[node name="PointerAim" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Rows/PointerAim"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "Pointer aim"
+
+[node name="PointerAimValue" type="Label" parent="Margin/Rows/PointerAim"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "(+0.00, +0.00)"
+
+[node name="ActiveActions" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Rows/ActiveActions"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "Active actions"
+
+[node name="ActiveActionsValue" type="Label" parent="Margin/Rows/ActiveActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "none"
+autowrap_mode = 2
+
+[node name="EdgeEvents" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Rows/EdgeEvents"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "Last edge event"
+
+[node name="EdgeEventsValue" type="Label" parent="Margin/Rows/EdgeEvents"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "none"

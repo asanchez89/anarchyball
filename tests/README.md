@@ -7,5 +7,13 @@ Capas previstas:
 - `fixtures`: datos válidos e inválidos usados por validadores;
 - smoke test: importación headless y arranque de la escena principal.
 
-El framework de tests se elegirá mediante un spike contra la versión estable de Godot adoptada; no queda congelado por esta estructura inicial.
+El framework seleccionado es GdUnit4 6.2.1; consultar `docs/ADR/0002-test-framework.md`.
 
+Ejecutar toda la validación en Windows:
+
+```powershell
+$env:GODOT_BIN = "C:\ruta\a\godot_console.exe"
+.\tools\phase0\verify_all.cmd
+```
+
+La suite headless no simula transporte de input físico. `test_foundation.gd` valida acciones y bindings; `src/input/input_diagnostics.tscn` permite comprobar hardware real.
