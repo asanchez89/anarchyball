@@ -1,0 +1,24 @@
+# Godot generated files
+.godot/
+.import/
+.mono/
+
+# Local export data and generated builds
+export.cfg
+export_credentials.cfg
+builds/
+
+# Generated diagnostics and local playtest data
+logs/
+reports/
+telemetry/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.bak
+*.tmp
+
