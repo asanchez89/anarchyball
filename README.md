@@ -4,7 +4,7 @@ Base de desarrollo de un *action-platformer/shooter* 2D con progresión RPG lige
 
 ## Estado actual
 
-**Phase 0 - Foundation implementada.** El proyecto importa y ejecuta su bootstrap en Godot 4.6.3, dispone de input abstracto, diagnóstico visual, tests headless y CI reproducible. El siguiente trabajo de gameplay es Phase 1: movimiento y cámara.
+**Phase 5 - MVP Hardening en validación humana.** El vertical slice aprobado suma accesibilidad persistente, señales redundantes, resumen de telemetría, variante data-driven, CI y export Windows reproducible. El núcleo continúa siendo GDScript-only y no requiere backend.
 
 ## Empezar
 
@@ -37,7 +37,7 @@ Validar la importación sin interfaz:
 Ese comando ejecuta, en orden:
 
 1. importación headless;
-2. smoke test del bootstrap;
+2. smoke test de la sala jugable;
 3. suite GdUnit4.
 
 También puede pasarse el binario explícitamente:
@@ -48,6 +48,14 @@ También puede pasarse el binario explícitamente:
 
 Los reportes quedan en `reports/` y no se versionan.
 
+Generar el build Windows cuando estén instalados los export templates oficiales de Godot 4.6.3:
+
+```powershell
+.\tools\phase5\build_windows.cmd
+```
+
+El resultado queda en `builds/windows/` y no se versiona. CI publica esa carpeta como artefacto después de verificar su template mediante SHA-512.
+
 ## Documentos de referencia
 
 - [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md): visión, mundo, producto y dirección general.
@@ -55,6 +63,15 @@ Los reportes quedan en `reports/` y no se versionan.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): límites y flujo de la arquitectura técnica.
 - [`docs/DEVELOPMENT_PHASES.md`](docs/DEVELOPMENT_PHASES.md): fases, alcance y criterios de aceptación del MVP.
 - [`docs/PHASE_0_PLAN.md`](docs/PHASE_0_PLAN.md): backlog operativo y gate de la fase de fundación.
+- [`docs/PHASE_1_PLAN.md`](docs/PHASE_1_PLAN.md): alcance implementado, métricas y guion de playtest de movimiento.
+- [`docs/PHASE_2_PLAN.md`](docs/PHASE_2_PLAN.md): núcleo ético, cobertura canónica y guion de validación de combate.
+- [`docs/PHASE_3_PLAN.md`](docs/PHASE_3_PLAN.md): contrato de contenido, pipeline, telemetría y gate del Content Engine.
+- [`docs/PHASE_4_PLAN.md`](docs/PHASE_4_PLAN.md): recorrido del slice, sistemas integrados y guion de aceptación humana.
+- [`docs/PHASE_5_PLAN.md`](docs/PHASE_5_PLAN.md): hardening, accesibilidad, balance, build y gate final del MVP.
+- [`docs/CONTENT_EXTENSION_GUIDE.md`](docs/CONTENT_EXTENSION_GUIDE.md): procedimiento para añadir contenido sin tocar el núcleo.
+- [`docs/ADR/0005-versioned-local-checkpoint.md`](docs/ADR/0005-versioned-local-checkpoint.md): contrato de checkpoint/save local.
+- [`docs/ADR/0004-level-spec-v0.md`](docs/ADR/0004-level-spec-v0.md): separación entre Resources reutilizables y composición JSON.
+- [`docs/ADR/0003-centralized-target-validity.md`](docs/ADR/0003-centralized-target-validity.md): autoridad única para elegibilidad ofensiva.
 - [`docs/ADR/0002-test-framework.md`](docs/ADR/0002-test-framework.md): selección y límites de GdUnit4.
 - [`AGENTS.md`](AGENTS.md): contrato de trabajo para contribuciones asistidas.
 
