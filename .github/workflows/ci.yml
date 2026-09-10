@@ -41,6 +41,28 @@ jobs:
         shell: pwsh
         run: ./tools/phase0/verify_all.ps1 -GodotBinary $env:GODOT_BIN
 
+      - name: Install export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl --fail --location --silent --show-error --output ".tools/godot/${archive}" "${release}/${archive}"
+          (
+            cd .tools/godot
+            tr -d '\r' < SHA512-SUMS.txt | grep -F "  ${archive}" > SHA512-TEMPLATES-CHECK.txt
+            sha512sum --check SHA512-TEMPLATES-CHECK.txt
+            rm -rf template-package
+            mkdir template-package
+            unzip -q "${archive}" -d template-package
+            install -d "${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+            cp template-package/templates/* "${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
+          )
+
+      - name: Export Windows MVP
+        shell: pwsh
+        run: ./tools/phase5/build_windows.ps1 -GodotBinary $env:GODOT_BIN
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -48,3 +70,10 @@ jobs:
           name: gdunit4-reports
           path: reports/
           if-no-files-found: ignore
+
+      - name: Upload Windows MVP
+        uses: actions/upload-artifact@v4
+        with:
+          name: anarchyball-windows-mvp
+          path: builds/windows/
+          if-no-files-found: error

@@ -6,13 +6,13 @@
 # Local export data and generated builds
 export.cfg
 export_credentials.cfg
-builds/
+/builds/
 
 # Generated diagnostics and local playtest data
-logs/
-reports/
-telemetry/
-.tools/
+/logs/
+/reports/
+/telemetry/
+/.tools/
 
 # Editor and operating-system files
 .idea/
