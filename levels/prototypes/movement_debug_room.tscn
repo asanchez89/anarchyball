@@ -1,0 +1,183 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/debug/movement_debug_room.gd" id="1_room"]
+[ext_resource type="PackedScene" path="res://src/actors/player/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://src/debug/debug_platform.gd" id="3_platform"]
+[ext_resource type="Script" path="res://src/debug/movement_debug_hud.gd" id="5_hud"]
+[ext_resource type="PackedScene" path="res://src/debug/combat_target.tscn" id="6_combat_target"]
+[ext_resource type="PackedScene" path="res://src/combat/sandbox/hostile_bolt.tscn" id="7_hostile_bolt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
+bg_color = Color(0.055, 0.067, 0.11, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.22, 0.45, 0.58, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MovementDebugRoom" type="Node2D"]
+script = ExtResource("1_room")
+
+[node name="Backdrop" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 1920, 0, 1920, 720, 0, 720)
+color = Color(0.025, 0.03, 0.06, 1)
+
+[node name="GridLines" type="Node2D" parent="."]
+
+[node name="Line100" type="Line2D" parent="GridLines"]
+points = PackedVector2Array(0, 520, 1920, 520)
+width = 1.0
+default_color = Color(0.22, 0.45, 0.58, 0.25)
+
+[node name="Line200" type="Line2D" parent="GridLines"]
+points = PackedVector2Array(0, 420, 1920, 420)
+width = 1.0
+default_color = Color(0.22, 0.45, 0.58, 0.18)
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="StartFloor" type="StaticBody2D" parent="Platforms"]
+position = Vector2(425, 670)
+script = ExtResource("3_platform")
+size = Vector2(850, 100)
+
+[node name="EndFloor" type="StaticBody2D" parent="Platforms"]
+position = Vector2(1435, 670)
+script = ExtResource("3_platform")
+size = Vector2(910, 100)
+
+[node name="StepOne" type="StaticBody2D" parent="Platforms"]
+position = Vector2(360, 540)
+script = ExtResource("3_platform")
+size = Vector2(150, 24)
+
+[node name="StepTwo" type="StaticBody2D" parent="Platforms"]
+position = Vector2(560, 460)
+script = ExtResource("3_platform")
+size = Vector2(150, 24)
+
+[node name="StepThree" type="StaticBody2D" parent="Platforms"]
+position = Vector2(760, 380)
+script = ExtResource("3_platform")
+size = Vector2(150, 24)
+
+[node name="LandingPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(1040, 540)
+script = ExtResource("3_platform")
+size = Vector2(190, 24)
+
+[node name="EndWall" type="StaticBody2D" parent="Platforms"]
+position = Vector2(1880, 470)
+script = ExtResource("3_platform")
+size = Vector2(60, 400)
+
+[node name="CombatTargets" type="Node2D" parent="."]
+
+[node name="NeutralBall" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1010, 590)
+stable_id = &"neutral_ball"
+display_name = "NEUTRAL"
+player_path = NodePath("../../Player")
+
+[node name="DisputedBall" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1150, 590)
+stable_id = &"disputed_ball"
+display_name = "DISPUTED"
+initial_state = 1
+player_path = NodePath("../../Player")
+
+[node name="GuardAggressor" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1290, 590)
+stable_id = &"guard_aggressor"
+display_name = "GUARD"
+behavior = 1
+hostile_bolt_scene = ExtResource("7_hostile_bolt")
+player_path = NodePath("../../Player")
+
+[node name="ConfiscatorAggressor" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1430, 590)
+stable_id = &"confiscator_aggressor"
+display_name = "CONFISCATOR"
+behavior = 2
+protected_target_id = &"protected_merchant"
+protected_target_path = NodePath("../ProtectedMerchant")
+player_path = NodePath("../../Player")
+
+[node name="ProtectedMerchant" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1430, 450)
+stable_id = &"protected_merchant"
+display_name = "NPC PROTEGIDO"
+player_path = NodePath("../../Player")
+
+[node name="VoluntaryDuelist" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1570, 590)
+stable_id = &"voluntary_duelist"
+display_name = "DUEL CONSENTIDO"
+duel_enabled = true
+player_path = NodePath("../../Player")
+
+[node name="HostileMachine" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1705, 590)
+stable_id = &"hostile_machine"
+display_name = "MÁQUINA HOSTIL"
+target_kind = 1
+machine_permission = 0
+player_path = NodePath("../../Player")
+
+[node name="OwnedMachine" parent="CombatTargets" instance=ExtResource("6_combat_target")]
+position = Vector2(1815, 500)
+stable_id = &"owned_neutral_machine"
+display_name = "MÁQUINA AJENA"
+target_kind = 1
+machine_permission = 2
+player_path = NodePath("../../Player")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+unique_name_in_owner = true
+position = Vector2(120, 570)
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("5_hud")
+player_path = NodePath("../Player")
+
+[node name="MetricsPanel" type="PanelContainer" parent="Hud"]
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 510.0
+offset_bottom = 166.0
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="Margin" type="MarginContainer" parent="Hud/MetricsPanel"]
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="MetricsLabel" type="Label" parent="Hud/MetricsPanel/Margin"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.82, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Cargando métricas…"
+
+[node name="ControlsPanel" type="PanelContainer" parent="Hud"]
+offset_left = 18.0
+offset_top = 606.0
+offset_right = 990.0
+offset_bottom = 704.0
+theme_override_styles/panel = SubResource("StyleBox_panel")
+
+[node name="Margin" type="MarginContainer" parent="Hud/ControlsPanel"]
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="ControlsLabel" type="Label" parent="Hud/ControlsPanel/Margin"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.75, 0.82, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "Controles"

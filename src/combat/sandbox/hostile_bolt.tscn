@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/combat/sandbox/hostile_bolt.gd" id="1_bolt"]
+
+[sub_resource type="CircleShape2D" id="Circle_bolt"]
+radius = 7.0
+
+[node name="HostileBolt" type="Area2D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_bolt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Circle_bolt")

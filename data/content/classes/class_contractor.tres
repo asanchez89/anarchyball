@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ClassLoadout" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/class_loadout.gd" id="2_class"]
+
+[resource]
+script = ExtResource("2_class")
+content_id = &"class_contractor"
+display_name = "Contractor"
+tags = Array[StringName]([&"baseline_capable"])
+weapon_id = &"weapon_probe"
+ability_ids = Array[StringName]([&"ability_defensive_response"])
+interaction_tags = Array[StringName]([&"contractor_access"])
+movement_speed_multiplier = 1.0

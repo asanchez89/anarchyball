@@ -1,0 +1,59 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://src/debug/combat_target.gd" id="1_target"]
+[ext_resource type="Script" path="res://src/combat/effects/combat_identity_component.gd" id="2_identity"]
+[ext_resource type="Script" path="res://src/combat/conflict/conflict_state_component.gd" id="3_conflict"]
+[ext_resource type="Script" path="res://src/combat/effects/resolve_component.gd" id="4_resolve"]
+[ext_resource type="Script" path="res://src/combat/effects/effect_receiver_component.gd" id="5_receiver"]
+[ext_resource type="Script" path="res://src/combat/effects/voluntary_duel_context.gd" id="6_duel"]
+[ext_resource type="PackedScene" path="res://src/combat/sandbox/hostile_bolt.tscn" id="7_bolt"]
+
+[sub_resource type="CircleShape2D" id="Circle_target"]
+radius = 30.0
+
+[node name="CombatTarget" type="Area2D"]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("1_target")
+hostile_bolt_scene = ExtResource("7_bolt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Circle_target")
+
+[node name="Identity" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_identity")
+
+[node name="ConflictState" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_conflict")
+
+[node name="Resolve" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_resolve")
+
+[node name="DuelContext" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("6_duel")
+
+[node name="EffectReceiver" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("5_receiver")
+identity_path = NodePath("../Identity")
+conflict_state_path = NodePath("../ConflictState")
+resolve_path = NodePath("../Resolve")
+duel_context_path = NodePath("../DuelContext")
+
+[node name="StatusLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -74.0
+offset_top = 38.0
+offset_right = 74.0
+offset_bottom = 112.0
+theme_override_colors/font_color = Color(0.88, 0.93, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+text = "Target"
+horizontal_alignment = 1

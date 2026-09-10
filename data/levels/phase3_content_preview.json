@@ -1,0 +1,27 @@
+{
+  "schema_version": 0,
+  "level_id": "phase3_content_preview",
+  "display_name": "Phase 3 Content Preview",
+  "player_spawn": {"x": 80, "y": 596},
+  "exit": {"x": 1070, "y": 596},
+  "bounds": {"width": 1200, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "platform_start", "x": 0, "y": 620, "width": 400, "height": 100, "required": true, "route_tags": []},
+    {"id": "platform_bridge", "x": 520, "y": 560, "width": 180, "height": 24, "required": true, "route_tags": []},
+    {"id": "platform_exit", "x": 820, "y": 620, "width": 380, "height": 100, "required": true, "route_tags": []},
+    {"id": "platform_optional", "x": 690, "y": 430, "width": 120, "height": 24, "required": false, "route_tags": ["runner"]}
+  ],
+  "encounters": [
+    {"id": "encounter_placement_main", "definition_id": "encounter_third_party_defense", "x": 900, "y": 590}
+  ],
+  "resources": [
+    {"id": "pickup_training_supply", "kind": "training_supply", "x": 600, "y": 520, "ownership": "unowned_collectible"}
+  ],
+  "sections": [
+    {"id": "section_intro", "from_x": 0, "to_x": 500},
+    {"id": "section_encounter", "from_x": 500, "to_x": 1200}
+  ]
+}

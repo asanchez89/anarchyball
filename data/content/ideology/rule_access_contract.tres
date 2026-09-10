@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="IdeologyRuleDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/ideology_rule_definition.gd" id="2_rule"]
+
+[resource]
+script = ExtResource("2_rule")
+content_id = &"rule_access_contract"
+display_name = "Acceso contractual"
+tags = Array[StringName]([&"interaction_rule"])
+hook_id = &"access_gate"
+parameters = {
+"gate_label": "Acceso: contrato o ruta alternativa",
+"primary_color": "3f527e"
+}
+counterplay_tags = Array[StringName]([&"contractor_access", &"baseline_bypass"])

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="2_enemy"]
+
+[resource]
+script = ExtResource("2_enemy")
+content_id = &"enemy_guard_aggressor"
+display_name = "Guard Aggressor"
+tags = Array[StringName]([&"ball", &"ranged"])
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 30.0
+behavior_id = &"attack_player"

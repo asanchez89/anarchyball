@@ -1,0 +1,20 @@
+{
+  "schema_version": 0,
+  "level_id": "impossible_gap_fixture",
+  "display_name": "Impossible Gap",
+  "player_spawn": {"x": 80, "y": 596},
+  "exit": {"x": 900, "y": 596},
+  "bounds": {"width": 1100, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "platform_start", "x": 0, "y": 620, "width": 300, "height": 100, "required": true, "route_tags": []},
+    {"id": "platform_exit", "x": 650, "y": 620, "width": 450, "height": 100, "required": true, "route_tags": []}
+  ],
+  "encounters": [
+    {"id": "encounter_placement_main", "definition_id": "encounter_third_party_defense", "x": 800, "y": 590}
+  ],
+  "resources": [],
+  "sections": [{"id": "section_impossible", "from_x": 0, "to_x": 1100}]
+}

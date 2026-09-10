@@ -1,0 +1,37 @@
+{
+  "schema_version": 0,
+  "level_id": "mvp_hardening_variant",
+  "display_name": "MVP Hardening · Compact Route",
+  "slice": {
+    "title": "HARDENING VARIANT",
+    "objective": "Validate the compact route, defend MerchantBall and reach EXIT",
+    "intro": "This non-shipping variant reuses the same contracts with a shorter arrangement. It exists to prove that content changes do not require edits to the player or combat kernel.",
+    "completion": "Variant completed. Compare its local telemetry with the curated vertical slice before promoting any balance change."
+  },
+  "player_spawn": {"x": 80, "y": 596},
+  "exit": {"x": 1610, "y": 596},
+  "bounds": {"width": 1720, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "variant_start", "x": 0, "y": 620, "width": 480, "height": 100, "required": true, "route_tags": []},
+    {"id": "variant_bridge", "x": 570, "y": 560, "width": 250, "height": 24, "required": true, "route_tags": []},
+    {"id": "variant_finish", "x": 910, "y": 620, "width": 810, "height": 100, "required": true, "route_tags": []},
+    {"id": "variant_optional", "x": 690, "y": 430, "width": 160, "height": 24, "required": false, "route_tags": ["contractor_access"]}
+  ],
+  "encounters": [
+    {"id": "variant_merchant_defense", "definition_id": "encounter_third_party_defense", "x": 1080, "y": 590}
+  ],
+  "resources": [
+    {"id": "variant_supply", "kind": "training_supply", "x": 700, "y": 515, "ownership": "unowned_collectible"}
+  ],
+  "checkpoints": [
+    {"id": "variant_checkpoint", "x": 940, "y": 560, "respawn_x": 940, "respawn_y": 570}
+  ],
+  "gates": [],
+  "sections": [
+    {"id": "variant_traversal", "from_x": 0, "to_x": 900},
+    {"id": "variant_defense", "from_x": 900, "to_x": 1720}
+  ]
+}

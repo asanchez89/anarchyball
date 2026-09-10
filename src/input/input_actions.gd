@@ -44,6 +44,30 @@ static func directional_aim_vector() -> Vector2:
 	return Input.get_vector(AIM_LEFT, AIM_RIGHT, AIM_UP, AIM_DOWN)
 
 
+static func is_jump_just_pressed() -> bool:
+	return Input.is_action_just_pressed(JUMP)
+
+
+static func is_jump_just_released() -> bool:
+	return Input.is_action_just_released(JUMP)
+
+
+static func is_attack_primary_pressed() -> bool:
+	return Input.is_action_pressed(ATTACK_PRIMARY)
+
+
+static func is_ability_1_just_pressed() -> bool:
+	return Input.is_action_just_pressed(ABILITY_1)
+
+
+static func is_interact_just_pressed() -> bool:
+	return Input.is_action_just_pressed(INTERACT)
+
+
+static func is_pause_just_pressed() -> bool:
+	return Input.is_action_just_pressed(PAUSE)
+
+
 static func pointer_aim_vector(origin: Vector2, pointer_position: Vector2) -> Vector2:
 	return origin.direction_to(pointer_position)
 

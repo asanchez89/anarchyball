@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ContentCatalog" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/content/content_catalog.gd" id="1_catalog"]
+[ext_resource type="Resource" path="res://data/content/classes/class_contractor.tres" id="2_class"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_guard_aggressor.tres" id="3_guard"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_confiscator_aggressor.tres" id="4_confiscator"]
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_third_party_defense.tres" id="5_encounter"]
+[ext_resource type="Resource" path="res://data/content/ideology/rule_access_contract.tres" id="6_rule"]
+[ext_resource type="Resource" path="res://data/content/enemies/npc_merchant_neutral.tres" id="7_merchant"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_checkpoint_commander.tres" id="8_boss"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_checkpoint_turret.tres" id="9_turret"]
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_checkpoint_commander.tres" id="10_boss_encounter"]
+
+[resource]
+script = ExtResource("1_catalog")
+class_loadouts = Array[ExtResource("2_class")]([ExtResource("2_class")])
+enemy_archetypes = Array[ExtResource("3_guard")]([ExtResource("3_guard"), ExtResource("4_confiscator"), ExtResource("7_merchant"), ExtResource("8_boss"), ExtResource("9_turret")])
+encounter_definitions = Array[ExtResource("5_encounter")]([ExtResource("5_encounter"), ExtResource("10_boss_encounter")])
+ideology_rules = Array[ExtResource("6_rule")]([ExtResource("6_rule")])

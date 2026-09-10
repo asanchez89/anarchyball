@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "anarchyball://schemas/level_spec_v0",
+  "title": "Anarchyball LevelSpec v0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "level_id", "player_spawn", "exit", "bounds", "movement_profile_path", "class_loadout_id", "ideology_rule_ids", "platforms", "encounters", "resources", "sections"],
+  "properties": {
+    "schema_version": {"const": 0},
+    "level_id": {"$ref": "#/$defs/stable_id"},
+    "display_name": {"type": "string"},
+    "player_spawn": {"$ref": "#/$defs/point"},
+    "exit": {"$ref": "#/$defs/point"},
+    "bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {"width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0}}
+    },
+    "movement_profile_path": {"type": "string", "pattern": "^res://.+\\.tres$"},
+    "class_loadout_id": {"$ref": "#/$defs/stable_id"},
+    "ideology_rule_ids": {"type": "array", "maxItems": 1, "items": {"$ref": "#/$defs/stable_id"}},
+    "platforms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/platform"}},
+    "encounters": {"type": "array", "items": {"$ref": "#/$defs/encounter"}},
+    "resources": {"type": "array", "items": {"$ref": "#/$defs/resource"}},
+    "sections": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/section"}},
+    "checkpoints": {"type": "array", "items": {"$ref": "#/$defs/checkpoint"}},
+    "gates": {"type": "array", "items": {"$ref": "#/$defs/gate"}},
+    "slice": {"$ref": "#/$defs/slice"}
+  },
+  "$defs": {
+    "stable_id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"},
+    "point": {
+      "type": "object", "additionalProperties": false, "required": ["x", "y"],
+      "properties": {"x": {"type": "number"}, "y": {"type": "number"}}
+    },
+    "platform": {
+      "type": "object", "additionalProperties": false, "required": ["id", "x", "y", "width", "height", "required", "route_tags"],
+      "properties": {
+        "id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"},
+        "width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0},
+        "required": {"type": "boolean"}, "route_tags": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}
+      }
+    },
+    "encounter": {
+      "type": "object", "additionalProperties": false, "required": ["id", "definition_id", "x", "y"],
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}}
+    },
+    "resource": {
+      "type": "object", "additionalProperties": false, "required": ["id", "kind", "x", "y", "ownership"],
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "kind": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "ownership": {"type": "string"}}
+    },
+    "section": {
+      "type": "object", "additionalProperties": false, "required": ["id", "from_x", "to_x"],
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "from_x": {"type": "number"}, "to_x": {"type": "number"}}
+    },
+    "checkpoint": {
+      "type": "object", "additionalProperties": false, "required": ["id", "x", "y", "respawn_x", "respawn_y"],
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "respawn_x": {"type": "number"}, "respawn_y": {"type": "number"}}
+    },
+    "gate": {
+      "type": "object", "additionalProperties": false, "required": ["id", "x", "y", "width", "height", "required_tag", "label"],
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0}, "required_tag": {"$ref": "#/$defs/stable_id"}, "label": {"type": "string"}}
+    },
+    "slice": {
+      "type": "object", "additionalProperties": false, "required": ["title", "objective", "intro", "completion"],
+      "properties": {"title": {"type": "string"}, "objective": {"type": "string"}, "intro": {"type": "string"}, "completion": {"type": "string"}}
+    }
+  }
+}

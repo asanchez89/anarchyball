@@ -1,0 +1,57 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/actors/player/player_controller.gd" id="1_controller"]
+[ext_resource type="Resource" path="res://data/player/default_movement_profile.tres" id="2_profile"]
+[ext_resource type="Script" path="res://src/actors/player/player_visual.gd" id="3_visual"]
+[ext_resource type="Script" path="res://src/camera/player_camera.gd" id="4_camera"]
+[ext_resource type="Script" path="res://src/combat/sandbox/sandbox_probe_launcher.gd" id="5_launcher"]
+[ext_resource type="PackedScene" path="res://src/combat/sandbox/aim_probe.tscn" id="6_probe"]
+[ext_resource type="Script" path="res://src/combat/effects/combat_identity_component.gd" id="7_identity"]
+[ext_resource type="Script" path="res://src/combat/effects/health_component.gd" id="8_health"]
+[ext_resource type="Script" path="res://src/combat/effects/effect_receiver_component.gd" id="9_receiver"]
+
+[sub_resource type="CapsuleShape2D" id="Capsule_player"]
+radius = 23.0
+height = 48.0
+
+[node name="Player" type="CharacterBody2D"]
+unique_name_in_owner = true
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_controller")
+movement_profile = ExtResource("2_profile")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Capsule_player")
+
+[node name="Visual" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_visual")
+
+[node name="ProbeLauncher" type="Node2D" parent="."]
+position = Vector2(0, -2)
+script = ExtResource("5_launcher")
+probe_scene = ExtResource("6_probe")
+
+[node name="Identity" type="Node" parent="."]
+script = ExtResource("7_identity")
+stable_id = &"player"
+authority = 0
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("8_health")
+
+[node name="EffectReceiver" type="Node" parent="."]
+script = ExtResource("9_receiver")
+target_kind = 2
+identity_path = NodePath("../Identity")
+health_path = NodePath("../Health")
+
+[node name="PlayerCamera" type="Camera2D" parent="."]
+unique_name_in_owner = true
+limit_left = 0
+limit_top = 0
+limit_right = 1920
+limit_bottom = 720
+position_smoothing_enabled = true
+script = ExtResource("4_camera")

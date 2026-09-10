@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_checkpoint_commander"
+display_name = "Checkpoint Commander"
+entry_condition = &"on_section_enter"
+objective = &"cross_coercive_checkpoint"
+enemy_archetype_ids = Array[StringName]([&"enemy_checkpoint_commander", &"enemy_checkpoint_turret"])
+is_boss = true
+aggression_trigger_ids = Array[StringName]([&"detention_order_executed", &"hostile_machine_activated"])
+success_condition_ids = Array[StringName]([&"commander_surrenders", &"player_reaches_exit"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
+allowed_resolutions = Array[StringName]([&"force_surrender", &"evade_checkpoint"])
+class_shortcut_tags = Array[StringName]([&"contractor_access"])
+reward_ids = Array[StringName]([&"reward_checkpoint_clearance"])
+telemetry_tags = Array[StringName]([&"boss", &"coercive_checkpoint"])

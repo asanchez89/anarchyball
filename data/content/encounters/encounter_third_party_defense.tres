@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_third_party_defense"
+display_name = "Defensa de tercero"
+entry_condition = &"on_section_enter"
+objective = &"protect_merchant"
+enemy_archetype_ids = Array[StringName]([&"enemy_guard_aggressor", &"enemy_confiscator_aggressor"])
+protected_archetype_id = &"npc_merchant_neutral"
+aggression_trigger_ids = Array[StringName]([&"attack_commit", &"forced_confiscation"])
+success_condition_ids = Array[StringName]([&"merchant_safe", &"player_reaches_exit"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
+allowed_resolutions = Array[StringName]([&"neutralize_aggressors", &"evade_and_extract"])
+telemetry_tags = Array[StringName]([&"third_party_defense"])

@@ -16,7 +16,7 @@ Invoke-AnarchyballGodot `
         "--path", $projectRoot,
         "--script", "res://addons/gdUnit4/bin/GdUnitCmdTool.gd",
         "--ignoreHeadlessMode",
-        "--add", "res://tests/unit",
+        "--add", "res://tests",
         "--report-directory", "res://reports"
     ) `
     -Operation "GdUnit4 test suite"

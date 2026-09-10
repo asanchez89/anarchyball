@@ -1,0 +1,49 @@
+{
+  "schema_version": 0,
+  "level_id": "mvp_vertical_slice",
+  "display_name": "The Anarchist Frontier · Contract Line",
+  "slice": {
+    "title": "ANARCHYBALL · VERTICAL SLICE",
+    "objective": "Protect MerchantBall, cross the contract gate, survive the checkpoint and reach EXIT",
+    "intro": "A contract gate controls the lower road. Contractor credentials can open it, but the upper path remains free. Ahead, a confiscation is about to begin. Respond to aggression; do not initiate it.",
+    "completion": "The commander surrenders—or you evade the checkpoint—and MerchantBall escapes. No universal permit was needed. Telemetry and checkpoint state were saved locally."
+  },
+  "player_spawn": {"x": 100, "y": 596},
+  "exit": {"x": 4140, "y": 596},
+  "bounds": {"width": 4300, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "ground_intro", "x": 0, "y": 620, "width": 620, "height": 100, "required": true, "route_tags": []},
+    {"id": "step_teach", "x": 700, "y": 580, "width": 260, "height": 140, "required": true, "route_tags": []},
+    {"id": "ground_defense", "x": 1040, "y": 620, "width": 640, "height": 100, "required": true, "route_tags": []},
+    {"id": "gate_bypass_a", "x": 1480, "y": 525, "width": 150, "height": 22, "required": true, "route_tags": []},
+    {"id": "gate_bypass_b", "x": 1650, "y": 500, "width": 150, "height": 22, "required": true, "route_tags": []},
+    {"id": "ground_contract", "x": 1680, "y": 620, "width": 700, "height": 100, "required": true, "route_tags": []},
+    {"id": "runner_overlook", "x": 2140, "y": 450, "width": 190, "height": 22, "required": false, "route_tags": ["runner"]},
+    {"id": "checkpoint_approach", "x": 2460, "y": 600, "width": 520, "height": 120, "required": true, "route_tags": []},
+    {"id": "boss_arena", "x": 3060, "y": 620, "width": 900, "height": 100, "required": true, "route_tags": []},
+    {"id": "exit_platform", "x": 4020, "y": 620, "width": 280, "height": 100, "required": true, "route_tags": []}
+  ],
+  "gates": [
+    {"id": "gate_voluntary_access", "x": 1645, "y": 570, "width": 42, "height": 100, "required_tag": "contractor_access", "label": "Contract required on lower road · upper bypass is open"}
+  ],
+  "encounters": [
+    {"id": "encounter_merchant_confiscation", "definition_id": "encounter_third_party_defense", "x": 1210, "y": 590},
+    {"id": "encounter_commander_final", "definition_id": "encounter_checkpoint_commander", "x": 3450, "y": 590}
+  ],
+  "resources": [
+    {"id": "pickup_frontier_supply", "kind": "training_supply", "x": 890, "y": 530, "ownership": "unowned_collectible"},
+    {"id": "pickup_merchant_reward", "kind": "mission_reward", "x": 2220, "y": 405, "ownership": "mission_reward"}
+  ],
+  "checkpoints": [
+    {"id": "checkpoint_before_commander", "x": 2790, "y": 545, "respawn_x": 2740, "respawn_y": 570}
+  ],
+  "sections": [
+    {"id": "section_aggression_tutorial", "from_x": 0, "to_x": 1450},
+    {"id": "section_contract_gate", "from_x": 1450, "to_x": 2450},
+    {"id": "section_checkpoint", "from_x": 2450, "to_x": 3150},
+    {"id": "section_commander", "from_x": 3150, "to_x": 4300}
+  ]
+}
