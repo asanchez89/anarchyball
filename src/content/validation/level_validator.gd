@@ -54,6 +54,7 @@ static func validate(spec: LevelSpec, registry: ContentRegistry) -> LevelValidat
 	_validate_platforms(spec.data.get("platforms"), result)
 	_validate_encounters(spec.data.get("encounters"), registry, result)
 	_validate_resources(spec.data.get("resources"), result)
+	_validate_mission_rewards_on_base_route(spec, result)
 	_validate_sections(spec.data.get("sections"), result)
 	_validate_checkpoints(spec.data.get("checkpoints", []), result)
 	_validate_gates(spec.data.get("gates", []), registry, spec.data.get("ideology_rule_ids"), result)
@@ -196,6 +197,27 @@ static func _validate_resources(value: Variant, result: LevelValidationResult) -
 		var ownership := String(resource_data.get("ownership", ""))
 		if ownership not in RESOURCE_OWNERSHIP:
 			result.add_error(&"invalid_ownership", path + ".ownership", "semántica desconocida '%s'" % ownership)
+
+
+static func _validate_mission_rewards_on_base_route(spec: LevelSpec, result: LevelValidationResult) -> void:
+	if not spec.data.get("resources") is Array or not spec.data.get("platforms") is Array:
+		return
+	var required_platforms: Array = (spec.data.get("platforms") as Array).filter(
+		func(platform: Variant) -> bool: return platform is Dictionary and bool((platform as Dictionary).get("required", true))
+	)
+	for index: int in (spec.data.get("resources") as Array).size():
+		var resource_value: Variant = (spec.data.get("resources") as Array)[index]
+		if not resource_value is Dictionary:
+			continue
+		var resource_data := resource_value as Dictionary
+		if String(resource_data.get("ownership", "")) != "mission_reward":
+			continue
+		if _support_index(resource_data, required_platforms) < 0:
+			result.add_error(
+				&"mission_reward_off_base_route",
+				"resources[%d]" % index,
+				"una recompensa de misión debe poder recogerse desde una plataforma de la ruta base"
+			)
 
 
 static func _validate_sections(value: Variant, result: LevelValidationResult) -> void:

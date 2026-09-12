@@ -35,7 +35,7 @@
   ],
   "resources": [
     {"id": "pickup_frontier_supply", "kind": "training_supply", "x": 890, "y": 530, "ownership": "unowned_collectible"},
-    {"id": "pickup_merchant_reward", "kind": "mission_reward", "x": 2220, "y": 405, "ownership": "mission_reward"}
+    {"id": "pickup_merchant_reward", "kind": "mission_reward", "x": 2220, "y": 570, "ownership": "mission_reward"}
   ],
   "checkpoints": [
     {"id": "checkpoint_before_commander", "x": 2790, "y": 545, "respawn_x": 2740, "respawn_y": 570}

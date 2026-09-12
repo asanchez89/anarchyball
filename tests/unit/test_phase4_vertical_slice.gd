@@ -56,6 +56,22 @@ func test_vertical_slice_validates_and_builds_required_runtime() -> void:
 	assert_object(builder.get_node_or_null("Generated/Gates/gate_voluntary_access")).is_not_null()
 	assert_object(builder.get_node_or_null("Generated/Checkpoints/checkpoint_before_commander")).is_not_null()
 	assert_object(builder.get_node_or_null("Generated/Flow")).is_not_null()
+	var reward := builder.get_node("Generated/Resources/pickup_merchant_reward") as DebugPickup
+	assert_bool(reward.global_position.is_equal_approx(Vector2(2220.0, 570.0))).is_true()
+
+
+func test_mission_reward_on_class_only_platform_is_rejected() -> void:
+	var load_result := LevelSpecLoader.load_file(SLICE_SPEC)
+	var modified := load_result.spec.data.duplicate(true)
+	var resources := modified["resources"] as Array
+	var reward := resources[1] as Dictionary
+	reward["y"] = 405
+	var registry := ContentRegistry.new()
+	registry.register_catalog(load(CATALOG_PATH) as ContentCatalog, CATALOG_PATH)
+	var validation := LevelValidator.validate(LevelSpec.new(modified, "res://fixture_class_only_reward.json"), registry)
+
+	assert_bool(validation.is_valid()).is_false()
+	assert_bool(_has_issue(validation, &"mission_reward_off_base_route", "resources[1]")).is_true()
 
 
 func test_checkpoint_restores_actor_resolve_and_conflict_state() -> void:
@@ -88,3 +104,10 @@ func test_boss_definition_declares_legitimacy_adaptation_and_resolutions() -> vo
 	assert_int(encounter.allowed_resolutions.size()).is_greater_equal(2)
 	assert_bool(boss.is_boss).is_true()
 	assert_float(boss.phase_two_ratio).is_between(0.1, 0.9)
+
+
+func _has_issue(validation: LevelValidationResult, code: StringName, field_path: String) -> bool:
+	for issue: ValidationIssue in validation.issues:
+		if issue.code == code and issue.field_path == field_path:
+			return true
+	return false
