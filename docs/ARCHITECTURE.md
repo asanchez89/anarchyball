@@ -68,7 +68,7 @@ Ninguna arma, proyectil, trampa, drone o aliado contratado decide por sí mismo 
 
 ### 3.4 Encuentros y reglas de mundo
 
-`EncounterDefinition` declara estados iniciales, triggers, objetivos, resoluciones y recompensas. `IdeologyRuleDefinition` configura hooks limitados sobre pickup, interacción, spawn o ambiente. Las reglas de mundo nunca aparecen como `if current_world == ...` en el player.
+`EncounterDefinition` declara estados iniciales, triggers, objetivos, resoluciones y recompensas. Cada placement construido puede tener un `EncounterRuntimeObserver` local que relaciona sus actores y `rule_object_ids`, y emite como máximo una resolución declarada; no existe un quest manager global. `IdeologyRuleDefinition` configura hooks limitados sobre pickup, interacción, spawn o ambiente. Las reglas de mundo nunca aparecen como `if current_world == ...` en el player.
 
 ## 4. Motor de contenido
 
@@ -123,4 +123,3 @@ Un fallo de datos debe indicar archivo, ID y campo. No se toleran fallos silenci
 ## 8. Evolución
 
 Una abstracción nueva requiere dos usos reales o una invariancia crítica ya documentada. Una decisión que cambie stack, dependencias, formato persistente o una regla difícil de revertir se registra en `docs/ADR/`.
-

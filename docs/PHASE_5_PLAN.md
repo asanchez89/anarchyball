@@ -1,7 +1,8 @@
 # Phase 5 - MVP Hardening
 
-- **Estado:** IMPLEMENTACIÓN TÉCNICA EN CURSO; GATE HUMANO PENDIENTE
+- **Estado:** COMPLETADA Y APROBADA
 - **Inicio:** 2026-09-09
+- **Cierre:** 2026-09-12
 - **Reglas afectadas:** `GR-CORE-001` a `GR-CORE-010`, `GR-COMBAT-001/002`, `GR-BOSS-001` a `003`, `GR-RETRY-001`, `GR-LEVEL-001` a `005`, `GR-TELEM-001`
 
 ## Objetivo
@@ -35,9 +36,15 @@ La fase 4 fue aprobada sin bloqueos ni correcciones nuevas reportadas. Por ello 
 - [x] extensión de contenido documentada;
 - [x] export Windows ejecutado localmente con templates oficiales instalados;
 - [ ] build Windows ejecutado en una máquina limpia de desarrollo;
-- [ ] tres playtests completos consecutivos sin softlocks;
-- [ ] accesibilidad comprobada visualmente a 100%, 115% y 130%;
+- [x] tres playtests completos consecutivos sin softlocks;
+- [x] accesibilidad comprobada visualmente a 100%, 115% y 130%;
 - [ ] CI observado en remoto tras publicar el commit.
+
+## Registro de aceptación
+
+El gate humano fue aprobado el 2026-09-12 después de completar los playtests manuales. Durante la validación se detectó que `pickup_merchant_reward` estaba sobre una plataforma opcional fuera del alcance de Contractor; la recompensa se movió a la ruta base, se añadió una regresión al validador y la mecánica corregida fue aprobada manualmente.
+
+La importación headless, el smoke test y las 55 pruebas automatizadas pasan localmente. La comprobación en una máquina limpia y la observación del CI remoto permanecen como verificaciones operativas de distribución y no bloquean el inicio de la fábrica de contenido; deben completarse antes de declarar un candidato de release público.
 
 ## Deuda y decisiones abiertas
 

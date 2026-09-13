@@ -9,6 +9,9 @@ var _collected: bool = false
 
 
 func _ready() -> void:
+	collision_layer = 0
+	collision_mask = 2
+	monitoring = true
 	var shape_node := CollisionShape2D.new()
 	var shape := CircleShape2D.new()
 	shape.radius = 10.0

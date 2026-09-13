@@ -8,11 +8,12 @@ func test_telemetry_records_required_local_balancing_signals() -> void:
 	telemetry.record_event(&"retry", {"checkpoint_id": "checkpoint_start"})
 	telemetry.record_event(&"damage_received", {"amount": 10.0, "position": {"x": 20.0, "y": 30.0}})
 	telemetry.record_event(&"route_taken", {"route_tags": ["runner"]})
+	telemetry.record_event(&"rule_state_changed", {"rule_id": "rule_occupancy_and_use", "object_id": "machine_safe_use", "from_state": "available", "to_state": "occupied", "interaction_tag": "occupy_machine"})
 	telemetry.record_event(&"encounter_resolved", {"resolution": "evade_and_extract"})
 
 	var snapshot := telemetry.snapshot()
 	assert_int(snapshot.get("schema_version")).is_equal(0)
-	assert_int((snapshot.get("events") as Array).size()).is_equal(6)
+	assert_int((snapshot.get("events") as Array).size()).is_equal(7)
 
 
 func test_invalid_target_attempt_records_decision_as_design_signal() -> void:

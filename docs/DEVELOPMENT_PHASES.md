@@ -1,6 +1,6 @@
 # Fases de desarrollo de Anarchyball
 
-**Estado:** roadmap inicial v1.0  
+**Estado:** roadmap operativo v1.1; MVP aprobado
 **Fecha base:** 2026-08-21  
 **Objetivo:** llegar primero a un MVP jugable con un motor de gameplay y contenido suficientemente sólido para producir después niveles, enemigos, clases y mecánicas sin reescribir el núcleo.
 
@@ -266,10 +266,10 @@ Una nueva ideología no justifica una rama en `PlayerController`. Un enemigo nue
 
 ## 8. Próximo hito recomendado
 
-Completar **Phase 0** con dos spikes cortos:
+El MVP técnico y su gate humano están aprobados. El próximo hito es **Phase 6 - Content Factory v1**:
 
-1. fijar la versión estable exacta de Godot y comprobar renderer Compatibility en Windows;
-2. comparar un framework de tests compatible contra lógica GDScript headless.
+1. convertir los contratos existentes en plantillas y validación por lote;
+2. probarlos con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven;
+3. someter el nuevo nivel a validación automatizada y playtest humano antes de promoverlo.
 
-Después, implementar exclusivamente el sandbox de movimiento de **Phase 1**. El sistema de clases, el RPG, The Agora y la producción narrativa permanecen fuera hasta que el controller y la cámara superen playtest.
-
+World 0 completo, las clases restantes, The Agora y el RPG permanecen fuera de alcance hasta superar el gate de Phase 6. La comprobación del build en máquina limpia y la observación del CI remoto siguen como tareas operativas previas a un release público.

@@ -9,6 +9,7 @@ const SUPPORTED_EVENTS: Array[StringName] = [
 	&"checkpoint_used",
 	&"damage_received",
 	&"route_taken",
+	&"rule_state_changed",
 	&"encounter_resolved",
 	&"invalid_target_attempt",
 	&"defeat",

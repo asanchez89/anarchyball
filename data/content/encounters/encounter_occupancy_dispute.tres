@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_occupancy_dispute"
+display_name = "Occupancy Dispute"
+entry_condition = &"on_section_enter"
+objective = &"resolve_occupancy_dispute"
+enemy_archetype_ids = Array[StringName]([&"enemy_occupancy_enforcer"])
+aggression_trigger_ids = Array[StringName]([&"detain_order_executed"])
+success_condition_ids = Array[StringName]([&"enforcer_neutralized_or_machine_operated"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
+allowed_resolutions = Array[StringName]([&"neutralize_enforcer", &"operate_or_bypass_machine"])
+neutralization_resolution = &"neutralize_enforcer"
+rule_interaction_resolution = &"operate_or_bypass_machine"
+class_shortcut_tags = Array[StringName]([&"occupy_machine", &"baseline_bypass"])
+telemetry_tags = Array[StringName]([&"occupancy_dispute", &"detention_order"])

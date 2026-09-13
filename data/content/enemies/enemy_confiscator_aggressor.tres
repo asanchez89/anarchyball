@@ -11,3 +11,4 @@ tags = Array[StringName]([&"ball", &"third_party_aggression"])
 actor_scene_path = "res://src/debug/combat_target.tscn"
 maximum_resolve = 30.0
 behavior_id = &"attack_third_party"
+aggressor_reason = 2

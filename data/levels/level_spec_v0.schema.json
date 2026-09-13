@@ -26,6 +26,7 @@
     "sections": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/section"}},
     "checkpoints": {"type": "array", "items": {"$ref": "#/$defs/checkpoint"}},
     "gates": {"type": "array", "items": {"$ref": "#/$defs/gate"}},
+    "rule_objects": {"type": "array", "items": {"$ref": "#/$defs/rule_object"}},
     "slice": {"$ref": "#/$defs/slice"}
   },
   "$defs": {
@@ -44,7 +45,7 @@
     },
     "encounter": {
       "type": "object", "additionalProperties": false, "required": ["id", "definition_id", "x", "y"],
-      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}}
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "rule_object_ids": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}}
     },
     "resource": {
       "type": "object", "additionalProperties": false, "required": ["id", "kind", "x", "y", "ownership"],
@@ -61,6 +62,17 @@
     "gate": {
       "type": "object", "additionalProperties": false, "required": ["id", "x", "y", "width", "height", "required_tag", "label"],
       "properties": {"id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0}, "required_tag": {"$ref": "#/$defs/stable_id"}, "label": {"type": "string"}}
+    },
+    "rule_object": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag"],
+      "properties": {
+        "id": {"$ref": "#/$defs/stable_id"}, "hook_id": {"$ref": "#/$defs/stable_id"},
+        "x": {"type": "number"}, "y": {"type": "number"},
+        "initial_state": {"enum": ["inactive", "available", "occupied", "disabled"]},
+        "target_platform_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/stable_id"}},
+        "interaction_tag": {"$ref": "#/$defs/stable_id"}
+      }
     },
     "slice": {
       "type": "object", "additionalProperties": false, "required": ["title", "objective", "intro", "completion"],

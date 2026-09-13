@@ -23,6 +23,7 @@ var _flow: SliceFlowController
 var _audio: FeedbackTone
 var _accessibility: AccessibilitySettings
 var _skip_start_menu_once: bool = false
+var _encounter_actors: Dictionary = {}
 
 
 func _ready() -> void:
@@ -99,6 +100,8 @@ func _build_valid_spec(spec: LevelSpec) -> void:
 	_build_encounters(spec, generated)
 	_build_resources(spec, generated)
 	_build_gates(spec, generated)
+	_build_rule_objects(spec, generated)
+	_build_encounter_observers(spec, generated)
 	_build_checkpoints(spec, generated)
 	_build_exit(spec, generated)
 	_build_rule_label(spec, generated)
@@ -197,6 +200,8 @@ func _build_encounters(spec: LevelSpec, parent: Node2D) -> void:
 	parent.add_child(container)
 	for placement_value: Variant in spec.data.get("encounters") as Array:
 		var placement := placement_value as Dictionary
+		var encounter_id := StringName(String(placement.get("id")))
+		var encounter_actors: Array[CombatTarget] = []
 		var definition := registry.get_definition(
 			ContentRegistry.Kind.ENCOUNTER_DEFINITION,
 			StringName(String(placement.get("definition_id")))
@@ -218,9 +223,11 @@ func _build_encounters(spec: LevelSpec, parent: Node2D) -> void:
 			) as EnemyArchetype
 			var actor := _instantiate_actor(archetype, placement, index)
 			container.add_child(actor)
+			encounter_actors.append(actor)
 			if protected_actor != null and actor.behavior == CombatTarget.Behavior.ATTACK_THIRD_PARTY:
 				actor.protected_target_id = protected_actor.stable_id
 				actor.protected_target_path = actor.get_path_to(protected_actor)
+		_encounter_actors[encounter_id] = encounter_actors
 
 
 func _instantiate_actor(archetype: EnemyArchetype, placement: Dictionary, index: int) -> CombatTarget:
@@ -268,6 +275,63 @@ func _build_gates(spec: LevelSpec, parent: Node2D) -> void:
 		gate.rule_text = String(data.get("label", "Acceso contractual"))
 		gate.opened.connect(_on_gate_opened)
 		container.add_child(gate)
+
+
+func _build_rule_objects(spec: LevelSpec, parent: Node2D) -> void:
+	var container := Node2D.new()
+	container.name = "RuleObjects"
+	parent.add_child(container)
+	var rule_ids := spec.data.get("ideology_rule_ids") as Array
+	if rule_ids.is_empty():
+		return
+	var rule := registry.get_definition(
+		ContentRegistry.Kind.IDEOLOGY_RULE,
+		StringName(String(rule_ids[0]))
+	) as IdeologyRuleDefinition
+	for object_value: Variant in spec.data.get("rule_objects", []) as Array:
+		var data := object_value as Dictionary
+		if StringName(String(data.get("hook_id"))) != IdeologyRuleDefinition.HOOK_OCCUPANCY_MACHINE:
+			continue
+		var machine := RuleStateObject.new()
+		machine.name = String(data.get("id"))
+		machine.rule_id = rule.content_id
+		machine.object_id = StringName(String(data.get("id")))
+		machine.interaction_tag = StringName(String(data.get("interaction_tag")))
+		machine.machine_label = String(rule.parameters.get("machine_label", rule.display_name))
+		machine.current_state = RuleStateObject.state_from_id(StringName(String(data.get("initial_state"))))
+		machine.position = Vector2(float(data.get("x")), float(data.get("y")))
+		var targets: Array[DebugPlatform] = []
+		for target_value: Variant in data.get("target_platform_ids") as Array:
+			var target := parent.get_node("Platforms/%s" % String(target_value)) as DebugPlatform
+			targets.append(target)
+		machine.configure_targets(targets)
+		machine.state_changed.connect(_on_rule_state_changed)
+		container.add_child(machine)
+
+
+func _build_encounter_observers(spec: LevelSpec, parent: Node2D) -> void:
+	var container := Node.new()
+	container.name = "EncounterObservers"
+	parent.add_child(container)
+	for placement_value: Variant in spec.data.get("encounters") as Array:
+		var placement := placement_value as Dictionary
+		var encounter_id := StringName(String(placement.get("id")))
+		var definition := registry.get_definition(
+			ContentRegistry.Kind.ENCOUNTER_DEFINITION,
+			StringName(String(placement.get("definition_id")))
+		) as EncounterDefinition
+		var actors: Array[CombatTarget] = []
+		actors.assign(_encounter_actors.get(encounter_id, []))
+		var rule_objects: Array[RuleStateObject] = []
+		for object_id_value: Variant in placement.get("rule_object_ids", []) as Array:
+			var rule_object := parent.get_node_or_null("RuleObjects/%s" % String(object_id_value)) as RuleStateObject
+			if rule_object != null:
+				rule_objects.append(rule_object)
+		var observer := EncounterRuntimeObserver.new()
+		observer.name = String(encounter_id)
+		observer.configure(encounter_id, definition, actors, rule_objects)
+		observer.resolved.connect(_on_encounter_resolved)
+		container.add_child(observer)
 
 
 func _build_checkpoints(spec: LevelSpec, parent: Node2D) -> void:
@@ -357,8 +421,6 @@ func _connect_telemetry(player: PlayerController, generated: Node2D) -> void:
 						_hud.show_feedback("DEFENSIVE RESPONSE · %s" % ConflictStateComponent.AggressorReason.keys()[_reason], 2.0, "[Alerta: agresión confirmada; respuesta defensiva activa]")
 					if _audio != null:
 						_audio.play_cue(FeedbackTone.Cue.AGGRESSION)
-				if current == ConflictStateComponent.State.NEUTRALIZED:
-					telemetry.record_event(&"encounter_resolved", {"actor": conflict.get_parent().name})
 			)
 		elif node is CombatTarget:
 			var actor := node as CombatTarget
@@ -418,6 +480,12 @@ func _capture_checkpoint(checkpoint_id: StringName, position: Vector2) -> void:
 		if node is AccessGate:
 			var gate := node as AccessGate
 			rule_state[String(gate.gate_id)] = gate.is_open()
+		elif node is RuleStateObject:
+			var rule_object := node as RuleStateObject
+			rule_state[String(rule_object.object_id)] = rule_object.capture_runtime_state()
+		elif node is EncounterRuntimeObserver:
+			var observer := node as EncounterRuntimeObserver
+			rule_state["encounter:%s" % String(observer.encounter_id)] = observer.capture_runtime_state()
 	var health := _player.get_node("Health") as HealthComponent
 	_checkpoint.capture(checkpoint_id, position, health.maximum_health, actor_states, _collected_reward_ids, rule_state)
 	LocalSaveStore.save(loaded_spec.level_id(), _checkpoint)
@@ -442,12 +510,22 @@ func _retry_to_checkpoint() -> void:
 			var actor := node as CombatTarget
 			if _checkpoint.actor_states.has(String(actor.stable_id)):
 				actor.restore_runtime_state(_checkpoint.actor_states[String(actor.stable_id)] as Dictionary)
-		elif node is DebugPickup:
+		if node is DebugPickup:
 			var pickup := node as DebugPickup
 			pickup.restore_collected(pickup.pickup_id in _checkpoint.collected_reward_ids)
 		elif node is AccessGate:
 			var gate := node as AccessGate
 			gate.restore_open(bool(_checkpoint.world_rule_state.get(String(gate.gate_id), false)))
+		elif node is RuleStateObject:
+			var rule_object := node as RuleStateObject
+			var saved_state: Variant = _checkpoint.world_rule_state.get(String(rule_object.object_id), {})
+			if saved_state is Dictionary:
+				rule_object.restore_runtime_state(saved_state as Dictionary)
+		elif node is EncounterRuntimeObserver:
+			var observer := node as EncounterRuntimeObserver
+			var saved_observer_state: Variant = _checkpoint.world_rule_state.get("encounter:%s" % String(observer.encounter_id), {})
+			if saved_observer_state is Dictionary:
+				observer.restore_runtime_state(saved_observer_state as Dictionary)
 
 
 func _on_pickup_collected(pickup_id: StringName) -> void:
@@ -461,6 +539,37 @@ func _on_gate_opened(gate_id: StringName) -> void:
 	telemetry.record_event(&"route_taken", {"route_tags": ["contractor_access"], "gate_id": String(gate_id)})
 	if _hud != null:
 		_hud.show_feedback("CONTRACT ACCEPTED · ACCESS GRANTED", 2.0, "[Confirmación: acceso concedido]")
+
+
+func _on_rule_state_changed(
+	rule_id: StringName,
+	object_id: StringName,
+	previous_state: StringName,
+	current_state: StringName,
+	interaction_tag: StringName
+) -> void:
+	telemetry.record_event(&"rule_state_changed", {
+		"rule_id": String(rule_id),
+		"object_id": String(object_id),
+		"from_state": String(previous_state),
+		"to_state": String(current_state),
+		"interaction_tag": String(interaction_tag),
+	})
+	if _hud != null:
+		_hud.show_feedback(
+			"MACHINE OCCUPIED · PLATFORM ACTIVE",
+			2.0,
+			"[Confirmación: la máquina ahora está ocupada y la plataforma está activa]"
+		)
+
+
+func _on_encounter_resolved(encounter_id: StringName, resolution: StringName) -> void:
+	telemetry.record_event(&"encounter_resolved", {
+		"encounter_id": String(encounter_id),
+		"resolution": String(resolution),
+	})
+	if _hud != null:
+		_hud.show_feedback("ENCOUNTER RESOLVED · %s" % String(resolution).to_upper(), 2.0)
 
 
 func _on_level_completed() -> void:
@@ -510,6 +619,7 @@ func _clear_generated() -> void:
 	_flow = null
 	_audio = null
 	_collected_reward_ids.clear()
+	_encounter_actors.clear()
 	_checkpoint = RunCheckpointState.new()
 	_fall_reset_y = INF
 	for child: Node in get_children():

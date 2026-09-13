@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/builder/level_builder.gd" id="1_builder"]
+[ext_resource type="Resource" path="res://data/content/default_catalog.tres" id="2_catalog"]
+
+[node name="OccupancyRulePreview" type="Node2D"]
+script = ExtResource("1_builder")
+level_spec_path = "res://data/levels/phase6_occupancy_preview.json"
+content_catalog = ExtResource("2_catalog")

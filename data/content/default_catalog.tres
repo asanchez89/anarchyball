@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ContentCatalog" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="ContentCatalog" load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://src/content/content_catalog.gd" id="1_catalog"]
 [ext_resource type="Resource" path="res://data/content/classes/class_contractor.tres" id="2_class"]
@@ -10,10 +10,13 @@
 [ext_resource type="Resource" path="res://data/content/enemies/enemy_checkpoint_commander.tres" id="8_boss"]
 [ext_resource type="Resource" path="res://data/content/enemies/enemy_checkpoint_turret.tres" id="9_turret"]
 [ext_resource type="Resource" path="res://data/content/encounters/encounter_checkpoint_commander.tres" id="10_boss_encounter"]
+[ext_resource type="Resource" path="res://data/content/ideology/rule_occupancy_and_use.tres" id="11_occupancy_rule"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_occupancy_enforcer.tres" id="12_occupancy_enforcer"]
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_occupancy_dispute.tres" id="13_occupancy_encounter"]
 
 [resource]
 script = ExtResource("1_catalog")
 class_loadouts = Array[ExtResource("2_class")]([ExtResource("2_class")])
-enemy_archetypes = Array[ExtResource("3_guard")]([ExtResource("3_guard"), ExtResource("4_confiscator"), ExtResource("7_merchant"), ExtResource("8_boss"), ExtResource("9_turret")])
-encounter_definitions = Array[ExtResource("5_encounter")]([ExtResource("5_encounter"), ExtResource("10_boss_encounter")])
-ideology_rules = Array[ExtResource("6_rule")]([ExtResource("6_rule")])
+enemy_archetypes = Array[ExtResource("3_guard")]([ExtResource("3_guard"), ExtResource("4_confiscator"), ExtResource("7_merchant"), ExtResource("8_boss"), ExtResource("9_turret"), ExtResource("12_occupancy_enforcer")])
+encounter_definitions = Array[ExtResource("5_encounter")]([ExtResource("5_encounter"), ExtResource("10_boss_encounter"), ExtResource("13_occupancy_encounter")])
+ideology_rules = Array[ExtResource("6_rule")]([ExtResource("6_rule"), ExtResource("11_occupancy_rule")])

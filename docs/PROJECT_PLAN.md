@@ -1250,140 +1250,55 @@ Usar una sección temprana de **The Anarchist Frontier** porque permite validar:
 
 # 23. Fases de implementación
 
+La secuencia operativa y sus gates viven en `DEVELOPMENT_PHASES.md`. Este resumen conserva la dirección de producto sin mantener una numeración paralela.
+
 ## Phase 0 - Foundation
 
-Entregables:
+Repositorio ejecutable, proyecto Godot, documentos de autoridad, input abstracto, smoke import, framework de tests y decisiones de stack.
 
-- repo;
-- `AGENTS.md`;
-- Godot project;
-- estructura de carpetas;
-- input abstraction;
-- bootstrap scene;
-- CI smoke test;
-- coding conventions;
-- ADR-001: stack.
+## Phase 1 - Feel First Sandbox
 
-## Phase 1 - Movement & Combat Sandbox
+Movimiento configurable, salto asistido, cámara, aim, disparo, projectile, dummy mecánico y debug room. El feel se aprueba por playtest antes de producir contenido.
 
-Entregables:
+## Phase 2 - Ethical Combat Kernel
 
-- PlayerController;
-- cámara;
-- collisions;
-- jump/movement;
-- weapon;
-- projectile;
-- simple enemy;
-- damage/resolve;
-- debug room.
+Estados de conflicto, razones de agresión, `TargetValidity`, efectos compartidos, defensa de terceros, duelo, surrender, enemigos compuestos y máquina hostil.
 
-Criterio: el movimiento debe sentirse bien antes de añadir RPG.
+## Phase 3 - Content Engine
 
-## Phase 2 - Vertical Slice Systems
+Registros por ID, definiciones reutilizables, LevelSpec versionado, loader, builder, validator, fixtures y telemetría local.
 
-Entregables:
+## Phase 4 - MVP Vertical Slice
 
-- AggressionComponent / ConflictState;
-- Neutral/Disputed/Threatening/Aggressor/Surrendering/Neutralized;
-- damage gating para neutrales y surrendered;
-- third-party defense;
-- VoluntaryDuel context;
-- NPC interaction;
-- Contractor;
-- checkpoint;
-- boss framework;
-- HUD;
-- save mínimo.
+Contractor, checkpoint/save, HUD, regla ideológica con counterplay, defensa de MerchantBall, mini-boss legítimo, cierre y menú mínimo en una experiencia de 8-12 minutos.
 
-## Phase 3 - Data-Driven Level Pipeline
+## Phase 5 - MVP Hardening
 
-Entregables:
+Correcciones de playtest, accesibilidad básica, balance observable, suite estable, CI, export Windows reproducible y guía de extensión. Su cierre constituye la aprobación del MVP.
 
-- LevelSpec schema;
-- LevelBuilder;
-- validator;
-- sample generated levels;
-- debug visualization de métricas de salto;
-- tests.
+## Phase 6 - Content Factory v1
 
-Esta fase valida explícitamente el uso de Codex como diseñador asistido.
+Endurecer plantillas, herramientas, fixtures, validación por lote y generación asistida. Demostrar extensibilidad con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven, todos curados por playtest humano.
 
-## Phase 4 - The Agora & RPG
+## Phase 7 - World 0: The Anarchist Frontier
 
-Entregables:
+Construir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán mediante el patrón enseñar, demostrar, desafiar, combinar y culminar.
 
-- class selection;
-- progression;
-- equipment;
-- Workshop;
-- Market;
-- Safehouse;
-- Archive;
-- Coalition Hall.
+## Phase 8 - Classes, Agora and RPG Lite
 
-Mantener hub compacto.
+Agregar Runner, Tinkerer, Trader y Agorist de una en una; después construir una Agora compacta con progresión compartida, equipo, servicios inmediatos y Archive.
 
-## Phase 5 - World 0
+## Phase 9 - Ideological Worlds
 
-Entregables:
+Producir un mundo a la vez. Cada uno requiere design sheet, regla jugable, beneficio/coste cuando corresponda, counterplay, obstáculos, enemigos, boss, templates y tests.
 
-- Egoist;
-- Mutualist;
-- Left-Libertarian;
-- Black Anarchist;
-- Ancom;
-- Leviathan incursion;
-- boss;
-- tutorial completo;
-- primeras rutas específicas por clase.
+## Phase 10 - Leviathan and Panarchy
 
-## Phase 6 - Remaining Classes
+Mundo final, boss por justificaciones, contribuciones mecánicas de la coalición, mapa transformado, epílogo jugable y cliffhanger contractarian.
 
-Entregables:
+## Phase 11 - Platform and Release
 
-- Runner;
-- Tinkerer;
-- Trader;
-- Agorist;
-- balance inicial;
-- rutas alternativas;
-- habilidades.
-
-## Phase 7 - Ideological Worlds
-
-Crear mundos uno por uno. Cada mundo entra solo después de completar:
-
-- design sheet;
-- regla global;
-- 2-4 obstáculos;
-- enemigos;
-- boss;
-- LevelSpec templates;
-- tests.
-
-## Phase 8 - Leviathan & Panarchy
-
-Entregables:
-
-- final world;
-- multi-phase boss;
-- coalition mechanics;
-- transformed map;
-- epilogue jugable;
-- cliffhanger contractarian.
-
-## Phase 9 - Platform & Release
-
-- Steam integration;
-- achievements;
-- Steam Deck/gamepad;
-- Android UI/performance;
-- iOS export/signing;
-- cloud saves si aporta valor;
-- localization;
-- accessibility;
-- store compliance.
+Optimización, Steam/Steam Deck, Android, iOS, localización, accesibilidad completa, achievements, saves de plataforma, compliance y preparación de tiendas sin bloquear el gameplay offline.
 
 ---
 

@@ -1,0 +1,109 @@
+{
+  "schema_version": 0,
+  "level_id": "occupancy_workshop_draft",
+  "display_name": "Occupancy Workshop · Extended Draft",
+  "slice": {
+    "title": "OCCUPANCY WORKSHOP · EXTENDED PLAYTEST",
+    "objective": "Learn current use, protect a third party, resolve the disputed machine and reach EXIT",
+    "intro": "Four workshop zones test occupancy and defensive legitimacy. AVAILABLE machines may be occupied with Interact (F / gamepad X) to enable their marked platforms. Optional platforms never replace the ground route. At the disputed machine, an enforcer must visibly commit aggression before defensive force is valid.",
+    "completion": "The workshop route is complete. Compare machine use, bypasses, invalid targets, encounter resolutions, damage and retries in the local telemetry before curating this draft."
+  },
+  "player_spawn": {"x": 100, "y": 596},
+  "exit": {"x": 6160, "y": 576},
+  "bounds": {"width": 6300, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_occupancy_and_use"],
+  "platforms": [
+    {"id": "ground_teach", "x": 0, "y": 620, "width": 1000, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_demonstrate", "x": 1080, "y": 600, "width": 850, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_defense", "x": 2000, "y": 620, "width": 1000, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_checkpoint", "x": 3070, "y": 590, "width": 700, "height": 130, "required": true, "route_tags": []},
+    {"id": "ground_dispute", "x": 3840, "y": 620, "width": 1110, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_combine", "x": 5020, "y": 600, "width": 1280, "height": 120, "required": true, "route_tags": []},
+    {"id": "platform_teach_machine", "x": 500, "y": 470, "width": 220, "height": 24, "required": false, "route_tags": ["occupy_machine"]},
+    {"id": "platform_demonstrate_machine", "x": 1450, "y": 430, "width": 280, "height": 24, "required": false, "route_tags": ["occupy_machine"]},
+    {"id": "platform_defense_overlook", "x": 2540, "y": 465, "width": 260, "height": 24, "required": false, "route_tags": ["occupy_machine"]},
+    {"id": "platform_disputed_machine", "x": 4210, "y": 445, "width": 300, "height": 24, "required": false, "route_tags": ["occupy_machine"]},
+    {"id": "platform_final_machine", "x": 5500, "y": 430, "width": 300, "height": 24, "required": false, "route_tags": ["occupy_machine"]}
+  ],
+  "encounters": [
+    {
+      "id": "merchant_workshop_defense",
+      "definition_id": "encounter_third_party_defense",
+      "x": 2480,
+      "y": 590
+    },
+    {
+      "id": "workshop_occupancy_dispute",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 4350,
+      "y": 570,
+      "rule_object_ids": ["machine_disputed_workshop"]
+    }
+  ],
+  "resources": [
+    {"id": "pickup_teach_supply", "kind": "training_supply", "x": 850, "y": 570, "ownership": "unowned_collectible"},
+    {"id": "pickup_merchant_return", "kind": "returned_property", "x": 3150, "y": 540, "ownership": "returned_property"},
+    {"id": "pickup_workshop_reward", "kind": "mission_reward", "x": 4820, "y": 570, "ownership": "mission_reward"},
+    {"id": "pickup_final_salvage", "kind": "permitted_salvage", "x": 5960, "y": 550, "ownership": "permitted_salvage"}
+  ],
+  "sections": [
+    {"id": "section_teach_current_use", "from_x": 0, "to_x": 1200},
+    {"id": "section_demonstrate_routes", "from_x": 1200, "to_x": 2200},
+    {"id": "section_defend_third_party", "from_x": 2200, "to_x": 3300},
+    {"id": "section_challenge_dispute", "from_x": 3300, "to_x": 5000},
+    {"id": "section_combine_and_exit", "from_x": 5000, "to_x": 6300}
+  ],
+  "checkpoints": [
+    {"id": "checkpoint_after_defense", "x": 3210, "y": 535, "respawn_x": 3150, "respawn_y": 565},
+    {"id": "checkpoint_after_dispute", "x": 5100, "y": 545, "respawn_x": 5050, "respawn_y": 575}
+  ],
+  "rule_objects": [
+    {
+      "id": "machine_safe_teach",
+      "hook_id": "occupancy_machine",
+      "x": 380,
+      "y": 560,
+      "initial_state": "available",
+      "target_platform_ids": ["platform_teach_machine"],
+      "interaction_tag": "occupy_machine"
+    },
+    {
+      "id": "machine_route_demonstration",
+      "hook_id": "occupancy_machine",
+      "x": 1330,
+      "y": 540,
+      "initial_state": "available",
+      "target_platform_ids": ["platform_demonstrate_machine"],
+      "interaction_tag": "occupy_machine"
+    },
+    {
+      "id": "machine_defense_overlook",
+      "hook_id": "occupancy_machine",
+      "x": 2250,
+      "y": 560,
+      "initial_state": "available",
+      "target_platform_ids": ["platform_defense_overlook"],
+      "interaction_tag": "occupy_machine"
+    },
+    {
+      "id": "machine_disputed_workshop",
+      "hook_id": "occupancy_machine",
+      "x": 4010,
+      "y": 560,
+      "initial_state": "available",
+      "target_platform_ids": ["platform_disputed_machine"],
+      "interaction_tag": "occupy_machine"
+    },
+    {
+      "id": "machine_final_combination",
+      "hook_id": "occupancy_machine",
+      "x": 5320,
+      "y": 540,
+      "initial_state": "available",
+      "target_platform_ids": ["platform_final_machine"],
+      "interaction_tag": "occupy_machine"
+    }
+  ]
+}

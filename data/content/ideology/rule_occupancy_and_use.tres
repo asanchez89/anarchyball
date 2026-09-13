@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdeologyRuleDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/ideology_rule_definition.gd" id="2_rule"]
+
+[resource]
+script = ExtResource("2_rule")
+content_id = &"rule_occupancy_and_use"
+display_name = "Occupancy and use"
+tags = Array[StringName]([&"interaction_rule", &"spatial_rule"])
+hook_id = &"occupancy_machine"
+parameters = {
+"gate_label": "Unused machinery may be occupied and operated",
+"machine_label": "OCCUPANCY MACHINE",
+"primary_color": "304c46"
+}
+counterplay_tags = Array[StringName]([&"occupy_machine", &"baseline_bypass"])

@@ -16,6 +16,7 @@ success_condition_ids = Array[StringName]([&"commander_surrenders", &"player_rea
 failure_condition_ids = Array[StringName]([&"player_defeated"])
 surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
 allowed_resolutions = Array[StringName]([&"force_surrender", &"evade_checkpoint"])
+neutralization_resolution = &"force_surrender"
 class_shortcut_tags = Array[StringName]([&"contractor_access"])
 reward_ids = Array[StringName]([&"reward_checkpoint_clearance"])
 telemetry_tags = Array[StringName]([&"boss", &"coercive_checkpoint"])

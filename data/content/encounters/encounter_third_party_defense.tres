@@ -16,4 +16,5 @@ success_condition_ids = Array[StringName]([&"merchant_safe", &"player_reaches_ex
 failure_condition_ids = Array[StringName]([&"player_defeated"])
 surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
 allowed_resolutions = Array[StringName]([&"neutralize_aggressors", &"evade_and_extract"])
+neutralization_resolution = &"neutralize_aggressors"
 telemetry_tags = Array[StringName]([&"third_party_defense"])

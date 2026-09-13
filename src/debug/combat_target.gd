@@ -17,6 +17,8 @@ enum Behavior {
 @export var target_kind: EffectReceiverComponent.TargetKind = EffectReceiverComponent.TargetKind.BALL
 @export var machine_permission: EffectReceiverComponent.DamagePermission = EffectReceiverComponent.DamagePermission.OWNED_NEUTRAL
 @export var behavior: Behavior = Behavior.STATIC
+@export var aggressor_reason: ConflictStateComponent.AggressorReason = ConflictStateComponent.AggressorReason.NONE
+@export_multiline var threat_text: String = ""
 @export var protected_target_id: StringName = &"protected_merchant"
 @export var protected_target_path: NodePath
 @export var duel_enabled: bool = false
@@ -59,6 +61,9 @@ func apply_archetype(archetype: EnemyArchetype) -> void:
 	phase_two_ratio = archetype.phase_two_ratio
 	attack_interval = archetype.attack_interval
 	activation_distance = archetype.activation_distance
+	telegraph_delay = archetype.telegraph_delay
+	aggressor_reason = archetype.aggressor_reason
+	threat_text = archetype.threat_text
 	match archetype.behavior_id:
 		&"attack_player":
 			behavior = Behavior.ATTACK_PLAYER
@@ -132,17 +137,29 @@ func _update_behavior(delta: float) -> void:
 		_telegraph_started = conflict_state.begin_threatening()
 	if not _telegraph_started or _behavior_elapsed < 0.8 + telegraph_delay:
 		return
-	_aggression_committed = true
+	var committed := false
 	if behavior == Behavior.ATTACK_THIRD_PARTY:
-		conflict_state.commit_aggression(
-			ConflictStateComponent.AggressorReason.THIRD_PARTY_AGGRESSION,
-			protected_target_id
-		)
+		committed = conflict_state.commit_aggression(aggressor_reason, protected_target_id)
+		if not committed:
+			return
 		_attack_protected_target()
 	else:
-		conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+		committed = conflict_state.commit_aggression(aggressor_reason)
+		if not committed:
+			return
 		_launch_hostile_bolt()
+	_aggression_committed = true
 	aggression_committed.emit(stable_id, conflict_state.aggressor_reason)
+
+
+func stop_behavior() -> void:
+	behavior = Behavior.STATIC
+	_behavior_elapsed = 0.0
+	_aggression_committed = false
+	if conflict_state.current_state == ConflictStateComponent.State.THREATENING:
+		conflict_state.cancel_threat()
+	_telegraph_started = false
+	_update_presentation()
 
 
 func _attack_protected_target() -> void:
@@ -237,12 +254,14 @@ func _update_presentation() -> void:
 	var state_text := "DISABLED" if _machine_disabled else conflict_state.state_name()
 	var state_symbol := _state_symbol()
 	var boss_text := " · PHASE %d" % _boss_phase if is_boss else ""
-	status_label.text = "%s%s\n%s %s · %s\nResolve %.0f/%.0f\n%s" % [
+	var active_threat_text := "\n%s" % threat_text if conflict_state.current_state == ConflictStateComponent.State.THREATENING and not threat_text.is_empty() else ""
+	status_label.text = "%s%s\n%s %s · %s%s\nResolve %.0f/%.0f\n%s" % [
 		display_name,
 		boss_text,
 		state_symbol,
 		state_text,
 		conflict_state.reason_name(),
+		active_threat_text,
 		resolve.current_resolve,
 		resolve.maximum_resolve,
 		_last_decision,

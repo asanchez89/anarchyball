@@ -4,7 +4,7 @@ Base de desarrollo de un *action-platformer/shooter* 2D con progresión RPG lige
 
 ## Estado actual
 
-**Phase 5 - MVP Hardening en validación humana.** El vertical slice aprobado suma accesibilidad persistente, señales redundantes, resumen de telemetría, variante data-driven, CI y export Windows reproducible. El núcleo continúa siendo GDScript-only y no requiere backend.
+**MVP aprobado; Phase 6 - Content Factory v1 en curso.** P6.1 auditó los contratos, P6.2 añadió plantillas y validación por lote, y P6.3 incorpora la primera regla espacial stateful mediante `occupancy_machine`. El proyecto continúa siendo GDScript-only y no requiere backend.
 
 ## Empezar
 
@@ -37,8 +37,9 @@ Validar la importación sin interfaz:
 Ese comando ejecuta, en orden:
 
 1. importación headless;
-2. smoke test de la sala jugable;
-3. suite GdUnit4.
+2. validación por lote del catálogo y los LevelSpecs;
+3. smoke test de la sala jugable;
+4. suite GdUnit4.
 
 También puede pasarse el binario explícitamente:
 
@@ -68,6 +69,8 @@ El resultado queda en `builds/windows/` y no se versiona. CI publica esa carpeta
 - [`docs/PHASE_3_PLAN.md`](docs/PHASE_3_PLAN.md): contrato de contenido, pipeline, telemetría y gate del Content Engine.
 - [`docs/PHASE_4_PLAN.md`](docs/PHASE_4_PLAN.md): recorrido del slice, sistemas integrados y guion de aceptación humana.
 - [`docs/PHASE_5_PLAN.md`](docs/PHASE_5_PLAN.md): hardening, accesibilidad, balance, build y gate final del MVP.
+- [`docs/PHASE_6_PLAN.md`](docs/PHASE_6_PLAN.md): alcance, backlog y gate de la primera fábrica de contenido.
+- [`docs/PHASE_6_CONTRACT_AUDIT.md`](docs/PHASE_6_CONTRACT_AUDIT.md): mapa de contratos, gaps y criterios fijados antes del nuevo contenido.
 - [`docs/CONTENT_EXTENSION_GUIDE.md`](docs/CONTENT_EXTENSION_GUIDE.md): procedimiento para añadir contenido sin tocar el núcleo.
 - [`docs/ADR/0005-versioned-local-checkpoint.md`](docs/ADR/0005-versioned-local-checkpoint.md): contrato de checkpoint/save local.
 - [`docs/ADR/0004-level-spec-v0.md`](docs/ADR/0004-level-spec-v0.md): separación entre Resources reutilizables y composición JSON.

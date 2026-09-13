@@ -5,6 +5,7 @@ param(
 
 $verificationScripts = @(
     "verify_import.ps1",
+    "..\phase6\validate_content.ps1",
     "run_smoke.ps1",
     "run_tests.ps1"
 )

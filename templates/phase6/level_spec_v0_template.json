@@ -1,0 +1,25 @@
+{
+  "schema_version": 0,
+  "level_id": "level_template",
+  "display_name": "Level Template",
+  "player_spawn": {"x": 80, "y": 596},
+  "exit": {"x": 920, "y": 596},
+  "bounds": {"width": 1040, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "platform_start", "x": 0, "y": 620, "width": 1040, "height": 100, "required": true, "route_tags": []}
+  ],
+  "encounters": [],
+  "resources": [],
+  "checkpoints": [],
+  "gates": [],
+  "rule_objects": [],
+  "sections": [
+    {"id": "section_introduce", "from_x": 0, "to_x": 260},
+    {"id": "section_demonstrate", "from_x": 260, "to_x": 520},
+    {"id": "section_challenge", "from_x": 520, "to_x": 780},
+    {"id": "section_combine", "from_x": 780, "to_x": 1040}
+  ]
+}

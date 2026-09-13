@@ -11,3 +11,4 @@ tags = Array[StringName]([&"ball", &"ranged"])
 actor_scene_path = "res://src/debug/combat_target.tscn"
 maximum_resolve = 30.0
 behavior_id = &"attack_player"
+aggressor_reason = 1

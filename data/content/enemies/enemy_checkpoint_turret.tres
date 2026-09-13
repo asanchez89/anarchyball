@@ -11,6 +11,7 @@ tags = Array[StringName]([&"machine", &"hostile_device"])
 actor_scene_path = "res://src/debug/combat_target.tscn"
 maximum_resolve = 35.0
 behavior_id = &"attack_player"
+aggressor_reason = 5
 target_kind = 1
 machine_permission = 0
 attack_interval = 1.6
