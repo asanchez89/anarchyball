@@ -30,5 +30,5 @@ func _on_body_entered(body: Node2D) -> void:
 	_completed = true
 	telemetry.record_event(&"section_completed", {"section_id": String(section_id)})
 	telemetry.record_event(&"level_completed")
-	telemetry.save_local()
+	telemetry.save_completed_run()
 	completed.emit()

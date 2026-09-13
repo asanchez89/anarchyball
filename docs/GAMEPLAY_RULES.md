@@ -1,8 +1,9 @@
 # Anarchyball: The Game
 ## Gameplay Rules - Canonical implementation rules for Codex
 
-**Status:** Preproduction gameplay specification - v0.1  
-**Companion document:** `docs/PROJECT_PLAN.md` rev. 0.2  
+**Status:** Preproduction gameplay specification - v0.3
+**Last revision:** 2026-09-12
+**Companion document:** `docs/PROJECT_PLAN.md` rev. 0.4
 **Target engine:** Godot 4.x stable  
 **Language:** Typed GDScript  
 **Primary target:** Windows/Steam; Android and iOS supported by the input and UI architecture from the start.
@@ -809,11 +810,27 @@ When relevant, ideological mechanics can provide a benefit paired with a cost.
 
 Example: a social-democratic sub-zone may withhold part of coin income while offering free public healing. The player experiences a trade-off before dialogue comments on it.
 
+## GR-WORLD-004 - A later world earns its climax through an arc
+
+A later-world package normally provides these mission functions before its climax:
+
+1. demonstrate a real benefit or credible promise of the primary rule;
+2. expose a cost, limit or conflict;
+3. teach baseline counterplay and optional class shortcuts;
+4. combine the rule with previously learned systems under pressure;
+5. culminate in a boss or crisis that embodies the rule.
+
+Five missions are the production baseline, not a quota. Merge or remove a mission when it does not create a distinct gameplay decision.
+
+## GR-WORLD-005 - Convergence does not erase ideological differences
+
+When one world contains more than one ideological current, every current keeps a distinct sub-zone, visual language, claimed benefit, primary rule and counterplay. Shared coercion mechanics may support comparison, but faction or ideology names never substitute for an implemented gameplay distinction.
+
 ---
 
 # 12. World 0 gameplay specification
 
-World 0 is both tutorial and ideological foundation. Mechanics must be introduced one at a time and later recombined.
+World 0 is both tutorial and ideological foundation. Mechanics must be introduced one at a time and later recombined. The segments below are teaching beats, not a one-to-one mandate for level files; production packaging is governed by `PROJECT_PLAN.md` §12.8.
 
 ## 12.1 Segment A - AnarchyBall / aggression tutorial
 
@@ -954,7 +971,7 @@ This is the tutorial's thesis payoff.
 
 # 13. Later-world mechanic templates
 
-These are rule templates, not finished level designs.
+These are rule templates, not finished level designs. Provisional mission packages, IDs and durations live in `PROJECT_PLAN.md` §13.6; they do not authorize simultaneous production of every world.
 
 ## 13.1 Minarchy / The Night Watch
 
@@ -1036,17 +1053,13 @@ Some votes should help the player and some should hurt, so the mechanic communic
 
 ## 13.6 High-authority worlds
 
-Fascist/Stalinist and adjacent regions increase environmental coercion:
+Monarchy/Tradition, Fascist and Stalinist regions increase environmental coercion through distinct primary mechanics:
 
-- checkpoints;
-- surveillance;
-- propaganda triggers;
-- conscription encounters;
-- restricted zones;
-- secret-police pursuit;
-- industrial war hazards.
+- inherited jurisdiction and oath/exit rules for Monarchy/Tradition;
+- national mobilization, conscription and industrial war hazards for Fascist sub-zones;
+- party directives, political quotas and secret-police pursuit for Stalinist sub-zones.
 
-The climb toward Leviathan should be felt through increasingly unavoidable authority mechanics.
+Checkpoints, surveillance and restricted zones may recur as supporting language, but cannot be the only mechanical difference. The climb toward Leviathan should be felt through increasingly unavoidable authority while preserving the distinctions required by `GR-WORLD-005`.
 
 ---
 
@@ -1385,6 +1398,42 @@ Do not detect the class through arbitrary node names.
 
 Codex may generate LevelSpecs, but shipping levels require human playtest and curation.
 
+## GR-LEVEL-006 - Every shipping candidate declares a mission profile
+
+Before curation, a level declares its type and target ranges in a design sheet associated with its stable `level_id`.
+
+| Type | First clear | Clean replay | Completionist | Effective route | Checkpoints |
+|---|---:|---:|---:|---:|---:|
+| Optional challenge | 1-3 min | under 2 min | up to 4 min | 2-5 screens | 0 |
+| Short mission | 4-7 min | 2-4 min | 6-10 min | 7-11 screens | 0-1 |
+| Standard mission | 8-12 min | 4-6 min | 10-16 min | 12-18 screens | 1-2 |
+| Climax mission | 12-15 min | 6-9 min | 15-22 min | 16-24 screens including its arena | 2-3 |
+
+`First clear` means a new player from first gaining control to the exit, including checkpoint retries but excluding pause and optional Archive reading. `Clean replay` means a familiar player without deaths and without deliberate speedrunning. `Completionist` includes reasonable optional-route and secret collection.
+
+These are production targets, not structural-validity limits. A level may deviate when its design sheet explains why and human playtest supports the exception. Prototypes and validation fixtures do not need to meet campaign scale, but they cannot be used as evidence that a shipping mission does.
+
+## GR-LEVEL-007 - Spatial length is measured on the traversed route
+
+One effective-screen equivalent is a meaningful route segment normalized against the current 1280 px reference viewport. Ascents, descents and significant returns count; overlapping branches count only when the player actually traverses them. `bounds.width / 1280` is not a substitute for route length. Renormalize design sheets if the base viewport changes.
+
+## GR-LEVEL-008 - Duration must come from active play
+
+A standard mission starts with this content budget:
+
+- one primary ideological rule used safely, under pressure and in combination;
+- five readable beats: introduce, demonstrate, challenge, combine and climax;
+- no more than two substantial mandatory encounters, including the climax when applicable;
+- two or three platforming challenges with distinct purposes;
+- one or two optional routes that rejoin the main route in about one minute;
+- two or three optional secrets or rewards.
+
+Waiting, repeated waves, forced backtracking and non-interactive dialogue must not be used to reach a duration target. If the mechanic cannot sustain its target, shorten or reclassify the mission before adding filler.
+
+## GR-LEVEL-009 - Checkpoints follow risk and elapsed play
+
+Standard missions target a checkpoint every 2.5-4 minutes of active play and before a climax that changes the kind of challenge. Checkpoint placement is adjusted from human retry and section-time data, not from distance alone.
+
 ---
 
 # 23. Data-driven content contracts
@@ -1452,13 +1501,16 @@ Per run/attempt, optionally record locally:
 - level/section ID;
 - class;
 - lens;
-- completion time;
+- playtest profile: first clear, clean replay or completionist when known;
+- total completion time and, when instrumented, active-control vs. non-interactive time;
+- time split between traversal, combat and interaction when those states are observable;
+- time per section and elapsed time between checkpoints;
 - retries;
 - defeat location;
 - damage received;
 - ammo/resource starvation;
 - encounter resolution type;
-- routes taken;
+- routes taken, optional detours and backtracking;
 - aggressors neutralized vs. evaded;
 - invalid-target attempts;
 - checkpoint usage;
@@ -1467,6 +1519,10 @@ Per run/attempt, optionally record locally:
 ## GR-TELEM-001 - Invalid target attempts are a design signal
 
 If players repeatedly try to attack a neutral/disputed target, the encounter may be communicating aggression poorly. Do not automatically interpret this as player misconduct.
+
+## GR-TELEM-002 - Diagnose duration by section, not only by total time
+
+When a level misses its target, inspect where time accumulated and what the player was doing. A target reached through waiting, repeated dialogue or low-variation combat is a level-design failure, not a successful duration result.
 
 ---
 
@@ -1516,11 +1572,13 @@ CI should fail when:
 - a boss lacks a legitimacy context/aggression trigger;
 - an IdeologyRule is referenced but not registered.
 
+The curated-level gate should also warn when a shipping candidate has no associated mission profile, falls outside its route or checkpoint envelope, or lacks enough human timing samples. These warnings do not belong in the closed `LevelSpec v0` schema unless a compatible extension or migration is accepted.
+
 ---
 
 # 26. Vertical slice gameplay acceptance criteria
 
-The first 5-10 minute slice is accepted only when all conditions below are met.
+The vertical-slice target is 8-12 minutes on first clear and 4-6 minutes on a clean replay. The already approved technical MVP proves the gameplay and content contracts; this duration profile governs its campaign-scale curation and does not retroactively turn a pipeline fixture into a failed shipping level.
 
 ## Movement
 
@@ -1555,7 +1613,8 @@ The first 5-10 minute slice is accepted only when all conditions below are met.
 - level can be represented by LevelSpec or equivalent data;
 - LevelBuilder loads/builds it;
 - LevelValidator catches at least one intentionally impossible test case;
-- telemetry records section completion and defeat position.
+- telemetry records section completion, checkpoint timing and defeat position;
+- the shipping candidate has a mission profile and playtest evidence for its duration and effective route.
 
 ## Technical
 
@@ -1622,7 +1681,7 @@ Do not implement:
 
 # 29. Open gameplay decisions
 
-These are intentionally not frozen in v0.1:
+These are intentionally not frozen in v0.3:
 
 - final desktop aiming model: free aim vs. directional snapping;
 - mobile aim-assist behavior;
@@ -1634,7 +1693,7 @@ These are intentionally not frozen in v0.1:
 - final lens roster and perk depth;
 - exact world order after Minarchy;
 - whether optional pacifist-style achievements exist;
-- how much backtracking is supported;
+- the exact optional-backtracking budget inside the predominantly linear structure;
 - whether boss Resolve is shown numerically or only as a bar.
 
 Codex must not treat an open decision as settled unless a later ADR or document revision resolves it.

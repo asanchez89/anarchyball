@@ -59,10 +59,12 @@ func _ready() -> void:
 			break
 	_panel = VBoxContainer.new()
 	_panel.position = Vector2(18.0, 16.0)
-	_panel.size = Vector2(380.0, 190.0)
+	_panel.size = Vector2(520.0, 220.0)
 	_panel.add_theme_constant_override("separation", 5)
 	add_child(_panel)
 	_status_label = Label.new()
+	_status_label.custom_minimum_size = Vector2(500.0, 82.0)
+	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status_label.add_theme_font_size_override("font_size", 14)
 	_panel.add_child(_status_label)
 	_health_bar = _make_bar(Color("76b7d8"))
@@ -75,15 +77,16 @@ func _ready() -> void:
 	_boss_bar = _make_bar(Color("e65f65"))
 	_panel.add_child(_boss_bar)
 	_feedback_label = Label.new()
-	_feedback_label.position = Vector2(430.0, 36.0)
-	_feedback_label.size = Vector2(420.0, 70.0)
+	_feedback_label.position = Vector2(550.0, 36.0)
+	_feedback_label.size = Vector2(700.0, 76.0)
 	_feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_feedback_label.add_theme_font_size_override("font_size", 20)
 	_feedback_label.add_theme_color_override("font_color", Color("f4b942"))
 	add_child(_feedback_label)
 	_subtitle_label = Label.new()
-	_subtitle_label.position = Vector2(340.0, 650.0)
-	_subtitle_label.size = Vector2(600.0, 42.0)
+	_subtitle_label.position = Vector2(240.0, 650.0)
+	_subtitle_label.size = Vector2(800.0, 42.0)
 	_subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_subtitle_label.add_theme_font_size_override("font_size", 17)
 	_subtitle_label.add_theme_color_override("font_color", Color.WHITE)

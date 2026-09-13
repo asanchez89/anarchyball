@@ -3,6 +3,7 @@ extends Area2D
 
 var section_id: StringName = &""
 var size: Vector2 = Vector2.ONE
+var completion_x: float = 0.0
 var telemetry: LocalRunTelemetry
 var _entered: bool = false
 var _completed: bool = false
@@ -27,6 +28,8 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _on_body_exited(body: Node2D) -> void:
 	if _completed or not _entered or not body is PlayerController or telemetry == null:
+		return
+	if body.global_position.x < completion_x:
 		return
 	_completed = true
 	telemetry.record_event(&"section_completed", {"section_id": String(section_id)})

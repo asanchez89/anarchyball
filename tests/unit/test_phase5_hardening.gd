@@ -26,8 +26,11 @@ func test_accessibility_scale_cycles_only_supported_values() -> void:
 
 
 func test_balance_summary_extracts_regression_signals() -> void:
-	var summary := TelemetryBalanceSummary.summarize({
+	var snapshot := {
 		"elapsed_seconds": 780.0,
+		"playtest_profile": "clean_replay",
+		"effective_route_screens": 8.5,
+		"backtracking_pixels": 256.0,
 		"events": [
 			{"event": "retry", "payload": {}},
 			{"event": "retry", "payload": {}},
@@ -36,15 +39,26 @@ func test_balance_summary_extracts_regression_signals() -> void:
 			{"event": "invalid_target_attempt", "payload": {}},
 			{"event": "invalid_target_attempt", "payload": {}},
 			{"event": "route_taken", "payload": {"route_tags": ["contractor_access"]}},
+			{"event": "rule_state_changed", "payload": {"object_id": "machine_fixture"}},
+			{"event": "encounter_resolved", "payload": {"resolution": "neutralize_enforcer"}},
 			{"event": "level_completed", "payload": {}},
 		]
-	})
+	}
+	var summary := TelemetryBalanceSummary.summarize(snapshot)
 
 	assert_bool(bool(summary["completed"])).is_true()
 	assert_int(int(summary["retries"])).is_equal(2)
 	assert_float(float(summary["damage_received"])).is_equal(25.0)
 	assert_int((summary["recommendations"] as Array).size()).is_equal(2)
 	assert_array(summary["routes"] as Array).contains(["contractor_access"])
+	assert_int(int(summary["rule_state_changes"])).is_equal(1)
+	assert_array(summary["encounter_resolutions"] as Array).contains(["neutralize_enforcer"])
+	var completion_line := TelemetryBalanceSummary.completion_line(snapshot)
+	assert_str(completion_line).contains("Máquinas 1")
+	assert_str(completion_line).contains("neutralize_enforcer")
+	assert_str(completion_line).contains("contractor_access")
+	assert_str(completion_line).contains("clean_replay")
+	assert_str(completion_line).contains("8.5 pantallas")
 
 
 func test_hardening_variant_is_data_only_and_valid() -> void:

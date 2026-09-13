@@ -46,10 +46,10 @@ duel_context_path = NodePath("../DuelContext")
 
 [node name="StatusLabel" type="Label" parent="."]
 unique_name_in_owner = true
-offset_left = -74.0
+offset_left = -110.0
 offset_top = 38.0
-offset_right = 74.0
-offset_bottom = 112.0
+offset_right = 110.0
+offset_bottom = 158.0
 theme_override_colors/font_color = Color(0.88, 0.93, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 1
@@ -57,3 +57,4 @@ theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 11
 text = "Target"
 horizontal_alignment = 1
+autowrap_mode = 2

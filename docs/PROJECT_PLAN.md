@@ -1,7 +1,8 @@
 # Anarchyball: The Game
 ## Documento de planificación de producto, diseño y arquitectura para implementación con Codex
 
-**Estado:** Documento base de preproducción - revisión 0.2  
+**Estado:** Documento base de preproducción - revisión 0.4
+**Última revisión:** 2026-09-12
 **Objetivo:** Convertir la idea de *Anarchyball* en un side-scroller shooter/RPG 2D, data-driven y multiplataforma, diseñado desde el inicio para que Codex pueda implementar, probar y asistir en la generación de niveles.  
 **Plataformas objetivo:** Steam (Windows primero), Android e iOS.  
 **Motor elegido:** Godot 4.x estable + GDScript tipado.  
@@ -155,19 +156,20 @@ Al final, varios minarquistas reconocen que el Leviatán puede terminar absorbie
 
 ## 5.3 Mundos intermedios - orden provisional
 
-El orden exacto se define durante preproducción. Deben aparecer ideologías claramente identificables y diferenciadas. Candidatos:
+Después de World 1, la planificación usa esta secuencia de producción provisional:
 
-- RepublicanBall / DemocraticBall;
-- SocialdemBall;
-- CorporatistBall;
-- MonarchyBall;
-- CommunistBall;
-- MarxistLeninistBall;
-- StalinistBall;
-- FascistBall;
-- otras corrientes si agregan una mecánica distinta y no repiten contenido.
+1. **The Civic Mandate** - RepublicanBall / DemocraticBall y jurisdicción por mayoría;
+2. **The Welfare Compact** - SocialdemBall, servicios compartidos y withholding;
+3. **The Chartered Market** - CorporatistBall, licencias y privilegio;
+4. **The Central Plan** - CommunistBall / MarxistLeninistBall, asignación y cuotas;
+5. **The Command Heights** - subzonas diferenciadas de MonarchyBall, FascistBall y StalinistBall que convergen hacia autoridad concentrada;
+6. **Leviathan** - síntesis y recombinación final.
 
-Cada mundo necesita una identidad jugable propia y no debe existir solo porque "falta representar una ideología".
+Este orden sirve para presupuestar producción; el mapa puede desbloquear nodos adyacentes en otro orden si las dependencias de tutorial y narrativa lo permiten. Por eso los IDs de mundos todavía provisionales son descriptivos y no contienen número.
+
+Agrupar corrientes en un mundo no las declara equivalentes. Cada subzona necesita estética, argumento, beneficio alegado, regla y counterplay propios. **The Command Heights** solo las aproxima para estudiar cómo justificaciones distintas pueden converger en menor capacidad de salida. Si los prototypes confunden sus diferencias, el mundo se divide o se recorta.
+
+Cada mundo necesita una identidad jugable propia y no debe existir solo porque "falta representar una ideología". Otras corrientes entran únicamente si agregan una mecánica distinta y no repiten contenido.
 
 ## 5.4 Final world - Leviathan
 
@@ -618,15 +620,59 @@ Cada ideología debe traducirse a cinco elementos:
 | Counterplay | ¿Qué puede hacer el jugador? |
 | Idea | ¿Qué tensión o argumento representa? |
 
-Además, cada mundo debe tener como máximo:
+Además:
 
-- 1 regla global principal;
-- 2-4 obstáculos ideológicos;
+- cada nivel o subzona tiene como máximo 1 regla ideológica primaria nueva;
+- un mundo puede recombinar reglas ya enseñadas y contiene 2-4 familias de obstáculos ideológicos;
 - un set de enemigos característicos;
 - 1 boss principal;
 - variaciones suficientes para no repetir la misma gimmick.
 
 La filosofía debe nacer del encounter. El Archive puede contener explicación más extensa para quien quiera profundizar.
+
+## 11.1 Escala, duración y densidad de misión
+
+Los niveles de campaña deben diseñarse contra un presupuesto explícito de tiempo, recorrido y contenido. Los rangos son objetivos de producción y playtest, no una orden de rellenar minutos: si una idea se agota antes, se reclasifica como misión corta o se rediseña.
+
+La referencia de género combina tres familias: cursos compactos que concentran una idea memorable, stages de acción pensados para dominarse y rejugarse, y niveles exploratorios mucho más largos. Anarchyball se sitúa deliberadamente en el centro: más espacio para una regla, su counterplay y una decisión, sin convertir cada misión en una zona de 20-40 minutos.
+
+| Tipo | Primera vuelta | Repetición limpia | Completionist | Ruta efectiva | Checkpoints |
+|---|---:|---:|---:|---:|---:|
+| Desafío opcional | 1-3 min | menos de 2 min | hasta 4 min | 2-5 pantallas | 0 |
+| Misión corta | 4-7 min | 2-4 min | 6-10 min | 7-11 pantallas | 0-1 |
+| Misión estándar | 8-12 min | 4-6 min | 10-16 min | 12-18 pantallas | 1-2 |
+| Clímax | 12-15 min | 6-9 min | 15-22 min | 16-24 pantallas, incluida la arena | 2-3 |
+
+Las mediciones significan:
+
+- **primera vuelta:** jugador nuevo, desde que obtiene control por primera vez hasta la salida, incluidos retries, sin contar pausa ni lectura voluntaria del Archive;
+- **repetición limpia:** jugador familiarizado, sin muertes y sin intentar un speedrun;
+- **completionist:** ruta razonable para secretos, desvíos y resoluciones opcionales;
+- **pantalla equivalente:** longitud de la ruta recorrida, normalizada contra el viewport actual de referencia de 1280 px. Incluye ascensos, descensos y retornos significativos; no es `bounds.width / 1280`. Si cambia el viewport base, las fichas se renormalizan.
+
+Una misión estándar parte del siguiente presupuesto de contenido:
+
+- 1 regla ideológica primaria utilizada en un contexto seguro, uno bajo presión y uno combinado;
+- 5 beats legibles: introducir, demostrar, desafiar, combinar y culminar;
+- hasta 2 encounters obligatorios sustanciales, incluido el clímax cuando aplique;
+- 2-3 desafíos de plataformas con función distinta;
+- 1-2 rutas opcionales que vuelven a la principal en aproximadamente un minuto;
+- 2-3 secretos o recompensas opcionales;
+- checkpoints cada 2,5-4 minutos de juego activo y antes de un clímax que cambie el tipo de reto.
+
+Ritmo de referencia para una misión estándar de unos diez minutos:
+
+| Tiempo | Beat |
+|---:|---|
+| 0:00-1:15 | introducir la regla en un espacio seguro |
+| 1:15-2:45 | demostrar una consecuencia clara |
+| 2:45-5:00 | primer desafío o encounter |
+| 5:00 | checkpoint y cambio de intensidad |
+| 5:00-7:30 | combinar la regla con movimiento, combate o una ruta opcional |
+| 7:30-10:30 | clímax, mini-boss o decisión de mayor presión |
+| 10:30-11:00 | salida y cierre breve |
+
+El tiempo debe provenir de decisiones, dominio del movimiento y recombinación de reglas. Esperas, oleadas repetidas, backtracking obligatorio y diálogo no interactivo no cuentan como sustitutos de longitud jugable. Como referencia de campaña, los mundos posteriores apuntan a cuatro misiones estándar y un clímax, aproximadamente 45-65 minutos de juego de misión antes de hub y lectura opcional.
 
 ---
 
@@ -722,6 +768,26 @@ Boss: **The AncomBall**.
 
 El encounter se interrumpe por invasión del Leviatán. Las mecánicas aprendidas en el mundo se combinan para escapar.
 
+## 12.8 Paquete provisional de misiones de World 0
+
+Los segmentos conceptuales anteriores se agrupan en misiones jugables; no es necesario convertir cada argumento en un nivel independiente.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `w0_01_first_aggression` | movimiento, MerchantBall, agresión y rendición | misión corta | 6-8 min |
+| `w0_02_contract_bridge` | EgoistBall, contrato y cumplimiento | misión estándar | 8-10 min |
+| `w0_03_occupancy_workshop` | MutualistBall, uso actual y maquinaria | misión estándar | 10-12 min |
+| `w0_04_claim_and_access` | apropiación, easement y acceso | misión estándar | 8-10 min |
+| `w0_05_hierarchy_without_titles` | influencia informal y jerarquía voluntaria/coerciva en subzonas separadas | clímax | 12-14 min |
+| `w0_06_common_pool` | mutual aid, recurso común y The AncomBall | clímax | 12-15 min |
+| `w0_07_leviathan_escape` | incursión y escape recombinando reglas anteriores | misión estándar | 8-10 min |
+
+Objetivo provisional del mundo: **64-79 minutos de misiones** y **75-95 minutos** al incluir transiciones breves, intermisiones y hub. La lectura del Archive no forma parte del objetivo. Estos rangos se revisan con playtests; nunca justifican extender artificialmente un segmento.
+
+`w0_01_first_aggression` es deliberadamente fronteriza: su recorrido debe sentirse como misión corta en repetición, aunque el onboarding y el primer encounter puedan llevar la primera vuelta hasta ocho minutos.
+
+`occupancy_workshop_draft` se conserva como prototipo técnico y fixture jugable de la fábrica de contenido; no se renombra ni se promueve como misión. `w0_03_occupancy_workshop` será un LevelSpec separado, diseñado desde cero contra el presupuesto estándar de campaña. Otros specs de herramientas siguen siendo pruebas de contrato salvo decisión editorial explícita.
+
 ---
 
 # 13. Ejemplos de mecánicas para mundos posteriores
@@ -785,19 +851,159 @@ Ejemplos:
 Tema:
 legitimidad de mayoría vs. consentimiento individual.
 
-## 13.5 FascistBall / StalinistBall
+## 13.5 MonarchyBall / FascistBall / StalinistBall
 
-Al aproximarse al Leviatán aumenta la coerción ambiental:
+Al aproximarse al Leviatán aumenta la coerción ambiental, pero cada corriente necesita una mecánica diferenciada:
 
-- surveillance;
-- propaganda;
-- conscription;
-- restricted zones;
-- secret police;
-- checkpoints;
-- industrial war machinery.
+- **MonarchyBall:** juramento, tradición y jurisdicción heredada; la tensión está en quién pudo consentir y abandonar la relación;
+- **FascistBall:** movilización nacional, conscription, propaganda e industrial war machinery;
+- **StalinistBall:** party directive, cuota política, surveillance y secret police.
 
-El jugador debe sentir espacialmente que está ascendiendo hacia autoridad concentrada.
+Restricted zones y checkpoints pueden reaparecer como lenguaje común de autoridad concentrada, pero no reemplazan las diferencias anteriores. El jugador debe sentir espacialmente que asciende hacia menor capacidad de salida sin recibir la tesis falsa de que todas estas doctrinas son idénticas.
+
+## 13.6 Paquetes provisionales de niveles posteriores
+
+Estos paquetes son fichas de planificación, no `LevelSpec` ni autorización para abrir todos los mundos en el backlog. Cada fila hereda los objetivos de ruta efectiva, completionist y checkpoints de su tipo en §11.1. Los IDs descriptivos deben sobrevivir a cambios del orden del mapa.
+
+Un mundo posterior usa normalmente cinco funciones de misión:
+
+1. presentar una fortaleza o promesa real de la regla;
+2. demostrar su coste o límite;
+3. enseñar counterplay base y rutas de clase opcionales;
+4. combinar la regla bajo presión con sistemas ya conocidos;
+5. culminar en un boss o crisis que encarne la regla sin reducirse a más vida.
+
+### World 1 - The Night Watch
+
+Regla de mundo: `EmergencyPowerLevel`. Cada misión muestra una facultad inicialmente limitada que permanece activa cuando aparece la siguiente.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `night_watch_01_limited_patrol` | policía y tribunal limitados protegen un convoy; beneficio inicial y jurisdicción legible | misión estándar | 8-10 min |
+| `night_watch_02_temporary_checkpoint` | una emergencia cierra rutas y convierte controles temporales en obstáculos persistentes | misión estándar | 8-11 min |
+| `night_watch_03_emergency_levy` | un impuesto temporal financia defensas útiles, pero reduce opciones y no se retira | misión estándar | 9-12 min |
+| `night_watch_04_permit_ratchet` | permisos, vigilancia y checkpoints acumulados; rescate de un MinarchyBall disidente | misión estándar | 10-12 min |
+| `night_watch_05_guardian_of_the_act` | clímax contra el administrador de emergencia usando salidas, apelación y defensa legítima | clímax | 12-15 min |
+
+Total provisional: **47-60 minutos de misiones**. El estado de emergencia debe ser visible y acumulativo; no se simula mediante una dificultad global oculta.
+
+### World 2 provisional - The Civic Mandate
+
+Regla de mundo: decisiones periódicas de mayoría cambian rutas, servicios y acceso. Algunas decisiones deben ayudar al jugador antes de mostrar el conflicto entre mandato y consentimiento individual.
+
+RepublicanBall enfatiza límites constitucionales y representación; DemocraticBall enfatiza participación y decisión directa. Sus subzonas comparten la pregunta por el mandato, pero no exactamente la misma regla.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `civic_mandate_01_shared_bridge` | una votación abre un puente y coordina una evacuación | misión estándar | 8-10 min |
+| `civic_mandate_02_rotating_ballot` | ciclos de voto alternan plataformas y servicios; el jugador aprende a anticiparlos | misión estándar | 8-11 min |
+| `civic_mandate_03_dissenting_district` | la mayoría cierra una ruta usada por una minoría; aparecen opt-out y bypass | misión estándar | 9-12 min |
+| `civic_mandate_04_campaign_pressure` | influencia, promesas y cambios de regla se combinan con defensa de terceros | misión estándar | 9-12 min |
+| `civic_mandate_05_hall_of_mandates` | RepublicanBall/DemocraticBall defiende el mandato; el combate solo se habilita al ejecutar coerción | clímax | 12-15 min |
+
+Total provisional: **46-60 minutos de misiones**. La votación es un cambio de estado legible y predecible, no RNG que invalida saltos en curso.
+
+### World 3 provisional - The Welfare Compact
+
+Regla de mundo: withholding automático financia servicios compartidos visibles. El diseño debe mostrar tanto protección real como elegibilidad, escasez y dificultad de salida.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `welfare_compact_01_common_clinic` | pickups retenidos financian curación pública gratuita y una ruta segura | misión estándar | 8-10 min |
+| `welfare_compact_02_eligibility_queue` | turnos y requisitos de acceso crean una ruta lenta y counterplays opcionales | misión estándar | 8-11 min |
+| `welfare_compact_03_progressive_withholding` | retención escalonada obliga a planificar recursos y comparar proveedores | misión estándar | 9-12 min |
+| `welfare_compact_04_budget_trilemma` | presupuesto finito entre clínica, plataformas y defensa; ninguna opción cubre todo | misión estándar | 10-12 min |
+| `welfare_compact_05_insurance_of_all` | crisis de cobertura: proteger beneficiarios y proveedores alternativos antes del clímax con SocialdemBall | clímax | 12-15 min |
+
+Total provisional: **47-60 minutos de misiones**. El servicio público debe producir al menos una ventaja que una ruta puramente individual no replique sin coste.
+
+### World 4 provisional - The Chartered Market
+
+Regla de mundo: instalaciones que parecen privadas condicionan intercambio y tránsito a licencias, charters o proveedores privilegiados.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `chartered_market_01_approved_vendor` | mercado funcional junto a un License Gate; contraste entre intercambio y permiso | misión estándar | 8-10 min |
+| `chartered_market_02_exclusive_charter` | un monopolio concedido controla transporte y reparación | misión estándar | 8-11 min |
+| `chartered_market_03_patent_foundry` | Patent Gates bloquean maquinaria y plataformas pese a existir capacidad ociosa | misión estándar | 9-12 min |
+| `chartered_market_04_customs_corridor` | aduana, tarifas y rutas opcionales de Trader, Tinkerer, Runner y Agorist | misión estándar | 10-12 min |
+| `chartered_market_05_board_of_privilege` | una junta coordina licencias y revocaciones; el boss pierde legitimidad al confiscar o detener | clímax | 12-15 min |
+
+Total provisional: **47-60 minutos de misiones**. Cada nivel necesita intercambio ordinario visible para que corporatismo y libre mercado no parezcan sinónimos.
+
+### World 5 provisional - The Central Plan
+
+Regla de mundo: asignación de suministros por zona y objetivos de producción sincronizados. La primera misión muestra que la coordinación central puede concentrar recursos con rapidez; las siguientes exponen información tardía, cuotas y enforcement.
+
+CommunistBall presenta cooperación y asignación común; MarxistLeninistBall introduce dirección de partido y enforcement territorial. No se vuelven hostiles por su nombre: la elegibilidad aparece solo cuando una acción concreta cruza las reglas de conflicto.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `central_plan_01_priority_delivery` | una asignación coordinada salva una zona crítica y enseña el sistema | misión estándar | 8-10 min |
+| `central_plan_02_quota_shift` | una revisión de cuota mueve recursos y plataformas fuera de una zona que aún los necesita | misión estándar | 8-11 min |
+| `central_plan_03_empty_price` | precio fijo y stock limitado crean colas, intercambio lateral y rutas de clase | misión estándar | 9-12 min |
+| `central_plan_04_synchronized_factory` | producción sincronizada, información local y maquinaria se recombinan sin esperas pasivas | misión estándar | 10-12 min |
+| `central_plan_05_last_revision` | PlannerBall/MarxistLeninistBall intenta imponer un plan que ya no coincide con el terreno | clímax | 12-15 min |
+
+Total provisional: **47-60 minutos de misiones**. Las máquinas planificadas crean ventanas de decisión; sus ciclos nunca sirven para rellenar tiempo.
+
+### World 6 provisional - The Command Heights
+
+Regla de mundo: la salida física y social se reduce conforme cada subzona concentra mando. MonarchyBall, FascistBall y StalinistBall mantienen identidades separadas; el mundo compara mecanismos de autoridad, no declara que sus doctrinas sean intercambiables.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `command_heights_01_crown_oath` | tradición, juramento y protección del Crown; distinguir pertenencia voluntaria de jurisdicción heredada | misión estándar | 8-10 min |
+| `command_heights_02_mobilization_decree` | conscription, propaganda y maquinaria industrial de guerra | misión estándar | 9-12 min |
+| `command_heights_03_party_directive` | cuota política, vigilancia y secret police alteran rutas y comportamiento NPC | misión estándar | 9-12 min |
+| `command_heights_04_no_exit_corridor` | persecución paralela y rescate de disidentes con counterplays aprendidos | misión estándar | 10-12 min |
+| `command_heights_05_throne_and_committee` | clímax en subarenas diferenciadas que convergen sobre la imposibilidad de salir | clímax | 12-15 min |
+
+Total provisional: **48-61 minutos de misiones**. Si una subzona solo cambia uniforme y diálogo, se elimina o se separa hasta conseguir una mecánica propia.
+
+### Final world - Leviathan
+
+Regla de mundo: `JurisdictionClaim` universal. El Leviatán reutiliza justificaciones anteriores, mientras la coalición devuelve al jugador counterplays ganados en cada mundo.
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `leviathan_01_absorbed_frontier` | frontera ocupada; rescatar aliados y recuperar sus capacidades | misión estándar | 9-12 min |
+| `leviathan_02_registry_spine` | identidad, registro y permiso universal reorganizan rutas según jurisdicción | misión estándar | 9-12 min |
+| `leviathan_03_monopoly_works` | infraestructura coerciva y máquinas que solo una autoridad puede operar | misión estándar | 10-12 min |
+| `leviathan_04_justification_tower` | ascenso por Tradition, Majority, Planning y Security sin repetir mundos completos | misión estándar | 10-13 min |
+| `leviathan_05_break_the_monopoly` | boss final de cinco fases con intervenciones jugables de la coalición | clímax | 12-15 min |
+
+Total provisional: **50-64 minutos de misiones**. El boss final puede apartarse del rango espacial de un clímax porque su profundidad proviene de patrones y aliados, pero no del rango temporal ni de la cadencia de retry.
+
+### Epílogo jugable - Panarchy
+
+| ID de producción | Contenido principal | Tipo | Primera vuelta |
+|---|---|---|---:|
+| `panarchy_01_free_associations` | recorrer la red transformada y observar soluciones voluntarias con interacciones breves | misión corta | 5-7 min |
+| `panarchy_02_future_clause` | viñeta interactiva del ContractarianBall y la cláusula que alcanza a terceros | viñeta | 2-3 min |
+
+Total provisional: **7-10 minutos**. No hay combate obligatorio ni checklist de lore; el epílogo permite moverse, conversar y cerrar el arco.
+
+## 13.7 Presupuesto total de campaña
+
+| Paquete | Misiones/viñetas | Primera vuelta |
+|---|---:|---:|
+| World 0 - The Anarchist Frontier | 7 | 64-79 min |
+| World 1 - The Night Watch | 5 | 47-60 min |
+| The Civic Mandate | 5 | 46-60 min |
+| The Welfare Compact | 5 | 47-60 min |
+| The Chartered Market | 5 | 47-60 min |
+| The Central Plan | 5 | 47-60 min |
+| The Command Heights | 5 | 48-61 min |
+| Leviathan | 5 | 50-64 min |
+| Panarchy | 2 | 7-10 min |
+| **Total** | **44** | **403-514 min** |
+
+Esto equivale aproximadamente a **6 h 45 min-8 h 35 min de misiones** y **8-11 horas de campaña principal** al incluir Agora, intermisiones y navegación. Una vuelta completionist apunta inicialmente a **10-13 horas**, sin contar la lectura exhaustiva del Archive.
+
+Los desafíos opcionales de 1-3 minutos se presupuestan primero como rutas o salas laterales dentro de estas misiones. No aumentan automáticamente las 44 entradas; solo se convierten en nodos independientes si reutilizan contenido de forma valiosa y sustituyen, en vez de duplicar, un desvío ya presupuestado.
+
+El total es un sobre de producción, no una cuota de contenido. Un mundo se recorta si no sostiene cinco misiones distintas; una mecánica excelente puede crecer solo si los playtests muestran variedad y no mera repetición. No se inicia producción simultánea de todos los paquetes.
 
 ---
 
@@ -983,38 +1189,30 @@ Codex no debería editar manualmente miles de nodos de una `.tscn` para generar 
 
 Se define un formato de **LevelSpec** legible por humanos y agentes. El juego o una herramienta de editor convierte esa especificación en una escena jugable.
 
-## 17.2 Ejemplo LevelSpec
+## 17.2 LevelSpec y ficha de objetivos
 
-```json
-{
-  "id": "w0_mutualist_02",
-  "world": "anarchist_frontier",
-  "theme": "mutualist_industry",
-  "difficulty": 2,
-  "target_duration_seconds": 420,
-  "required_mechanics": [
-    "occupancy_use",
-    "aggression"
-  ],
-  "sections": [
-    {
-      "id": "intro",
-      "type": "traversal",
-      "length": 800
-    },
-    {
-      "id": "crane_dispute",
-      "type": "ideology_puzzle",
-      "rule": "occupancy_use"
-    },
-    {
-      "id": "combat_01",
-      "type": "combat",
-      "encounter": "property_dispute"
-    }
-  ]
-}
+`LevelSpec v0` es un contrato cerrado y versionado conforme a ADR-0004. No se le agregan campos editoriales ad hoc. Mientras una extensión de schema y validator no se acepte explícitamente, cada spec de producción debe tener una ficha de diseño asociada por su `level_id`.
+
+Formato editorial ilustrativo; no es entrada de `LevelBuilder`:
+
+```yaml
+level_id: w0_03_occupancy_workshop
+level_type: standard_mission
+targets:
+  first_clear_seconds: [600, 720]
+  clean_clear_seconds: [240, 360]
+  completionist_seconds: [720, 960]
+  effective_route_screens: [12, 18]
+  checkpoint_interval_seconds: [150, 240]
+beats:
+  - introduce
+  - demonstrate
+  - challenge
+  - combine
+  - climax
 ```
+
+Una futura revisión puede incorporar estos objetivos a `LevelSpec`, pero requiere actualizar schema, parser, validator, fixtures y tests mediante una decisión ADR; si el cambio es incompatible, también requiere nueva versión y migración. Los datos observados de playtest no se guardan como objetivos de diseño.
 
 ## 17.3 Dos estados del nivel
 
@@ -1049,7 +1247,8 @@ Debe comprobar al menos:
 - recursos mínimos para encounters obligatorios;
 - referencias de assets/data válidas;
 - reglas ideológicas requeridas presentes;
-- duración/longitud dentro de rango aproximado.
+- presencia de una ficha de objetivos para niveles candidatos a shipping;
+- advertencias de longitud efectiva y cadencia de checkpoints cuando exista instrumentación suficiente.
 
 Las capacidades físicas del jugador deben estar parametrizadas:
 
@@ -1063,6 +1262,8 @@ Las capacidades físicas del jugador deben estar parametrizadas:
 
 No confiar en intuición espacial del LLM cuando una condición puede verificarse matemáticamente.
 
+La validez estructural no depende de que un playtest caiga exactamente dentro de un rango. El validator puede detectar omisiones y valores atípicos, pero la duración se aprueba con datos humanos. Nunca debe inferir longitud jugable solo a partir de `bounds.width`.
+
 ---
 
 # 19. Playtesting automatizado y telemetría
@@ -1074,14 +1275,20 @@ Permitir que Codex reciba feedback sobre sus niveles.
 Registrar por intento:
 
 - completion rate;
-- tiempo de finalización;
+- tiempo de primera vuelta, repetición limpia y completionist cuando el perfil sea conocido;
+- tiempo total, tiempo con control y tiempo no interactivo;
+- distribución entre traversal, combate e interacción cuando la instrumentación pueda distinguirlos;
+- permanencia por sección y separación temporal entre checkpoints;
 - muertes/derrotas por sección;
 - daño recibido;
 - ammo/resource starvation;
-- rutas utilizadas;
+- rutas utilizadas, desvíos y backtracking;
 - checkpoints;
 - encounters evitados;
+- resoluciones de encounters e invalid-target attempts;
 - errores/softlocks.
+
+El análisis debe comparar el tiempo observado con el tipo de misión y localizar de dónde proviene. Un nivel no mejora por alcanzar el minuto objetivo si el aumento se concentra en espera, diálogo forzado o repetición de oleadas.
 
 ## 19.2 Bot
 
@@ -1113,10 +1320,11 @@ Orden de prioridad sugerido:
 
 1. `AGENTS.md`
 2. `docs/PROJECT_PLAN.md`
-3. `docs/ARCHITECTURE.md`
-4. `docs/GAMEPLAY_RULES.md`
-5. ADRs aceptados
-6. código existente y tests
+3. `docs/GAMEPLAY_RULES.md`
+4. `docs/ARCHITECTURE.md`
+5. `docs/DEVELOPMENT_PHASES.md`
+6. ADRs aceptados
+7. código existente y tests
 
 ## 20.2 Reglas para cada tarea de Codex
 
@@ -1205,7 +1413,7 @@ Builds completos multiplataforma pueden ejecutarse en ramas/tags de release para
 
 Validar que el proyecto es divertido y que la arquitectura AI-friendly funciona.
 
-Duración: **5-10 minutos**.
+Duración objetivo: **8-12 minutos en primera vuelta** y **4-6 minutos en una repetición limpia**. El fixture técnico del MVP demuestra el pipeline; no fija por sí solo la escala de una misión de campaña curada.
 
 Contenido mínimo:
 
@@ -1278,7 +1486,7 @@ Correcciones de playtest, accesibilidad básica, balance observable, suite estab
 
 ## Phase 6 - Content Factory v1
 
-Endurecer plantillas, herramientas, fixtures, validación por lote y generación asistida. Demostrar extensibilidad con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven, todos curados por playtest humano.
+Endurecer plantillas, herramientas, fixtures, validación por lote y generación asistida. Demostrar extensibilidad con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven, todos curados por playtest humano. Incorporar fichas de objetivos y reportes de duración, secciones, checkpoints y ruta efectiva antes de ampliar World 0.
 
 ## Phase 7 - World 0: The Anarchist Frontier
 
@@ -1290,11 +1498,11 @@ Agregar Runner, Tinkerer, Trader y Agorist de una en una; después construir una
 
 ## Phase 9 - Ideological Worlds
 
-Producir un mundo a la vez. Cada uno requiere design sheet, regla jugable, beneficio/coste cuando corresponda, counterplay, obstáculos, enemigos, boss, templates y tests.
+Producir un mundo a la vez usando §13.6 como sobre provisional, no como backlog simultáneo. Cada uno requiere design sheet, regla jugable, beneficio/coste cuando corresponda, counterplay, obstáculos, enemigos, boss, templates, tests y datos humanos antes de abrir el siguiente.
 
 ## Phase 10 - Leviathan and Panarchy
 
-Mundo final, boss por justificaciones, contribuciones mecánicas de la coalición, mapa transformado, epílogo jugable y cliffhanger contractarian.
+Cinco misiones de Leviathan, boss por justificaciones, contribuciones mecánicas de la coalición, mapa transformado, dos viñetas jugables de Panarchy y cliffhanger contractarian.
 
 ## Phase 11 - Platform and Release
 
@@ -1387,12 +1595,25 @@ Un nivel no está terminado hasta que:
 - spawn y salida son válidos;
 - puede completarse con la clase base requerida;
 - no tiene softlocks conocidos;
+- declara tipo de misión y objetivos de primera vuelta, repetición limpia, completionist y ruta efectiva;
+- su recorrido y densidad corresponden al presupuesto de §11.1, o documenta por qué se apartan;
 - sus checkpoints funcionan;
+- sus checkpoints dividen decisiones y riesgo con una cadencia razonable, no solo distancia;
 - su gimmick ideológica es comprensible;
 - existe counterplay;
 - su boss/encounter cumple el NAP design cuando aplica;
 - ha sido jugado por un humano;
-- la telemetría no muestra un cuello de botella accidental obvio.
+- la telemetría no muestra un cuello de botella accidental obvio;
+- su duración no depende principalmente de esperas, diálogo obligatorio, oleadas repetidas o backtracking forzado.
+
+Un mundo no está terminado hasta que:
+
+- todos sus niveles cumplen la Definition of Done anterior;
+- su arco muestra beneficio o promesa, coste, counterplay, combinación y clímax;
+- ninguna misión existe solo para repetir la anterior con más enemigos;
+- el boss encarna la regla y tiene legitimidad de combate explícita cuando aplica;
+- su tiempo total cae dentro del sobre de §13.6 o la excepción está respaldada por playtest;
+- los playtests completos no muestran fatiga sostenida ni una sección que concentre desproporcionadamente los abandonos.
 
 ---
 
@@ -1441,13 +1662,17 @@ Mitigación: limitar The Agora, hacer que Trader use Capital como recurso de acc
 
 Mitigación: LevelSpec + validator + telemetría + selección humana + refinamiento en editor.
 
+## Riesgo: duración artificial o escala excesiva
+
+Mitigación: presupuestar primera vuelta, repetición limpia, ruta efectiva y contenido antes de construir; medir por sección; reclasificar o recortar antes de añadir relleno.
+
 ## Riesgo: dependencia excesiva de Codex
 
 Mitigación: documentación, tests, schemas y arquitectura que permitan entender el proyecto sin depender de contexto conversacional.
 
 ## Riesgo: scope ideológico infinito
 
-Mitigación: solo entra una ideología si produce una mecánica distinta y sirve al arco narrativo.
+Mitigación: solo entra una ideología si produce una mecánica distinta y sirve al arco narrativo. El sobre de 44 misiones/viñetas es un máximo provisional: una incorporación nueva reemplaza o fusiona contenido antes de aumentar el total, salvo evidencia fuerte de playtest.
 
 ---
 
@@ -1456,15 +1681,15 @@ Mitigación: solo entra una ideología si produce una mecánica distinta y sirve
 Estas decisiones deben resolverse mediante pequeños spikes, no discusión infinita:
 
 1. estilo visual final: pixel art vs. alta resolución vector-like;
-2. cámara y resolución base;
+2. cámara final y si 1280x720 permanece como resolución base;
 3. aiming: 360°, 8 direcciones o auto-aim asistido;
 4. touch controls exactos;
 5. health vs. Resolve como nombre visible;
 6. tamaño de árbol de habilidades;
 7. framework de testing;
 8. JSON puro vs. Resources de Godot como formato final de ciertos datos;
-9. grado de backtracking;
-10. orden final de mundos intermedios;
+9. presupuesto exacto de backtracking opcional dentro de la estructura predominantemente lineal;
+10. orden y ramificación final de la secuencia provisional de §5.3;
 11. localización inicial: español/inglés o inglés primero;
 12. tono de humor y nivel de referencias filosóficas explícitas.
 

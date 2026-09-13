@@ -1,0 +1,24 @@
+{
+  "schema_version": 0,
+  "level_id": "occupancy_workshop_draft",
+  "lifecycle": "technical_prototype",
+  "classification": "technical_prototype",
+  "campaign_successor_id": "w0_03_occupancy_workshop",
+  "reference_viewport_width": 1280,
+  "beats": [
+    "introduce",
+    "demonstrate",
+    "challenge",
+    "combine",
+    "climax"
+  ],
+  "evidence_targets": {
+    "minimum_first_clear_samples": 3,
+    "minimum_clean_replay_samples": 3
+  },
+  "decision": {
+    "action": "retain_as_prototype",
+    "reason": "Conservar como fixture jugable para validar occupancy, encounters, collectibles, checkpoints y telemetría. No expandir ni renombrar como misión de campaña.",
+    "campaign_boundary": "World 0 usará un LevelSpec separado con ID w0_03_occupancy_workshop y presupuesto propio de misión estándar."
+  }
+}

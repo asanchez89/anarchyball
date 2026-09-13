@@ -13,6 +13,7 @@ var _heading: Label
 var _body: Label
 var _primary_button: Button
 var _restart_button: Button
+var _profile_button: Button
 var _shake_button: Button
 var _subtitles_button: Button
 var _scale_button: Button
@@ -95,6 +96,10 @@ func _build_ui() -> void:
 	_primary_button.custom_minimum_size = Vector2(280.0, 48.0)
 	_primary_button.pressed.connect(_on_primary_pressed)
 	_panel.add_child(_primary_button)
+	_profile_button = Button.new()
+	_profile_button.custom_minimum_size = Vector2(280.0, 42.0)
+	_profile_button.pressed.connect(_cycle_playtest_profile)
+	_panel.add_child(_profile_button)
 	_restart_button = Button.new()
 	_restart_button.text = "REINICIAR SLICE"
 	_restart_button.custom_minimum_size = Vector2(280.0, 42.0)
@@ -118,6 +123,7 @@ func _build_ui() -> void:
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_panel.add_child(controls)
 	_refresh_accessibility_labels()
+	_refresh_profile_label()
 
 
 func _show_overlay(heading: String, body: String, primary_text: String) -> void:
@@ -160,6 +166,25 @@ func _toggle_subtitles() -> void:
 func _cycle_scale() -> void:
 	_settings.cycle_ui_scale()
 	_commit_accessibility()
+
+
+func _cycle_playtest_profile() -> void:
+	if _host != null:
+		_host.cycle_playtest_profile()
+	_refresh_profile_label()
+
+
+func _refresh_profile_label() -> void:
+	if _profile_button == null or _host == null:
+		return
+	var labels := {
+		&"unspecified": "SIN CLASIFICAR",
+		&"first_clear": "PRIMERA VUELTA",
+		&"clean_replay": "REPETICIÓN LIMPIA",
+		&"completionist": "COMPLETIONIST",
+	}
+	var profile := _host.current_playtest_profile()
+	_profile_button.text = "PERFIL DE PRUEBA: %s" % String(labels.get(profile, "SIN CLASIFICAR"))
 
 
 func _commit_accessibility() -> void:

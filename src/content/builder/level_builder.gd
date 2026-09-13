@@ -24,6 +24,7 @@ var _audio: FeedbackTone
 var _accessibility: AccessibilitySettings
 var _skip_start_menu_once: bool = false
 var _encounter_actors: Dictionary = {}
+var _playtest_profile: StringName = &"unspecified"
 
 
 func _ready() -> void:
@@ -33,7 +34,10 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _player == null or _player.global_position.y <= _fall_reset_y:
+	if _player == null:
+		return
+	telemetry.track_player_position(_player.global_position)
+	if _player.global_position.y <= _fall_reset_y:
 		return
 	telemetry.record_event(&"defeat", {"cause": "fall", "position": _vector_payload(_player.global_position)})
 	_retry_to_checkpoint()
@@ -50,6 +54,19 @@ func activate_checkpoint(checkpoint_id: StringName, position: Vector2) -> void:
 
 func retry_from_checkpoint() -> void:
 	_retry_to_checkpoint()
+
+
+func current_playtest_profile() -> StringName:
+	return _playtest_profile
+
+
+func cycle_playtest_profile() -> StringName:
+	var current_index := LocalRunTelemetry.PLAYTEST_PROFILES.find(_playtest_profile)
+	var next_index := (current_index + 1) % LocalRunTelemetry.PLAYTEST_PROFILES.size()
+	_playtest_profile = LocalRunTelemetry.PLAYTEST_PROFILES[next_index]
+	if telemetry != null:
+		telemetry.set_playtest_profile(_playtest_profile)
+	return _playtest_profile
 
 
 func build_from_file(path: String, catalog: ContentCatalog) -> LevelValidationResult:
@@ -85,7 +102,12 @@ func _build_valid_spec(spec: LevelSpec) -> void:
 	telemetry = LocalRunTelemetry.new()
 	telemetry.name = "RunTelemetry"
 	generated.add_child(telemetry)
-	telemetry.configure(spec.level_id(), StringName(String(spec.data.get("class_loadout_id", ""))))
+	telemetry.configure(
+		spec.level_id(),
+		StringName(String(spec.data.get("class_loadout_id", ""))),
+		&"",
+		_playtest_profile
+	)
 	_audio = FeedbackTone.new()
 	_audio.name = "FeedbackAudio"
 	generated.add_child(_audio)
@@ -94,6 +116,7 @@ func _build_valid_spec(spec: LevelSpec) -> void:
 	var player := _build_player(spec, generated)
 	_player = player
 	_spawn_position = player.global_position
+	telemetry.reset_position_tracking(_spawn_position)
 	var bounds := spec.data.get("bounds") as Dictionary
 	_fall_reset_y = float(bounds.get("height")) + 120.0
 	_build_sections(spec, generated)
@@ -186,6 +209,7 @@ func _build_sections(spec: LevelSpec, parent: Node2D) -> void:
 		trigger.section_id = StringName(String(data.get("id")))
 		var from_x := float(data.get("from_x", 0.0))
 		var to_x := float(data.get("to_x", bounds.get("width")))
+		trigger.completion_x = to_x
 		trigger.size = Vector2(to_x - from_x, float(bounds.get("height")))
 		trigger.position = Vector2((from_x + to_x) * 0.5, trigger.size.y * 0.5)
 		trigger.collision_layer = 0
@@ -251,7 +275,7 @@ func _build_resources(spec: LevelSpec, parent: Node2D) -> void:
 		pickup.pickup_id = StringName(String(data.get("id")))
 		pickup.ownership = StringName(String(data.get("ownership")))
 		pickup.position = Vector2(float(data.get("x")), float(data.get("y")))
-		pickup.collected.connect(_on_pickup_collected)
+		pickup.collected.connect(_on_pickup_collected.bind(pickup.ownership))
 		container.add_child(pickup)
 
 
@@ -501,6 +525,7 @@ func _retry_to_checkpoint() -> void:
 		return
 	telemetry.record_event(&"retry", {"checkpoint_id": String(_checkpoint.checkpoint_id)})
 	_player.reset_at(_checkpoint.player_position)
+	telemetry.reset_position_tracking(_checkpoint.player_position)
 	(_player.get_node("Health") as HealthComponent).restore(_checkpoint.health)
 	var response := _player.get_node_or_null("ContractorDefensiveResponse") as ContractorDefensiveResponse
 	if response != null:
@@ -528,11 +553,15 @@ func _retry_to_checkpoint() -> void:
 				observer.restore_runtime_state(saved_observer_state as Dictionary)
 
 
-func _on_pickup_collected(pickup_id: StringName) -> void:
+func _on_pickup_collected(pickup_id: StringName, ownership: StringName) -> void:
 	if pickup_id not in _collected_reward_ids:
 		_collected_reward_ids.append(pickup_id)
 	if _hud != null:
-		_hud.show_feedback("PERMITTED SUPPLY COLLECTED", 1.5)
+		_hud.show_feedback(
+			"%s COLLECTED · %d TOTAL" % [String(ownership).to_upper(), _collected_reward_ids.size()],
+			1.8,
+			"[Confirmación: recurso recogido]"
+		)
 
 
 func _on_gate_opened(gate_id: StringName) -> void:
@@ -578,7 +607,14 @@ func _on_level_completed() -> void:
 	if _audio != null:
 		_audio.play_cue(FeedbackTone.Cue.SUCCESS)
 	if _flow != null:
-		_flow.append_completion_summary(TelemetryBalanceSummary.completion_line(telemetry.snapshot()))
+		var total_resources := (loaded_spec.data.get("resources", []) as Array).size()
+		_flow.append_completion_summary(
+			"%s\nRecursos %d/%d" % [
+				TelemetryBalanceSummary.completion_line(telemetry.snapshot()),
+				_collected_reward_ids.size(),
+				total_resources,
+			]
+		)
 		_flow.show_completion()
 
 

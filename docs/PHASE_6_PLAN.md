@@ -1,9 +1,9 @@
 # Phase 6 - Content Factory v1
 
-- **Estado:** EN CURSO; P6.1-P6.5 IMPLEMENTADAS, P6.3-P6.5 PENDIENTES DE PLAYTEST HUMANO
+- **Estado:** EN CIERRE; P6.1-P6.7 IMPLEMENTADAS TÉCNICAMENTE, PENDIENTE EVIDENCIA HUMANA
 - **Inicio:** 2026-09-12
 - **Dependencia:** MVP aprobado en Phase 5
-- **Reglas afectadas:** `GR-CORE-006` a `GR-CORE-008`, `GR-ENCOUNTER-001/002`, `GR-WORLD-001/002`, `GR-LEVEL-001` a `GR-LEVEL-005`, `GR-TELEM-001`
+- **Reglas afectadas:** `GR-CORE-006` a `GR-CORE-008`, `GR-ENCOUNTER-001/002`, `GR-WORLD-001/002`, `GR-LEVEL-001` a `GR-LEVEL-009`, `GR-TELEM-001/002`
 
 ## Objetivo
 
@@ -132,23 +132,65 @@ Ejecutar `res://levels/prototypes/occupancy_workshop_draft.tscn` con teclado y l
 
 ### P6.6 - Curación y cierre
 
-- ejecutar importación, smoke y suite completa;
-- realizar playtest con teclado y gamepad;
-- corregir softlocks, legibilidad y pacing con evidencia;
-- promover el borrador solo después de aprobación humana.
+- [x] ejecutar importación, smoke y suite completa;
+- [ ] realizar playtest final con teclado y gamepad;
+- [x] corregir problemas técnicos y de legibilidad detectados hasta ahora;
+- [x] decidir explícitamente no promover el prototipo como contenido de campaña.
+
+Resultado técnico: el HUD reserva espacio y ajusta textos largos; enemigos y amenazas disponen de una etiqueta más legible; cada collectible confirma tipo y total recogido; la pantalla de salida presenta recursos, cambios de maquinaria, resoluciones de encounter y rutas observadas. La telemetría rechaza eventos críticos incompletos antes de guardarlos, evitando registros ambiguos durante la curación. El nivel deja de ser candidato de campaña y se conserva como prototipo técnico.
+
+Evidencia automatizada local del 2026-09-12: catálogo + 5 LevelSpecs válidos, importación, smoke, arranque runtime headless del workshop y suite completa aprobados; 15/15 suites y 82/82 pruebas sin errores. El build Windows fue regenerado correctamente con estos ajustes.
+
+#### Gate humano final de P6.6
+
+Ejecutar el build Windows una vez con teclado y otra con gamepad, completando el nivel de principio a fin:
+
+1. confirmar que las cinco máquinas, los dos encounters, los cuatro recursos y ambos checkpoints tienen feedback visible y textual;
+2. completar por la ruta base sin depender de plataformas activadas por clase o maquinaria;
+3. comprobar `OPERATE_OR_BYPASS_MACHINE` y `NEUTRALIZE_ENFORCER`, incluido el bloqueo inmediato durante surrender;
+4. provocar al menos un retry y verificar que máquina, enforcer y resolución recuperan el snapshot correcto;
+5. comprobar que la salida resume recursos `4/4`, cambios de maquinaria, resoluciones y rutas usadas;
+6. repetir hasta obtener tres recorridos completos consecutivos —incluyendo teclado y gamepad— sin softlocks conocidos.
+
+### P6.7 - Perfilado y evidencia de producción
+
+- [x] mantener `LevelSpec v0` cerrado y almacenar las fichas editoriales por separado;
+- [x] clasificar `occupancy_workshop_draft` como `technical_prototype` no promocionable;
+- [x] reservar `w0_03_occupancy_workshop` como ID distinto para la futura misión de campaña;
+- [x] permitir seleccionar `first_clear`, `clean_replay` o `completionist` antes de jugar;
+- [x] archivar cada recorrido completo sin reemplazar la evidencia anterior;
+- [x] medir tiempo total, sección, checkpoint, distancia recorrida y backtracking;
+- [x] generar un reporte agregado con conteos y pendientes del gate;
+- [ ] reunir tres primeras vueltas de jugadores nuevos y tres repeticiones limpias;
+- [ ] aprobar la ruta base con teclado y gamepad sin softlocks conocidos.
+
+Resultado: `data/level_profiles/occupancy_workshop_draft.json` documenta la frontera entre fixture y campaña. La telemetría v1 asigna un `run_id`, conserva el perfil elegido, mide recorrido y archiva cada finalización. `tools/phase6/report_playtests.cmd` agrega las corridas y mantiene `promotion_ready=false` para cualquier prototipo técnico. ADR-0006 registra la separación sin modificar LevelSpec.
+
+Evidencia automatizada local del 2026-09-13: catálogo + 5 LevelSpecs + 1 perfil editorial válidos; importación, smoke, runtime headless y build Windows aprobados; 16/16 suites y 87/87 pruebas sin errores.
+
+#### Captura de evidencia humana de P6.7
+
+Antes de iniciar cada recorrido, elegir en la pantalla inicial el perfil correspondiente:
+
+1. completar tres recorridos como `FIRST CLEAR`, cada uno con un jugador que no haya visto antes el nivel;
+2. completar tres recorridos como `CLEAN REPLAY`, alternando teclado y gamepad y sin provocar retries deliberados;
+3. llegar siempre a `EXIT`, ya que solo una finalización archiva una corrida bajo `user://telemetry/runs/`;
+4. generar el informe con `tools/phase6/report_playtests.cmd -LevelId occupancy_workshop_draft`;
+5. revisar tiempos por sección, intervalos entre checkpoints, ruta efectiva, backtracking, resoluciones y warnings del informe;
+6. registrar la decisión humana sin promover este prototipo: cualquier misión de campaña se construirá aparte con el ID `w0_03_occupancy_workshop`.
 
 ## Gate de salida
 
-- [ ] la segunda regla cambia espacio o interacción y muestra counterplay antes del lore;
-- [ ] el nuevo enemigo se registra por ID y se compone sin modificar `PlayerController`, armas ni `TargetValidity`;
-- [ ] el encounter registra la razón de agresión y admite dos resoluciones cuando es práctico;
-- [ ] el segundo nivel nace de LevelSpec, pasa validación y se construye headlessly;
+- [x] la segunda regla cambia espacio o interacción y muestra counterplay antes del lore;
+- [x] el nuevo enemigo se registra por ID y se compone sin modificar `PlayerController`, armas ni `TargetValidity`;
+- [x] el encounter registra la razón de agresión y admite dos resoluciones cuando es práctico;
+- [x] el segundo nivel nace de LevelSpec, pasa validación y se construye headlessly;
 - [ ] la ruta requerida se completa con Contractor y movimiento base;
-- [ ] un lote con fixtures inválidos falla indicando archivo, campo y causa;
-- [ ] telemetría registra las señales de diseño requeridas;
-- [ ] suite completa, smoke e importación pasan;
+- [x] un lote con fixtures inválidos falla indicando archivo, campo y causa;
+- [x] telemetría registra las señales de diseño requeridas;
+- [x] suite completa, smoke e importación pasan;
 - [ ] teclado y gamepad pasan playtest humano sin softlocks conocidos;
-- [ ] ningún contenido se promueve a shipping sin curación humana.
+- [x] ningún contenido se promueve a shipping sin curación humana; el workshop queda retenido como prototipo.
 
 ## No objetivos
 
@@ -177,5 +219,6 @@ Ejecutar `res://levels/prototypes/occupancy_workshop_draft.tscn` con teclado y l
 4. P6.4 Enemigo y encounter.
 5. P6.5 Segundo nivel data-driven.
 6. P6.6 Curación y cierre.
+7. P6.7 Perfilado y evidencia de producción.
 
 No se inicia Phase 7 hasta superar este gate.

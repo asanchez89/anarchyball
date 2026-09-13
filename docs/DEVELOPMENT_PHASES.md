@@ -1,7 +1,8 @@
 # Fases de desarrollo de Anarchyball
 
-**Estado:** roadmap operativo v1.1; MVP aprobado
+**Estado:** roadmap operativo v1.3; MVP aprobado
 **Fecha base:** 2026-08-21  
+**Última revisión:** 2026-09-12
 **Objetivo:** llegar primero a un MVP jugable con un motor de gameplay y contenido suficientemente sólido para producir después niveles, enemigos, clases y mecánicas sin reescribir el núcleo.
 
 ## 1. Definición de éxito
@@ -217,9 +218,26 @@ Gate final del MVP:
 
 Endurecer plantillas, herramientas de editor, fixtures, generador asistido y documentación. Probar la extensibilidad creando una segunda regla ideológica, un tercer enemigo y un segundo nivel. Solo promover a shipping contenido curado y probado por humanos.
 
+Entregables adicionales para diseño de niveles:
+
+- plantilla de ficha editorial asociada a `level_id`, sin romper el schema cerrado de `LevelSpec v0`;
+- clasificación de misión y objetivos de primera vuelta, repetición limpia, completionist, ruta efectiva y checkpoints;
+- reporte derivado de telemetría con tiempo total, tiempo por sección, retry, uso de checkpoints y rutas;
+- comparación del segundo nivel contra su presupuesto, con decisión explícita de expandirlo, recortarlo o reclasificarlo.
+
+Gate de producción de niveles:
+
+- el segundo nivel supera validación estructural y puede completarse con movimiento base;
+- cinco beats aparecen a escala de nivel o existe una excepción justificada por el tipo de misión;
+- al menos tres primeras vueltas de jugadores nuevos y tres repeticiones limpias quedan registradas antes de promoverlo;
+- el tiempo no proviene principalmente de espera, diálogo obligatorio, oleadas repetidas o backtracking forzado;
+- cualquier extensión de `LevelSpec v0` actualiza schema, parser, validator, fixtures y tests mediante una decisión ADR; si es incompatible, también crea nueva versión y migración.
+
+Un segundo nivel retenido explícitamente como `technical_prototype` no se promociona ni necesita simular escala de campaña. Debe conservar una ficha validada, producir el reporte de evidencia y apuntar a un `campaign_successor_id` distinto. Para World 0, `occupancy_workshop_draft` queda como fixture y `w0_03_occupancy_workshop` será una misión separada.
+
 ### Phase 7 - World 0: The Anarchist Frontier
 
-Construir sus segmentos con el patrón enseñar, demostrar, desafiar, combinar y culminar. Incluir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán sin romper los contratos del MVP.
+Construir sus segmentos con el patrón enseñar, demostrar, desafiar, combinar y culminar. Incluir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán sin romper los contratos del MVP. Usar el paquete provisional de siete misiones de `PROJECT_PLAN.md` §12.8: 64-79 minutos de misiones y 75-95 minutos al incluir transiciones, intermisiones y hub. Revisar el rango después de cada lote de playtests, sin rellenar segmentos para cumplirlo.
 
 ### Phase 8 - Classes, Agora and RPG Lite
 
@@ -227,11 +245,28 @@ Agregar Runner, Tinkerer, Trader y Agorist de una en una. Luego construir The Ag
 
 ### Phase 9 - Ideological Worlds
 
-Producir un mundo a la vez. Ninguno entra al backlog de producción sin design sheet, regla principal, beneficio/coste cuando corresponda, counterplay, 2-4 obstáculos, enemigos, boss, templates y tests.
+Producir un mundo a la vez siguiendo los paquetes provisionales de `PROJECT_PLAN.md` §13.6. Ninguno entra al backlog de producción sin design sheet, regla principal, beneficio/coste cuando corresponda, counterplay, 2-4 familias de obstáculos, enemigos, boss, templates y tests. El punto de partida es cuatro misiones estándar y un clímax, aproximadamente 45-65 minutos de juego de misión; el número final se decide por variedad mecánica y datos, no por cuota.
+
+Gate por mundo:
+
+- la regla primaria se prueba primero en un prototype aislado;
+- la primera misión demuestra una fortaleza o promesa comprensible y la segunda introduce su límite;
+- cada misión posterior añade una decisión nueva, no solo más enemigos o decoración;
+- el clímax combina la regla con sistemas conocidos y establece legitimidad de combate cuando aplica;
+- el paquete completo tiene perfiles humanos de primera vuelta y repetición limpia antes de iniciar el siguiente mundo;
+- corrientes agrupadas conservan subzonas y mecánicas diferenciadas conforme a `GR-WORLD-005`.
 
 ### Phase 10 - Leviathan and Panarchy
 
-Crear mundo final, boss por justificaciones, contribuciones mecánicas de la coalición, mapa transformado, epílogo jugable y cliffhanger contractarian.
+Crear las cinco misiones de Leviathan y las dos viñetas jugables de Panarchy descritas en `PROJECT_PLAN.md` §13.6. El boss cambia entre Tradition, Majority, Planning, Security y Leviathan; la coalición aporta verbos y counterplays jugables, no solo cameos. El epílogo transforma el mapa, muestra asociaciones voluntarias y cierra con el cliffhanger contractarian sin combate obligatorio.
+
+Gate de campaña:
+
+- Leviathan ocupa 50-64 minutos de misiones y su boss final 12-15 minutos de primera vuelta;
+- Panarchy ocupa 7-10 minutos y conserva control del jugador durante el cierre;
+- la campaña completa cae inicialmente entre 403 y 514 minutos de misiones, aproximadamente 8-11 horas con Agora e intermisiones;
+- cada aliado requerido en el boss final fue presentado y tiene una contribución mecánica observable;
+- ninguna fase final exige recordar una regla que no se haya reintroducido de forma breve y segura.
 
 ### Phase 11 - Platform and Release
 
@@ -262,14 +297,46 @@ Una nueva ideología no justifica una rama en `PlayerController`. Un enemigo nue
 | Scope narrativo | diálogo antes de existir mecánica | exigir objeto, regla, obstáculo y counterplay |
 | LevelSpec frágil | datos inválidos fallan en runtime | mover la comprobación al schema/validator |
 | Generación mediocre | specs válidos pero aburridos | mantener curación y playtest humano obligatorios |
+| Duración artificial | el tiempo crece por espera, diálogo o repetición | medir por sección y recortar, reclasificar o añadir decisiones reales |
+| Escala espacial engañosa | `bounds.width` parece largo pero la ruta es trivial | medir ruta efectiva en pantallas equivalentes y probar recorrido limpio |
 | Port prematuro | tiempo móvil frena core loop | conservar abstracciones, aplazar polish por plataforma |
 
-## 8. Próximo hito recomendado
+## 8. Presupuesto operativo de niveles
 
-El MVP técnico y su gate humano están aprobados. El próximo hito es **Phase 6 - Content Factory v1**:
+Los valores canónicos viven en `GAMEPLAY_RULES.md` §22 y su intención de producto en `PROJECT_PLAN.md` §11.1. Resumen para planificación:
+
+| Tipo | Primera vuelta | Repetición limpia | Completionist | Ruta efectiva | Checkpoints |
+|---|---:|---:|---:|---:|---:|
+| Desafío opcional | 1-3 min | menos de 2 min | hasta 4 min | 2-5 pantallas | 0 |
+| Misión corta | 4-7 min | 2-4 min | 6-10 min | 7-11 pantallas | 0-1 |
+| Misión estándar | 8-12 min | 4-6 min | 10-16 min | 12-18 pantallas | 1-2 |
+| Clímax | 12-15 min | 6-9 min | 15-22 min | 16-24 pantallas | 2-3 |
+
+Cada nivel atraviesa este ciclo:
+
+1. **Brief:** tipo, regla primaria, cinco beats, counterplay y objetivos de tiempo/recorrido.
+2. **Greybox:** ruta base completa, rutas opcionales y checkpoints; sin usar arte o diálogo para ocultar falta de espacio jugable.
+3. **Validación:** referencias, geometría, alcance base, objetivos y ausencia de softlocks.
+4. **Playtest:** primera vuelta, repetición limpia y completionist cuando corresponda; tiempo por sección y punto de derrota.
+5. **Curación:** ajustar densidad y cadencia; luego arte, secretos y exposición opcional.
+
+Cada mundo posterior atraviesa un ciclo equivalente: beneficio o promesa, coste, counterplay, combinación y clímax. El target inicial es cuatro misiones estándar y un clímax; un paquete se reduce si no sostiene cinco decisiones diferentes.
+
+Una pantalla equivalente mide recorrido efectivo normalizado contra el viewport actual de referencia de 1280 px. Ascensos, descensos y retornos significativos cuentan; el ancho del bounding box no basta. Si cambia el viewport base, las fichas se renormalizan.
+
+Los specs `mvp_vertical_slice` y `occupancy_workshop_draft` son evidencia del pipeline y los contratos actuales, no de la escala final de campaña. `occupancy_workshop_draft` queda retenido como `technical_prototype`: no se expande ni se reclasifica como misión de campaña. Su sucesor `w0_03_occupancy_workshop` será un LevelSpec separado, diseñado contra el presupuesto de una misión estándar y sin alargar contenido mediante más vida enemiga o exposición.
+
+El sobre provisional completo es de 44 misiones/viñetas y 403-514 minutos de primera vuelta dentro de niveles. Los desafíos opcionales viven primero dentro del presupuesto completionist de cada misión y no aumentan este conteo por defecto. Solo se convierte en backlog el mundo activo; el resto conserva estatus de planificación hasta superar el gate del mundo anterior.
+
+## 9. Próximo hito recomendado
+
+El MVP técnico y su gate humano están aprobados. **Phase 6 - Content Factory v1** está implementada técnicamente y debe cerrar su gate de evidencia humana:
 
 1. convertir los contratos existentes en plantillas y validación por lote;
-2. probarlos con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven;
-3. someter el nuevo nivel a validación automatizada y playtest humano antes de promoverlo.
+2. crear la ficha editorial y el reporte de métricas de nivel sin modificar todavía `LevelSpec v0`;
+3. probar los contratos con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven;
+4. medir el segundo nivel por sección, checkpoint, ruta efectiva y perfiles de recorrido;
+5. conservar `occupancy_workshop_draft` como fixture técnico y documentar sus hallazgos sin promoverlo;
+6. reunir tres primeras vueltas y tres repeticiones limpias, incluyendo teclado y gamepad, antes de iniciar Phase 7.
 
 World 0 completo, las clases restantes, The Agora y el RPG permanecen fuera de alcance hasta superar el gate de Phase 6. La comprobación del build en máquina limpia y la observación del CI remoto siguen como tareas operativas previas a un release público.

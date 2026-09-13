@@ -42,11 +42,23 @@ Los hooks runtime disponibles son `access_gate` y `occupancy_machine`. Para el s
 4. Carga el archivo mediante `LevelSpecLoader` y ejecútalo contra `LevelValidator` en una prueba.
 5. Construye la escena con `LevelBuilder`, realiza playtest humano y conserva el LevelSpec junto a la escena promovida.
 
+## Perfilar y curar un nivel
+
+1. Copia `templates/phase6/level_playtest_profile_template.json` a `data/level_profiles/<level_id>.json` y conserva el mismo `level_id` del LevelSpec.
+2. Declara `classification: shipping_candidate` únicamente cuando el nivel pueda optar a campaña. Usa `technical_prototype` para fixtures y laboratorios; estos deben indicar `retain_as_prototype` y un `campaign_successor_id` distinto.
+3. Define los rangos objetivo de duración, secciones, checkpoints, backtracking y rutas antes de reunir evidencia de promoción.
+4. En la pantalla inicial selecciona `FIRST CLEAR`, `CLEAN REPLAY` o `COMPLETIONIST`. Solo una corrida que alcance la salida se archiva; reiniciar conserva el perfil elegido.
+5. Reúne como mínimo tres primeras vueltas de jugadores nuevos y tres repeticiones limpias, incluyendo teclado y gamepad.
+6. Ejecuta `tools/phase6/report_playtests.cmd -LevelId <level_id>` y usa el reporte de `telemetry/` como apoyo para la decisión humana. `promotion_ready` no sustituye el playtest ni autoriza por sí solo la promoción.
+
+Los LevelSpecs permanecen enfocados en runtime. La intención editorial, los targets y la decisión de curación viven en el perfil separado; un prototipo y su sucesor de campaña nunca comparten ID.
+
 ## Verificación
 
 ```powershell
 $env:GODOT_BIN = "C:\ruta\a\godot_console.exe"
 .\tools\phase6\validate_content.cmd
+.\tools\phase6\report_playtests.cmd -LevelId occupancy_workshop_draft
 .\tools\phase0\verify_all.cmd
 .\tools\phase5\build_windows.cmd
 ```

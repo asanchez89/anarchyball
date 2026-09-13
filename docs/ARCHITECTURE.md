@@ -81,11 +81,15 @@ LevelSpec JSON
   -> LevelBuilder
   -> escena de borrador jugable
   -> validación runtime y telemetría local
-  -> curación humana
-  -> escena de shipping + LevelSpec conservado
+  -> ficha editorial externa + reporte de corridas
+  -> decisión humana
+      -> conservar como prototipo técnico, o
+      -> curar como escena de shipping + LevelSpec conservado
 ```
 
 El `LevelValidator` debe reutilizar perfiles reales de movimiento, registros de contenido y contratos de encounter. El formato tendrá versión explícita y migraciones cuando cambie de manera incompatible.
+
+Las fichas de `data/level_profiles/` no son extensiones de `LevelSpec v0`. La telemetría archiva recorridos completos por `run_id`; el agregador deriva tiempos por sección/checkpoint y distancia recorrida sin convertir esas observaciones en reglas de gameplay. ADR-0006 define este límite.
 
 ## 5. Estado, guardado y servicios
 
