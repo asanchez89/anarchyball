@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Anarchyball: The Game"
-run/main_scene="res://levels/prototypes/occupancy_workshop_draft.tscn"
+run/main_scene="res://levels/campaign/campaign_shell.tscn"
 config/features=PackedStringArray("4.6")
 
 [display]

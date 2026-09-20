@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/builder/level_builder.gd" id="1_builder"]
+[ext_resource type="Resource" path="res://data/content/default_catalog.tres" id="2_catalog"]
+
+[node name="W001FirstAggression" type="Node2D"]
+script = ExtResource("1_builder")
+level_spec_path = "res://data/levels/w0_01_first_aggression.json"
+content_catalog = ExtResource("2_catalog")
+start_in_menu = true

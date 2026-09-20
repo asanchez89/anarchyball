@@ -14,6 +14,7 @@ extends ContentDefinition
 @export_range(0.2, 5.0, 0.1) var attack_interval: float = 1.2
 @export_range(50.0, 2000.0, 10.0) var activation_distance: float = 520.0
 @export_range(0.1, 10.0, 0.1) var telegraph_delay: float = 1.5
+@export_range(0.0, 3.0, 0.05) var commitment_impact_delay: float = 0.35
 
 
 func is_structurally_valid() -> bool:
@@ -26,4 +27,5 @@ func is_structurally_valid() -> bool:
 		and attack_interval > 0.0
 		and activation_distance > 0.0
 		and telegraph_delay > 0.0
+		and commitment_impact_delay >= 0.0
 	)

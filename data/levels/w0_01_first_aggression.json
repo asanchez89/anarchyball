@@ -1,0 +1,55 @@
+{
+  "schema_version": 0,
+  "level_id": "w0_01_first_aggression",
+  "display_name": "World 0 · First Aggression",
+  "slice": {
+    "title": "FIRST AGGRESSION",
+    "objective": "Reach MerchantBall, wait for RobberBall to commit aggression, force surrender, collect the thanks and exit",
+    "intro": "Move and aim through the frontier. MerchantBall is protected: attacks against a neutral target are blocked. RobberBall first threatens confiscation, then becomes a valid defensive target only after committing aggression. Reduce resolve until surrender and continue to EXIT.",
+    "completion": "MerchantBall is safe and RobberBall surrendered. This campaign attempt and its route evidence were saved locally."
+  },
+  "player_spawn": {"x": 120, "y": 596},
+  "exit": {"x": 9570, "y": 576},
+  "bounds": {"width": 9800, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": [],
+  "platforms": [
+    {"id": "ground_onboarding", "x": 0, "y": 620, "width": 1100, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_aim", "x": 1180, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_validity", "x": 2310, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_checkpoint", "x": 3440, "y": 600, "width": 850, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_encounter", "x": 4370, "y": 620, "width": 1250, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_recovery", "x": 5700, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_traverse", "x": 6830, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_confirm", "x": 7960, "y": 600, "width": 900, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_exit", "x": 8940, "y": 620, "width": 860, "height": 100, "required": true, "route_tags": []},
+    {"id": "aim_perch", "x": 1650, "y": 445, "width": 280, "height": 24, "required": false, "route_tags": ["aim_practice"]},
+    {"id": "encounter_overlook", "x": 5000, "y": 455, "width": 300, "height": 24, "required": false, "route_tags": ["defense_overlook"]},
+    {"id": "return_perch", "x": 7200, "y": 450, "width": 300, "height": 24, "required": false, "route_tags": ["clean_replay"]}
+  ],
+  "encounters": [
+    {
+      "id": "encounter_merchant_robbery",
+      "definition_id": "encounter_first_aggression",
+      "x": 4850,
+      "y": 590,
+      "required_for_completion": true
+    }
+  ],
+  "resources": [
+    {"id": "pickup_frontier_supply", "kind": "training_supply", "x": 2050, "y": 550, "ownership": "unowned_collectible"},
+    {"id": "pickup_merchant_thanks", "kind": "mission_reward", "x": 6030, "y": 550, "ownership": "mission_reward"},
+    {"id": "pickup_road_salvage", "kind": "permitted_salvage", "x": 8500, "y": 550, "ownership": "permitted_salvage"}
+  ],
+  "sections": [
+    {"id": "section_learn_movement", "from_x": 0, "to_x": 2000},
+    {"id": "section_learn_target_validity", "from_x": 2000, "to_x": 3900},
+    {"id": "section_witness_aggression", "from_x": 3900, "to_x": 5700},
+    {"id": "section_confirm_surrender", "from_x": 5700, "to_x": 7800},
+    {"id": "section_return_to_frontier", "from_x": 7800, "to_x": 9800}
+  ],
+  "checkpoints": [
+    {"id": "checkpoint_before_confiscation", "x": 3760, "y": 545, "respawn_x": 3690, "respawn_y": 565}
+  ]
+}

@@ -1,11 +1,12 @@
 class_name LevelExitMarker
 extends Area2D
 
-signal completed()
+signal completion_requested()
 
 var telemetry: LocalRunTelemetry
 var section_id: StringName = &"level_exit"
 var _completed: bool = false
+var _request_pending: bool = false
 
 
 func _ready() -> void:
@@ -25,10 +26,16 @@ func _draw() -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if _completed or not body is PlayerController or telemetry == null:
+	if _completed or _request_pending or not body is PlayerController or telemetry == null:
 		return
+	_request_pending = true
+	completion_requested.emit()
+
+
+func confirm_completion() -> void:
 	_completed = true
-	telemetry.record_event(&"section_completed", {"section_id": String(section_id)})
-	telemetry.record_event(&"level_completed")
-	telemetry.save_completed_run()
-	completed.emit()
+	_request_pending = false
+
+
+func reject_completion() -> void:
+	_request_pending = false

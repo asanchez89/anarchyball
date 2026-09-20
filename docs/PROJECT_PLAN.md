@@ -1494,7 +1494,9 @@ Endurecer plantillas, herramientas, fixtures, validación por lote y generación
 
 Construir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán mediante el patrón enseñar, demostrar, desafiar, combinar y culminar.
 
-**Estado:** próximo hito habilitado para planificación.
+**Estado:** en desarrollo; P7.0 completada y P7.1 implementada, pendiente de playtest humano y evidencia de promoción.
+
+Plan operativo: [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). El primer slice será `w0_01_first_aggression`; World 0 se producirá de forma secuencial y no como siete niveles abiertos a la vez.
 
 ## Phase 8 - Classes, Agora and RPG Lite
 

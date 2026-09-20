@@ -45,7 +45,7 @@
     },
     "encounter": {
       "type": "object", "additionalProperties": false, "required": ["id", "definition_id", "x", "y"],
-      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "rule_object_ids": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}}
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "rule_object_ids": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}, "required_for_completion": {"type": "boolean", "default": false}}
     },
     "resource": {
       "type": "object", "additionalProperties": false, "required": ["id", "kind", "x", "y", "ownership"],

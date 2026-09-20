@@ -3,11 +3,15 @@ extends Node2D
 
 signal level_built(spec: LevelSpec)
 signal slice_completed()
+signal level_completed(level_id: StringName)
+signal return_to_campaign_requested(level_id: StringName)
 
 @export_file("*.json") var level_spec_path: String
 @export var content_catalog: ContentCatalog
 @export var build_on_ready: bool = true
 @export var start_in_menu: bool = true
+@export var campaign_mode: bool = false
+@export var resume_from_checkpoint: bool = false
 
 var registry := ContentRegistry.new()
 var last_validation: LevelValidationResult
@@ -25,6 +29,7 @@ var _accessibility: AccessibilitySettings
 var _skip_start_menu_once: bool = false
 var _encounter_actors: Dictionary = {}
 var _playtest_profile: StringName = &"unspecified"
+var _exit_marker: LevelExitMarker
 
 
 func _ready() -> void:
@@ -44,8 +49,27 @@ func _process(_delta: float) -> void:
 
 
 func restart_run() -> void:
+	if telemetry != null:
+		telemetry.save_run(&"restarted")
 	_skip_start_menu_once = true
+	resume_from_checkpoint = false
 	build_from_file(level_spec_path, content_catalog)
+
+
+func continue_after_completion() -> void:
+	if campaign_mode and loaded_spec != null:
+		get_tree().paused = false
+		return_to_campaign_requested.emit(loaded_spec.level_id())
+	else:
+		restart_run()
+
+
+func abandon_run() -> void:
+	if telemetry != null:
+		telemetry.save_run(&"abandoned")
+	get_tree().paused = false
+	if loaded_spec != null:
+		return_to_campaign_requested.emit(loaded_spec.level_id())
 
 
 func activate_checkpoint(checkpoint_id: StringName, position: Vector2) -> void:
@@ -130,7 +154,12 @@ func _build_valid_spec(spec: LevelSpec) -> void:
 	_build_rule_label(spec, generated)
 	_build_debug_hud(spec, player, generated)
 	_connect_telemetry(player, generated)
-	_capture_checkpoint(&"level_start", _spawn_position)
+	var saved_checkpoint := LocalSaveStore.load_checkpoint(spec.level_id()) if resume_from_checkpoint else null
+	if saved_checkpoint != null:
+		_checkpoint = saved_checkpoint
+		_restore_checkpoint_state()
+	else:
+		_capture_checkpoint(&"level_start", _spawn_position)
 	_build_slice_flow(spec, generated)
 	level_built.emit(spec)
 
@@ -387,7 +416,8 @@ func _build_exit(spec: LevelSpec, parent: Node2D) -> void:
 	if not sections.is_empty():
 		marker.section_id = StringName(String((sections[-1] as Dictionary).get("id")))
 	parent.add_child(marker)
-	marker.completed.connect(_on_level_completed)
+	_exit_marker = marker
+	marker.completion_requested.connect(_on_completion_requested)
 
 
 func _build_rule_label(spec: LevelSpec, parent: Node2D) -> void:
@@ -524,6 +554,12 @@ func _retry_to_checkpoint() -> void:
 	if _player == null:
 		return
 	telemetry.record_event(&"retry", {"checkpoint_id": String(_checkpoint.checkpoint_id)})
+	_restore_checkpoint_state()
+
+
+func _restore_checkpoint_state() -> void:
+	if _player == null:
+		return
 	_player.reset_at(_checkpoint.player_position)
 	telemetry.reset_position_tracking(_checkpoint.player_position)
 	(_player.get_node("Health") as HealthComponent).restore(_checkpoint.health)
@@ -601,9 +637,22 @@ func _on_encounter_resolved(encounter_id: StringName, resolution: StringName) ->
 		_hud.show_feedback("ENCOUNTER RESOLVED · %s" % String(resolution).to_upper(), 2.0)
 
 
-func _on_level_completed() -> void:
+func _on_completion_requested() -> void:
+	var unresolved := required_unresolved_encounter_ids()
+	if not unresolved.is_empty():
+		if _exit_marker != null:
+			_exit_marker.reject_completion()
+		if _hud != null:
+			_hud.show_feedback("RESOLVE ENCOUNTER · %s" % String(unresolved[0]).to_upper(), 2.5, "[Salida bloqueada: resuelve el encuentro requerido]")
+		return
+	if _exit_marker != null:
+		_exit_marker.confirm_completion()
+		telemetry.record_event(&"section_completed", {"section_id": String(_exit_marker.section_id)})
+	telemetry.record_event(&"level_completed")
+	telemetry.save_completed_run()
 	LocalSaveStore.save(loaded_spec.level_id(), _checkpoint)
 	slice_completed.emit()
+	level_completed.emit(loaded_spec.level_id())
 	if _audio != null:
 		_audio.play_cue(FeedbackTone.Cue.SUCCESS)
 	if _flow != null:
@@ -616,6 +665,21 @@ func _on_level_completed() -> void:
 			]
 		)
 		_flow.show_completion()
+
+
+func required_unresolved_encounter_ids() -> Array[StringName]:
+	var unresolved: Array[StringName] = []
+	if loaded_spec == null:
+		return unresolved
+	for placement_value: Variant in loaded_spec.data.get("encounters", []) as Array:
+		var placement := placement_value as Dictionary
+		if not bool(placement.get("required_for_completion", false)):
+			continue
+		var encounter_id := StringName(String(placement.get("id")))
+		var observer := get_node_or_null("Generated/EncounterObservers/%s" % String(encounter_id)) as EncounterRuntimeObserver
+		if observer == null or not observer.is_resolved():
+			unresolved.append(encounter_id)
+	return unresolved
 
 
 func _apply_accessibility(settings: AccessibilitySettings) -> void:
@@ -654,6 +718,7 @@ func _clear_generated() -> void:
 	_hud = null
 	_flow = null
 	_audio = null
+	_exit_marker = null
 	_collected_reward_ids.clear()
 	_encounter_actors.clear()
 	_checkpoint = RunCheckpointState.new()

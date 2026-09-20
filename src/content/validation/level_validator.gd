@@ -23,7 +23,7 @@ const ROOT_FIELDS: PackedStringArray = [
 const POINT_FIELDS: PackedStringArray = ["x", "y"]
 const BOUNDS_FIELDS: PackedStringArray = ["width", "height"]
 const PLATFORM_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required", "route_tags"]
-const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "rule_object_ids"]
+const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "rule_object_ids", "required_for_completion"]
 const RESOURCE_FIELDS: PackedStringArray = ["id", "kind", "x", "y", "ownership"]
 const SECTION_FIELDS: PackedStringArray = ["id", "from_x", "to_x"]
 const CHECKPOINT_FIELDS: PackedStringArray = ["id", "x", "y", "respawn_x", "respawn_y"]
@@ -218,6 +218,8 @@ static func _validate_encounters(spec: LevelSpec, registry: ContentRegistry, res
 		var encounter_data := encounter as Dictionary
 		_validate_identity(encounter_data.get("id", ""), path + ".id", result)
 		_validate_vector(encounter_data, path, result)
+		if encounter_data.has("required_for_completion") and not encounter_data.get("required_for_completion") is bool:
+			result.add_error(&"invalid_type", path + ".required_for_completion", "se esperaba bool")
 		var rule_object_ids: Variant = encounter_data.get("rule_object_ids", [])
 		if not rule_object_ids is Array:
 			result.add_error(&"invalid_type", path + ".rule_object_ids", "se esperaba array")

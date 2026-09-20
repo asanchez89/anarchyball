@@ -35,6 +35,8 @@ var _distance_travelled_pixels: float = 0.0
 var _backtracking_pixels: float = 0.0
 var _last_tracked_position: Vector2
 var _has_tracked_position: bool = false
+var _run_outcome: StringName = &"in_progress"
+var _archived: bool = false
 
 
 func _process(delta: float) -> void:
@@ -57,6 +59,8 @@ func configure(
 	_distance_travelled_pixels = 0.0
 	_backtracking_pixels = 0.0
 	_has_tracked_position = false
+	_run_outcome = &"in_progress"
+	_archived = false
 	record_event(&"level_loaded")
 
 
@@ -105,12 +109,13 @@ func record_invalid_target(target_id: StringName, permission: TargetPermission) 
 
 func snapshot() -> Dictionary:
 	return {
-		"schema_version": 1,
+		"schema_version": 2,
 		"run_id": run_id,
 		"level_id": String(level_id),
 		"class_id": String(class_id),
 		"lens_id": String(lens_id),
 		"playtest_profile": String(playtest_profile),
+		"run_outcome": String(_run_outcome),
 		"elapsed_seconds": snappedf(_elapsed, 0.001),
 		"active_control_seconds": snappedf(_elapsed, 0.001),
 		"distance_travelled_pixels": snappedf(_distance_travelled_pixels, 0.01),
@@ -137,6 +142,19 @@ func save_completed_run(
 	latest_path: String = "user://telemetry/latest_run.json",
 	archive_directory: String = "user://telemetry/runs"
 ) -> Error:
+	return save_run(&"completed", latest_path, archive_directory)
+
+
+func save_run(
+	outcome: StringName,
+	latest_path: String = "user://telemetry/latest_run.json",
+	archive_directory: String = "user://telemetry/runs"
+) -> Error:
+	if outcome not in [&"completed", &"restarted", &"abandoned"]:
+		return ERR_INVALID_PARAMETER
+	if _archived:
+		return OK
+	_run_outcome = outcome
 	var latest_error := save_local(latest_path)
 	if latest_error != OK:
 		return latest_error
@@ -144,7 +162,10 @@ func save_completed_run(
 		var make_error := DirAccess.make_dir_recursive_absolute(archive_directory)
 		if make_error != OK:
 			return make_error
-	return save_local(archive_directory.path_join("%s.json" % run_id))
+	var archive_error := save_local(archive_directory.path_join("%s.json" % run_id))
+	if archive_error == OK:
+		_archived = true
+	return archive_error
 
 
 func _has_required_payload(event_type: StringName, payload: Dictionary) -> bool:

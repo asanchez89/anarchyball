@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WorldDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/campaign/world_definition.gd" id="1_world"]
+[ext_resource type="Script" path="res://src/campaign/campaign_mission_definition.gd" id="2_mission"]
+[ext_resource type="PackedScene" path="res://levels/world_0/w0_01_first_aggression.tscn" id="3_scene"]
+
+[sub_resource type="Resource" id="Mission_first_aggression"]
+script = ExtResource("2_mission")
+mission_id = &"w0_01_first_aggression"
+display_name = "01 · First Aggression"
+mission_scene = ExtResource("3_scene")
+
+[resource]
+script = ExtResource("1_world")
+world_id = &"world_00_anarchist_frontier"
+display_name = "Anarchist Frontier"
+missions = Array[ExtResource("2_mission")]([SubResource("Mission_first_aggression")])

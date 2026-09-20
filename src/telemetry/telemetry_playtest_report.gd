@@ -72,6 +72,8 @@ static func load_run_directory(directory: String) -> Array:
 
 
 static func _is_completed(snapshot: Dictionary) -> bool:
+	if snapshot.has("run_outcome"):
+		return String(snapshot.get("run_outcome")) == "completed"
 	for event_value: Variant in snapshot.get("events", []) as Array:
 		if event_value is Dictionary and String((event_value as Dictionary).get("event", "")) == "level_completed":
 			return true

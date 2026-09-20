@@ -17,6 +17,7 @@ var _profile_button: Button
 var _shake_button: Button
 var _subtitles_button: Button
 var _scale_button: Button
+var _campaign_button: Button
 var _settings: AccessibilitySettings
 var _panel: VBoxContainer
 var _is_completion: bool = false
@@ -60,7 +61,7 @@ func _process(_delta: float) -> void:
 
 func show_completion() -> void:
 	_is_completion = true
-	_show_overlay("SLICE COMPLETADO", _completion, "VOLVER A JUGAR")
+	_show_overlay("MISIÓN COMPLETADA" if _host.campaign_mode else "SLICE COMPLETADO", _completion, "CONTINUAR" if _host.campaign_mode else "VOLVER A JUGAR")
 	_restart_button.visible = false
 	get_tree().paused = true
 
@@ -105,6 +106,12 @@ func _build_ui() -> void:
 	_restart_button.custom_minimum_size = Vector2(280.0, 42.0)
 	_restart_button.pressed.connect(_restart)
 	_panel.add_child(_restart_button)
+	_campaign_button = Button.new()
+	_campaign_button.text = "VOLVER A CAMPAÑA"
+	_campaign_button.custom_minimum_size = Vector2(280.0, 42.0)
+	_campaign_button.visible = _host.campaign_mode
+	_campaign_button.pressed.connect(_host.abandon_run)
+	_panel.add_child(_campaign_button)
 	var accessibility_row := HBoxContainer.new()
 	accessibility_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	accessibility_row.add_theme_constant_override("separation", 8)
@@ -137,7 +144,7 @@ func _show_overlay(heading: String, body: String, primary_text: String) -> void:
 
 func _on_primary_pressed() -> void:
 	if _is_completion:
-		_restart()
+		_host.continue_after_completion()
 	else:
 		_resume()
 

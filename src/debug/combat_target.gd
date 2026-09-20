@@ -23,6 +23,7 @@ enum Behavior {
 @export var protected_target_path: NodePath
 @export var duel_enabled: bool = false
 @export_range(0.1, 10.0, 0.1) var telegraph_delay: float = 1.5
+@export_range(0.0, 3.0, 0.05) var commitment_impact_delay: float = 0.35
 @export_range(1.0, 1000.0, 1.0) var maximum_resolve: float = 30.0
 @export var hostile_bolt_scene: PackedScene
 @export var player_path: NodePath
@@ -48,6 +49,7 @@ var _aggression_committed: bool = false
 var _surrender_remaining: float = 0.0
 var _boss_phase: int = 1
 var _attack_cooldown: float = 0.0
+var _third_party_impact_remaining: float = -1.0
 
 
 func apply_archetype(archetype: EnemyArchetype) -> void:
@@ -62,6 +64,7 @@ func apply_archetype(archetype: EnemyArchetype) -> void:
 	attack_interval = archetype.attack_interval
 	activation_distance = archetype.activation_distance
 	telegraph_delay = archetype.telegraph_delay
+	commitment_impact_delay = archetype.commitment_impact_delay
 	aggressor_reason = archetype.aggressor_reason
 	threat_text = archetype.threat_text
 	match archetype.behavior_id:
@@ -94,6 +97,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_attack_line_remaining = maxf(_attack_line_remaining - delta, 0.0)
+	_update_pending_third_party_impact(delta)
 	_update_behavior(delta)
 	if _surrender_remaining > 0.0:
 		_surrender_remaining = maxf(_surrender_remaining - delta, 0.0)
@@ -142,7 +146,7 @@ func _update_behavior(delta: float) -> void:
 		committed = conflict_state.commit_aggression(aggressor_reason, protected_target_id)
 		if not committed:
 			return
-		_attack_protected_target()
+		_third_party_impact_remaining = commitment_impact_delay
 	else:
 		committed = conflict_state.commit_aggression(aggressor_reason)
 		if not committed:
@@ -152,10 +156,23 @@ func _update_behavior(delta: float) -> void:
 	aggression_committed.emit(stable_id, conflict_state.aggressor_reason)
 
 
+func _update_pending_third_party_impact(delta: float) -> void:
+	if _third_party_impact_remaining < 0.0:
+		return
+	if conflict_state.current_state != ConflictStateComponent.State.AGGRESSOR:
+		_third_party_impact_remaining = -1.0
+		return
+	_third_party_impact_remaining -= delta
+	if _third_party_impact_remaining <= 0.0:
+		_third_party_impact_remaining = -1.0
+		_attack_protected_target()
+
+
 func stop_behavior() -> void:
 	behavior = Behavior.STATIC
 	_behavior_elapsed = 0.0
 	_aggression_committed = false
+	_third_party_impact_remaining = -1.0
 	if conflict_state.current_state == ConflictStateComponent.State.THREATENING:
 		conflict_state.cancel_threat()
 	_telegraph_started = false
@@ -295,6 +312,7 @@ func capture_runtime_state() -> Dictionary:
 		"aggression_committed": _aggression_committed,
 		"telegraph_started": _telegraph_started,
 		"boss_phase": _boss_phase,
+		"third_party_impact_remaining": _third_party_impact_remaining,
 	}
 
 
@@ -318,6 +336,7 @@ func restore_runtime_state(snapshot: Dictionary) -> void:
 	_aggression_committed = bool(snapshot.get("aggression_committed", false))
 	_telegraph_started = bool(snapshot.get("telegraph_started", false))
 	_boss_phase = int(snapshot.get("boss_phase", 1))
+	_third_party_impact_remaining = float(snapshot.get("third_party_impact_remaining", -1.0))
 	_surrender_remaining = 0.0
 	_attack_cooldown = 0.0
 	_update_presentation()

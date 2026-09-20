@@ -12,7 +12,8 @@ func test_telemetry_records_required_local_balancing_signals() -> void:
 	telemetry.record_event(&"encounter_resolved", {"encounter_id": "encounter_preview", "resolution": "evade_and_extract"})
 
 	var snapshot := telemetry.snapshot()
-	assert_int(snapshot.get("schema_version")).is_equal(1)
+	assert_int(snapshot.get("schema_version")).is_equal(2)
+	assert_str(snapshot.get("run_outcome")).is_equal("in_progress")
 	assert_int((snapshot.get("events") as Array).size()).is_equal(7)
 
 

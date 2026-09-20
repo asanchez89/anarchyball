@@ -239,6 +239,10 @@ Un segundo nivel retenido explícitamente como `technical_prototype` no se promo
 
 Construir sus segmentos con el patrón enseñar, demostrar, desafiar, combinar y culminar. Incluir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán sin romper los contratos del MVP. Usar el paquete provisional de siete misiones de `PROJECT_PLAN.md` §12.8: 64-79 minutos de misiones y 75-95 minutos al incluir transiciones, intermisiones y hub. Revisar el rango después de cada lote de playtests, sin rellenar segmentos para cumplirlo.
 
+El plan operativo vive en [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). La producción comienza por P7.0 y `w0_01_first_aggression`; las demás misiones no entran simultáneamente al backlog detallado.
+
+P7.1 ya dispone de shell local, progreso versionado, checkpoint por nivel, finalización condicionada, outcomes de telemetría y el draft independiente `w0_01_first_aggression`. Su promoción queda bloqueada hasta completar teclado/gamepad y reunir tres recorridos `first_clear` y tres `clean_replay`.
+
 ### Phase 8 - Classes, Agora and RPG Lite
 
 Agregar Runner, Tinkerer, Trader y Agorist de una en una. Luego construir The Agora compacta, progresión compartida, equipo y Archive. Cada clase debe completar contenido requerido y heredar target validity.
