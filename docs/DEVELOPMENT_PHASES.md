@@ -330,13 +330,14 @@ El sobre provisional completo es de 44 misiones/viñetas y 403-514 minutos de pr
 
 ## 9. Próximo hito recomendado
 
-El MVP técnico y su gate humano están aprobados. **Phase 6 - Content Factory v1** está implementada técnicamente y debe cerrar su gate de evidencia humana:
+El MVP y **Phase 6 - Content Factory v1** están aprobados. Phase 6 cerró el 2026-09-20 con `occupancy_workshop_draft` retenido como prototipo técnico no promocionable. Sus recorridos históricos sin perfil no se reclasifican; el gate de tres primeras vueltas y tres repeticiones limpias se aplicará al primer candidato real a shipping.
 
-1. convertir los contratos existentes en plantillas y validación por lote;
-2. crear la ficha editorial y el reporte de métricas de nivel sin modificar todavía `LevelSpec v0`;
-3. probar los contratos con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven;
-4. medir el segundo nivel por sección, checkpoint, ruta efectiva y perfiles de recorrido;
-5. conservar `occupancy_workshop_draft` como fixture técnico y documentar sus hallazgos sin promoverlo;
-6. reunir tres primeras vueltas y tres repeticiones limpias, incluyendo teclado y gamepad, antes de iniciar Phase 7.
+El próximo hito es **Phase 7 - World 0: The Anarchist Frontier**:
 
-World 0 completo, las clases restantes, The Agora y el RPG permanecen fuera de alcance hasta superar el gate de Phase 6. La comprobación del build en máquina limpia y la observación del CI remoto siguen como tareas operativas previas a un release público.
+1. crear el plan ejecutable de World 0 a partir del paquete provisional de siete misiones;
+2. producir primero un slice de campaña pequeño con brief, cinco beats, presupuesto y ficha editorial;
+3. mantener `occupancy_workshop_draft` como fixture y crear `w0_03_occupancy_workshop` como LevelSpec independiente cuando corresponda;
+4. reutilizar los contratos del MVP y abrir extensiones únicamente ante gaps comprobados;
+5. validar, medir y curar cada candidato antes de ampliar el siguiente lote.
+
+Las clases restantes, The Agora y el RPG siguen fuera de alcance hasta Phase 8. La comprobación del build en máquina limpia y la observación del CI remoto continúan como tareas operativas previas a un release público.

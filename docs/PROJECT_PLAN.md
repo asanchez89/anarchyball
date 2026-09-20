@@ -1488,9 +1488,13 @@ Correcciones de playtest, accesibilidad básica, balance observable, suite estab
 
 Endurecer plantillas, herramientas, fixtures, validación por lote y generación asistida. Demostrar extensibilidad con una segunda regla ideológica, un nuevo arquetipo enemigo y un segundo nivel data-driven, todos curados por playtest humano. Incorporar fichas de objetivos y reportes de duración, secciones, checkpoints y ruta efectiva antes de ampliar World 0.
 
+**Estado:** aprobada y cerrada el 2026-09-20. `occupancy_workshop_draft` se conserva como prototipo técnico; ninguna de sus corridas se convierte en evidencia de campaña ni se promociona retroactivamente.
+
 ## Phase 7 - World 0: The Anarchist Frontier
 
 Construir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán mediante el patrón enseñar, demostrar, desafiar, combinar y culminar.
+
+**Estado:** próximo hito habilitado para planificación.
 
 ## Phase 8 - Classes, Agora and RPG Lite
 

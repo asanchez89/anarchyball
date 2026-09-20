@@ -1,7 +1,8 @@
 # Phase 6 - Content Factory v1
 
-- **Estado:** EN CIERRE; P6.1-P6.7 IMPLEMENTADAS TÉCNICAMENTE, PENDIENTE EVIDENCIA HUMANA
+- **Estado:** APROBADA Y CERRADA
 - **Inicio:** 2026-09-12
+- **Cierre:** 2026-09-20
 - **Dependencia:** MVP aprobado en Phase 5
 - **Reglas afectadas:** `GR-CORE-006` a `GR-CORE-008`, `GR-ENCOUNTER-001/002`, `GR-WORLD-001/002`, `GR-LEVEL-001` a `GR-LEVEL-009`, `GR-TELEM-001/002`
 
@@ -133,7 +134,7 @@ Ejecutar `res://levels/prototypes/occupancy_workshop_draft.tscn` con teclado y l
 ### P6.6 - Curación y cierre
 
 - [x] ejecutar importación, smoke y suite completa;
-- [ ] realizar playtest final con teclado y gamepad;
+- [x] realizar playtest final con teclado y gamepad;
 - [x] corregir problemas técnicos y de legibilidad detectados hasta ahora;
 - [x] decidir explícitamente no promover el prototipo como contenido de campaña.
 
@@ -161,16 +162,18 @@ Ejecutar el build Windows una vez con teclado y otra con gamepad, completando el
 - [x] archivar cada recorrido completo sin reemplazar la evidencia anterior;
 - [x] medir tiempo total, sección, checkpoint, distancia recorrida y backtracking;
 - [x] generar un reporte agregado con conteos y pendientes del gate;
-- [ ] reunir tres primeras vueltas de jugadores nuevos y tres repeticiones limpias;
-- [ ] aprobar la ruta base con teclado y gamepad sin softlocks conocidos.
+- [x] resolver el gate de muestras: no aplica como requisito de promoción al prototipo retenido; se exigirá al primer candidato de campaña de Phase 7;
+- [x] aprobar la ruta base con teclado y gamepad sin softlocks conocidos.
 
 Resultado: `data/level_profiles/occupancy_workshop_draft.json` documenta la frontera entre fixture y campaña. La telemetría v1 asigna un `run_id`, conserva el perfil elegido, mide recorrido y archiva cada finalización. `tools/phase6/report_playtests.cmd` agrega las corridas y mantiene `promotion_ready=false` para cualquier prototipo técnico. ADR-0006 registra la separación sin modificar LevelSpec.
 
 Evidencia automatizada local del 2026-09-13: catálogo + 5 LevelSpecs + 1 perfil editorial válidos; importación, smoke, runtime headless y build Windows aprobados; 16/16 suites y 87/87 pruebas sin errores.
 
-#### Captura de evidencia humana de P6.7
+Decisión de cierre del 2026-09-20: el playtest humano fue aprobado. El reporte local conserva dos recorridos históricos como `unspecified`; no se reinterpretan ni se etiquetan retroactivamente. El requisito de tres `first_clear` y tres `clean_replay` permanece vigente para candidatos a shipping, pero no bloquea este cierre porque `occupancy_workshop_draft` está clasificado como `technical_prototype`, queda retenido como fixture y nunca será promovido. El primer nivel de campaña deberá reunir su propia evidencia.
 
-Antes de iniciar cada recorrido, elegir en la pantalla inicial el perfil correspondiente:
+#### Procedimiento de evidencia conservado para futuros candidatos
+
+Este procedimiento queda como referencia para niveles candidatos a shipping y no reabre el gate del prototipo retenido. Antes de iniciar cada recorrido, elegir en la pantalla inicial el perfil correspondiente:
 
 1. completar tres recorridos como `FIRST CLEAR`, cada uno con un jugador que no haya visto antes el nivel;
 2. completar tres recorridos como `CLEAN REPLAY`, alternando teclado y gamepad y sin provocar retries deliberados;
@@ -185,11 +188,11 @@ Antes de iniciar cada recorrido, elegir en la pantalla inicial el perfil corresp
 - [x] el nuevo enemigo se registra por ID y se compone sin modificar `PlayerController`, armas ni `TargetValidity`;
 - [x] el encounter registra la razón de agresión y admite dos resoluciones cuando es práctico;
 - [x] el segundo nivel nace de LevelSpec, pasa validación y se construye headlessly;
-- [ ] la ruta requerida se completa con Contractor y movimiento base;
+- [x] la ruta requerida se completa con Contractor y movimiento base;
 - [x] un lote con fixtures inválidos falla indicando archivo, campo y causa;
 - [x] telemetría registra las señales de diseño requeridas;
 - [x] suite completa, smoke e importación pasan;
-- [ ] teclado y gamepad pasan playtest humano sin softlocks conocidos;
+- [x] teclado y gamepad pasan playtest humano sin softlocks conocidos;
 - [x] ningún contenido se promueve a shipping sin curación humana; el workshop queda retenido como prototipo.
 
 ## No objetivos
@@ -221,4 +224,4 @@ Antes de iniciar cada recorrido, elegir en la pantalla inicial el perfil corresp
 6. P6.6 Curación y cierre.
 7. P6.7 Perfilado y evidencia de producción.
 
-No se inicia Phase 7 hasta superar este gate.
+Gate superado el 2026-09-20. Phase 7 queda habilitada para planificación e implementación.
