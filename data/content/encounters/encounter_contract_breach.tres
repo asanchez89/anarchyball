@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_contract_breach"
+display_name = "Bridge Agreement Breach"
+entry_condition = &"contract_performed"
+objective = &"restore_return_access_or_leave"
+enemy_archetype_ids = Array[StringName]([&"npc_egoist_counterparty"])
+success_condition_ids = Array[StringName]([&"return_access_restored", &"player_uses_open_bypass"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+allowed_resolutions = Array[StringName]([&"reroute_bridge_control", &"bypass_and_exit"])
+telemetry_tags = Array[StringName]([&"contract_breach", &"non_offensive_resolution"])

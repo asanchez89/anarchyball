@@ -68,7 +68,13 @@ Ninguna arma, proyectil, trampa, drone o aliado contratado decide por sí mismo 
 
 ### 3.4 Encuentros y reglas de mundo
 
-`EncounterDefinition` declara estados iniciales, triggers, objetivos, resoluciones y recompensas. Cada placement construido puede tener un `EncounterRuntimeObserver` local que relaciona sus actores y `rule_object_ids`, y emite como máximo una resolución declarada; no existe un quest manager global. `IdeologyRuleDefinition` configura hooks limitados sobre pickup, interacción, spawn o ambiente. Las reglas de mundo nunca aparecen como `if current_world == ...` en el player.
+`EncounterDefinition` declara estados iniciales, triggers, objetivos, resoluciones y recompensas. Cada placement construido puede tener un `EncounterRuntimeObserver` local que relaciona sus actores y `rule_object_ids`, y emite como máximo una resolución declarada; no existe un quest manager global. Los placements opcionales `actors` materializan NPC de catálogo que existen en el mundo sin fingir que pertenecen a un encounter. `IdeologyRuleDefinition` configura hooks limitados sobre pickup, interacción, spawn o ambiente. Las reglas de mundo nunca aparecen como `if current_world == ...` en el player.
+
+Los NPC neutrales o aliados pueden declarar líneas breves en su `EnemyArchetype`. `NpcDialogueBubble` presenta esas líneas en espacio de mundo, avanza mediante la acción abstracta `interact` y no modifica `ConflictState`, elegibilidad ofensiva ni resolución de encounters. El diálogo tutorial aporta contexto a una mecánica ya observable; no sustituye su implementación.
+
+La presentación de World 0 centraliza su densidad de píxel y profundidad de superficie en `World0ArtMetrics`. El terreno, la decoración y los props pequeños de Warped usan escalas enteras y filtro nearest; ningún actor de presentación aplica escalas fraccionarias que produzcan píxeles desiguales. Los elementos de escenario sin función jugable se dibujan detrás del terreno. `WorldPropPlacement` ajusta todo prop apoyado a la superficie física de la plataforma bajo su coordenada horizontal; checkpoints, máquinas y futuros props grounded no dependen de offsets manuales. Los pickups que flotan conservan una política separada e intencional. `platforms[].art_style` separa semántica de ruta y presentación: `road` usa el pavimento principal, mientras `column_supported` usa el piso elevado de Warped y columnas continuas hasta el soporte inferior. `required` nunca decide qué arte estructural corresponde.
+
+Las cuatro capas ambientales de World 0 usan `Parallax2D`: el cielo permanece casi fijo y montañas, árboles lejanos y árboles cercanos aumentan progresivamente su desplazamiento horizontal. La repetición corresponde al ancho escalado de cada textura y el desplazamiento vertical permanece unido a la cámara para no alterar la lectura de plataformas.
 
 ## 4. Motor de contenido
 

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_occupancy_title_claim"
+display_name = "Current Use and Older Title Claim"
+entry_condition = &"on_section_enter"
+objective = &"resolve_use_and_title_dispute"
+enemy_archetype_ids = Array[StringName]([&"enemy_occupancy_enforcer"])
+protected_archetype_id = &"npc_mutualist_claimant"
+aggression_trigger_ids = Array[StringName]([&"detain_order_executed"])
+success_condition_ids = Array[StringName]([&"alternate_machine_operated", &"enforcer_neutralized"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
+allowed_resolutions = Array[StringName]([&"neutralize_enforcer", &"operate_alternate_machine"])
+neutralization_resolution = &"neutralize_enforcer"
+rule_interaction_resolution = &"operate_alternate_machine"
+class_shortcut_tags = Array[StringName]([&"occupy_machine", &"baseline_bypass"])
+telemetry_tags = Array[StringName]([&"occupancy_title_dispute", &"current_use", &"detention_order"])

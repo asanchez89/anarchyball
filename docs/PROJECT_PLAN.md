@@ -109,7 +109,7 @@ Esta distinción debe aparecer desde el tutorial: dos ideologías pueden estar m
 
 ## 5.1 World 0 - The Anarchist Frontier
 
-El primer mundo sirve como tutorial mecánico y filosófico. No es "el mundo del Ancom", sino **el mundo de los anarquismos**.
+El primer mundo sirve como tutorial mecánico y filosófico. No es "el mundo del Ancom", sino **el mundo de los anarquismos**. Cuando comienza la campaña, el Leviatán no es todavía una sorpresa distante: sus agencias de seguridad ya ocupan nodos de transporte, talleres y barrios periféricos de comunidades ideológicamente distintas. La frontera conserva autonomía local, pero vive bajo redadas, requisas y puestos de control intermitentes.
 
 El recorrido introduce de forma progresiva:
 
@@ -131,7 +131,17 @@ La función del mundo es mostrar que la palabra "anarquía" contiene disputas re
 - liderazgo informal;
 - mercados y comunas.
 
-El enfrentamiento con AncomBall puede ser un duelo voluntario o una disputa reglada. En la fase final irrumpe una fuerza del Leviatán que declara ilegales las asociaciones de todos los anarquistas por igual. El boss fight se interrumpe y las facciones colaboran para escapar.
+La presencia estatal temprana aporta una fuente recurrente de acción sin convertir a las corrientes ideológicas en facciones enemigas. Una `OccupationPoliceBall` encontrada ejecutando una redada, detención o confiscación ya ha realizado un acto inspeccionable de agresión y puede entrar directamente como `Aggressor`; el uniforme o la afiliación institucional por sí solos nunca bastan.
+
+Una unidad de ocupación que consuma su Resolve mantiene presión ofensiva sostenida y pasa directamente a `Neutralized`, sin una fase de rendición. Esto expresa disciplina coercitiva, no letalidad ni permiso permanente: neutralizada, deja de ser un objetivo válido de inmediato.
+
+Las AncomBalls desconfían de AnarchyBall y algunas patrullas pueden bloquearlo, seguirlo o preparar una emboscada. Esos encuentros deben poder evitarse, abandonarse o desescalarse. Solo una AncomBall que materializa un ataque pasa a `Aggressor`; su ideología nunca concede permiso ofensivo automático.
+
+En el taller tutorial, esa diferencia también se expresa mediante verbos propios: las patrullas Ancom responden a señales de tregua, las disputas Egoist protegen alijos útiles que el jugador debe alcanzar y reclamar, y los reruteos de maquinaria pertenecen a operadores Mutualist. Las repeticiones combinan esas reglas con ascensores y rutas verticales, además de aumentar gradualmente el número de balls presentes.
+
+AncomBalls y contrapartes Egoist priorizan conservar su autonomía: si llegan a comprometer una agresión, prefieren retirarse o rendirse con presión defensiva moderada en vez de resistir hasta agotar todo su Resolve. La política se configura por arquetipo y no por comprobaciones del nombre ideológico.
+
+El enfrentamiento con The AncomBall puede ser un duelo voluntario o una disputa reglada. En la fase final, las agencias del Leviatán reciben refuerzos y convierten la ocupación fragmentaria en una ofensiva abierta que declara ilegales las asociaciones de todos los anarquistas por igual. El boss fight se interrumpe y las facciones colaboran para escapar.
 
 Esto establece la primera coalición.
 
@@ -263,8 +273,11 @@ Los enemigos representan **acciones coercitivas, aparatos institucionales o indi
 - CorporateGuardBall;
 - CensorBall;
 - InspectorBall.
+- OccupationPoliceBall, cuando una unidad del Leviatán ya está ejecutando una redada, requisa o detención;
 
 Esto evita que la fantasía del jugador sea "disparar a quien piensa distinto".
+
+`OccupationPoliceBall` no sustituye a toda policía del juego. La guardia limitada de The Night Watch puede proteger, permanecer neutral o escalar según el encounter; las fuerzas de ocupación responden a la jurisdicción expansiva del Leviatán. El estado de conflicto expresa la acción actual, no el uniforme.
 
 ---
 
@@ -711,6 +724,8 @@ Mecánica:
 
 Lección: incluso sistemas que rechazan propiedad privada convencional necesitan reglas de exclusión sobre recursos escasos.
 
+Ambientación: el nivel es un taller comunal todavía operativo, no una ruina forestal con máquinas aisladas. Las rutas elevadas usan pisos industriales propios sostenidos por columnas continuas; al fondo aparecen zonas de reparación, almacenaje compartido, conducciones y maquinaria conectada. Ninguna plataforma aparece flotando ni reutiliza el pavimento vial como repisa.
+
 ## 12.4 LeftLibertarianBall: original appropriation
 
 Mecánica:
@@ -763,10 +778,13 @@ Mecánica principal: **Common Pool / Mutual Aid**.
 Tensión secundaria:
 - recurso común insuficiente obliga a priorizar defensa/healing/plataformas;
 - la coordinación colectiva tiene un coste de decisión.
+- patrullas desconfiadas reaccionan a la intrusión con seguimiento y telegraph, pero el jugador puede evitar su zona, retirarse o desescalar;
+- si una patrulla decide atacar, su acción observable —no su identidad Ancom— habilita la defensa.
+- después de escalar, una patrulla prefiere retirada o surrender temprano frente a presión defensiva moderada.
 
 Boss: **The AncomBall**.
 
-El encounter se interrumpe por invasión del Leviatán. Las mecánicas aprendidas en el mundo se combinan para escapar.
+El encounter se interrumpe cuando la ocupación del Leviatán escala a ofensiva abierta. Las mecánicas aprendidas en el mundo se combinan para escapar.
 
 ## 12.8 Paquete provisional de misiones de World 0
 
@@ -1494,9 +1512,9 @@ Endurecer plantillas, herramientas, fixtures, validación por lote y generación
 
 Construir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán mediante el patrón enseñar, demostrar, desafiar, combinar y culminar.
 
-**Estado:** en desarrollo; P7.0 completada y P7.1 implementada, pendiente de playtest humano y evidencia de promoción.
+**Estado:** en desarrollo; P7.0 completada y P7.1-P7.3 implementadas, pendientes de playtest humano y evidencia de promoción.
 
-Plan operativo: [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). El primer slice será `w0_01_first_aggression`; World 0 se producirá de forma secuencial y no como siete niveles abiertos a la vez.
+Plan operativo: [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). `w0_01_first_aggression`, `w0_02_contract_bridge` y `w0_03_occupancy_workshop` forman el slice actual de campaña; World 0 se produce de forma secuencial y no como siete niveles abiertos a la vez. La segunda misión introduce el contrato y su incumplimiento; la tercera presenta utilidad de maquinaria abandonada, exclusión por uso actual y una disputa de título con resolución operativa o defensiva. Ningún desacuerdo concede por sí mismo permiso ofensivo.
 
 ## Phase 8 - Classes, Agora and RPG Lite
 

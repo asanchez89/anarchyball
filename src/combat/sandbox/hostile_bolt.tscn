@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/combat/sandbox/hostile_bolt.gd" id="1_bolt"]
+[ext_resource type="Texture2D" path="res://assets/art/vfx/world_0/defensive_missile.png" id="2_missile"]
 
 [sub_resource type="CircleShape2D" id="Circle_bolt"]
 radius = 7.0
@@ -12,3 +13,10 @@ script = ExtResource("1_bolt")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("Circle_bolt")
+
+[node name="MissileSprite" type="Sprite2D" parent="."]
+texture_filter = 1
+modulate = Color(1, 0.42, 0.5, 1)
+texture = ExtResource("2_missile")
+hframes = 2
+scale = Vector2(2, 2)

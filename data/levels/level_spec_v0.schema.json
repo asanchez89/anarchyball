@@ -26,8 +26,10 @@
     "sections": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/section"}},
     "checkpoints": {"type": "array", "items": {"$ref": "#/$defs/checkpoint"}},
     "gates": {"type": "array", "items": {"$ref": "#/$defs/gate"}},
-    "rule_objects": {"type": "array", "items": {"$ref": "#/$defs/rule_object"}},
-    "slice": {"$ref": "#/$defs/slice"}
+      "rule_objects": {"type": "array", "items": {"$ref": "#/$defs/rule_object"}},
+      "contracts": {"type": "array", "items": {"$ref": "#/$defs/contract"}},
+      "actors": {"type": "array", "items": {"$ref": "#/$defs/actor"}},
+      "slice": {"$ref": "#/$defs/slice"}
   },
   "$defs": {
     "stable_id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"},
@@ -40,12 +42,16 @@
       "properties": {
         "id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"},
         "width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0},
-        "required": {"type": "boolean"}, "route_tags": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}
+        "required": {"type": "boolean"},
+        "route_tags": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}},
+        "art_style": {"enum": ["road", "column_supported"]},
+        "motion_distance_y": {"type": "number"},
+        "motion_speed": {"type": "number", "exclusiveMinimum": 0}
       }
     },
     "encounter": {
       "type": "object", "additionalProperties": false, "required": ["id", "definition_id", "x", "y"],
-      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "rule_object_ids": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}, "required_for_completion": {"type": "boolean", "default": false}}
+      "properties": {"id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"}, "x": {"type": "number"}, "y": {"type": "number"}, "rule_object_ids": {"type": "array", "items": {"$ref": "#/$defs/stable_id"}}, "resolution_gate_id": {"$ref": "#/$defs/stable_id"}, "required_for_completion": {"type": "boolean", "default": false}}
     },
     "resource": {
       "type": "object", "additionalProperties": false, "required": ["id", "kind", "x", "y", "ownership"],
@@ -69,14 +75,48 @@
       "properties": {
         "id": {"$ref": "#/$defs/stable_id"}, "hook_id": {"$ref": "#/$defs/stable_id"},
         "x": {"type": "number"}, "y": {"type": "number"},
-        "initial_state": {"enum": ["inactive", "available", "occupied", "disabled"]},
+        "initial_state": {"enum": ["inactive", "available", "occupied", "disabled", "abandoned", "disputed"]},
         "target_platform_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/stable_id"}},
+        "targets_enabled_before_interaction": {"type": "boolean"},
         "interaction_tag": {"$ref": "#/$defs/stable_id"}
       }
     },
-    "slice": {
+      "contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "definition_id", "x", "y", "acceptance_gate_id", "resolution_gate_id", "encounter_id", "performance_x", "resolution_x", "resolution_y", "counterparty_escape_x"],
+      "properties": {
+        "id": {"$ref": "#/$defs/stable_id"}, "definition_id": {"$ref": "#/$defs/stable_id"},
+        "x": {"type": "number"}, "y": {"type": "number"},
+        "acceptance_gate_id": {"$ref": "#/$defs/stable_id"}, "resolution_gate_id": {"$ref": "#/$defs/stable_id"},
+        "encounter_id": {"$ref": "#/$defs/stable_id"}, "performance_x": {"type": "number"},
+        "resolution_x": {"type": "number"}, "resolution_y": {"type": "number"}, "counterparty_escape_x": {"type": "number"}
+        }
+      },
+      "actor": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "archetype_id", "x", "y"],
+        "properties": {
+          "id": {"$ref": "#/$defs/stable_id"}, "archetype_id": {"$ref": "#/$defs/stable_id"},
+          "x": {"type": "number"}, "y": {"type": "number"}
+        }
+      },
+      "slice": {
       "type": "object", "additionalProperties": false, "required": ["title", "objective", "intro", "completion"],
-      "properties": {"title": {"type": "string"}, "objective": {"type": "string"}, "intro": {"type": "string"}, "completion": {"type": "string"}}
+      "properties": {
+        "title": {"type": "string"}, "objective": {"type": "string"}, "intro": {"type": "string"}, "completion": {"type": "string"},
+        "briefing_cards": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["title", "body"],
+            "properties": {
+              "title": {"type": "string"}, "body": {"type": "string"},
+              "image_path": {"type": "string", "pattern": "^res://.+\\.png$"},
+              "image_columns": {"type": "integer", "minimum": 1},
+              "image_frame": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
     }
   }
 }

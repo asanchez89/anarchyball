@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="2_enemy"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/egoist_ball_visual.tres" id="3_visual"]
+
+[resource]
+script = ExtResource("2_enemy")
+content_id = &"npc_egoist_counterparty"
+display_name = "EgoistBall · DISPUTED"
+tags = Array[StringName]([&"ball", &"counterparty", &"contract_dispute"])
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 30.0
+surrender_resolve_ratio = 0.65
+behavior_id = &"static"
+initial_conflict_state = 1
+threat_text = "Agreement disputed · not an aggressor"
+visual_definition = ExtResource("3_visual")

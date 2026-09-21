@@ -19,19 +19,24 @@ const ROOT_FIELDS: PackedStringArray = [
 	"schema_version", "level_id", "display_name", "player_spawn", "exit", "bounds",
 	"movement_profile_path", "class_loadout_id", "ideology_rule_ids", "platforms",
 	"encounters", "resources", "sections", "checkpoints", "gates", "rule_objects", "slice",
+	"contracts", "actors",
 ]
 const POINT_FIELDS: PackedStringArray = ["x", "y"]
 const BOUNDS_FIELDS: PackedStringArray = ["width", "height"]
-const PLATFORM_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required", "route_tags"]
-const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "rule_object_ids", "required_for_completion"]
-const RESOURCE_FIELDS: PackedStringArray = ["id", "kind", "x", "y", "ownership"]
+const PLATFORM_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required", "route_tags", "art_style", "motion_distance_y", "motion_speed"]
+const PLATFORM_ART_STYLES: PackedStringArray = ["road", "column_supported"]
+const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "enemy_count", "rule_object_ids", "resource_ids", "resolution_gate_id", "required_for_completion"]
+const RESOURCE_FIELDS: PackedStringArray = ["id", "kind", "x", "y", "ownership", "effect_id", "effect_amount"]
 const SECTION_FIELDS: PackedStringArray = ["id", "from_x", "to_x"]
 const CHECKPOINT_FIELDS: PackedStringArray = ["id", "x", "y", "respawn_x", "respawn_y"]
 const GATE_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required_tag", "label"]
-const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag"]
-const SLICE_FIELDS: PackedStringArray = ["title", "objective", "intro", "completion"]
-const LOCAL_ID_COLLECTIONS: PackedStringArray = ["platforms", "encounters", "resources", "sections", "checkpoints", "gates", "rule_objects"]
-const RULE_OBJECT_STATES: PackedStringArray = ["inactive", "available", "occupied", "disabled"]
+const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag", "targets_enabled_before_interaction"]
+const CONTRACT_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "acceptance_gate_id", "resolution_gate_id", "encounter_id", "performance_x", "resolution_x", "resolution_y", "counterparty_escape_x"]
+const ACTOR_FIELDS: PackedStringArray = ["id", "archetype_id", "x", "y"]
+const SLICE_FIELDS: PackedStringArray = ["title", "objective", "intro", "completion", "briefing_cards"]
+const BRIEFING_CARD_FIELDS: PackedStringArray = ["title", "body", "image_path", "image_columns", "image_frame"]
+const LOCAL_ID_COLLECTIONS: PackedStringArray = ["platforms", "encounters", "resources", "sections", "checkpoints", "gates", "rule_objects", "contracts", "actors"]
+const RULE_OBJECT_STATES: PackedStringArray = ["inactive", "available", "occupied", "disabled", "abandoned", "disputed"]
 const RESOURCE_OWNERSHIP: PackedStringArray = [
 	"unowned_collectible",
 	"mission_reward",
@@ -75,8 +80,10 @@ static func validate(spec: LevelSpec, registry: ContentRegistry) -> LevelValidat
 	_validate_mission_rewards_on_base_route(spec, result)
 	_validate_sections(spec.data.get("sections"), result)
 	_validate_checkpoints(spec.data.get("checkpoints", []), result)
-	_validate_gates(spec.data.get("gates", []), registry, spec.data.get("ideology_rule_ids"), result)
+	_validate_gates(spec, registry, result)
 	_validate_rule_objects(spec, registry, result)
+	_validate_contracts(spec, registry, result)
+	_validate_actors(spec, registry, result)
 	_validate_unique_local_ids(spec, result)
 	_validate_placement_bounds(spec, result)
 	_validate_movement_and_reachability(spec, result)
@@ -95,6 +102,8 @@ static func _validate_closed_shapes(spec: LevelSpec, result: LevelValidationResu
 	_validate_dictionary_shape(spec.data.get("exit"), "exit", POINT_FIELDS, result)
 	_validate_dictionary_shape(spec.data.get("bounds"), "bounds", BOUNDS_FIELDS, result)
 	_validate_dictionary_shape(spec.data.get("slice", {}), "slice", SLICE_FIELDS, result)
+	var slice_data := spec.data.get("slice", {}) as Dictionary
+	_validate_array_shapes(slice_data.get("briefing_cards", []), "slice.briefing_cards", BRIEFING_CARD_FIELDS, result)
 	_validate_array_shapes(spec.data.get("platforms"), "platforms", PLATFORM_FIELDS, result)
 	_validate_array_shapes(spec.data.get("encounters"), "encounters", ENCOUNTER_FIELDS, result)
 	_validate_array_shapes(spec.data.get("resources"), "resources", RESOURCE_FIELDS, result)
@@ -102,6 +111,29 @@ static func _validate_closed_shapes(spec: LevelSpec, result: LevelValidationResu
 	_validate_array_shapes(spec.data.get("checkpoints", []), "checkpoints", CHECKPOINT_FIELDS, result)
 	_validate_array_shapes(spec.data.get("gates", []), "gates", GATE_FIELDS, result)
 	_validate_array_shapes(spec.data.get("rule_objects", []), "rule_objects", RULE_OBJECT_FIELDS, result)
+	_validate_array_shapes(spec.data.get("contracts", []), "contracts", CONTRACT_FIELDS, result)
+	_validate_array_shapes(spec.data.get("actors", []), "actors", ACTOR_FIELDS, result)
+
+
+static func _validate_actors(spec: LevelSpec, registry: ContentRegistry, result: LevelValidationResult) -> void:
+	var value: Variant = spec.data.get("actors", [])
+	if not value is Array:
+		result.add_error(&"invalid_type", "actors", "se esperaba array")
+		return
+	for index: int in (value as Array).size():
+		var path := "actors[%d]" % index
+		var actor_value: Variant = (value as Array)[index]
+		if not actor_value is Dictionary:
+			result.add_error(&"invalid_type", path, "se esperaba objeto")
+			continue
+		var actor := actor_value as Dictionary
+		_validate_identity(actor.get("id", ""), path + ".id", result)
+		_validate_vector(actor, path, result)
+		var archetype_id := StringName(String(actor.get("archetype_id", "")))
+		_validate_reference(registry, ContentRegistry.Kind.ENEMY_ARCHETYPE, archetype_id, path + ".archetype_id", result)
+		var archetype := registry.get_definition(ContentRegistry.Kind.ENEMY_ARCHETYPE, archetype_id) as EnemyArchetype
+		if archetype != null and (not archetype.is_structurally_valid() or not ResourceLoader.exists(archetype.actor_scene_path, "PackedScene")):
+			result.add_error(&"invalid_enemy_archetype", path + ".archetype_id", "EnemyArchetype '%s' no tiene escena válida" % archetype_id)
 
 
 static func _validate_array_shapes(value: Variant, path: String, allowed_fields: PackedStringArray, result: LevelValidationResult) -> void:
@@ -194,6 +226,13 @@ static func _validate_platforms(value: Variant, result: LevelValidationResult) -
 		_validate_vector(data, path, result)
 		if float(data.get("width", 0.0)) <= 0.0 or float(data.get("height", 0.0)) <= 0.0:
 			result.add_error(&"invalid_geometry", path, "width/height deben ser positivos")
+		var art_style := String(data.get("art_style", "road" if bool(data.get("required", true)) else "column_supported"))
+		if art_style not in PLATFORM_ART_STYLES:
+			result.add_error(&"invalid_platform_art_style", path + ".art_style", "se esperaba road o column_supported")
+		var motion_distance := float(data.get("motion_distance_y", 0.0))
+		var motion_speed := float(data.get("motion_speed", 0.0))
+		if (not is_zero_approx(motion_distance) and motion_speed <= 0.0) or (is_zero_approx(motion_distance) and motion_speed > 0.0):
+			result.add_error(&"invalid_platform_motion", path, "motion_distance_y y motion_speed deben declararse juntos")
 		if not data.get("route_tags", []) is Array:
 			result.add_error(&"invalid_type", path + ".route_tags", "se esperaba array")
 			continue
@@ -220,6 +259,12 @@ static func _validate_encounters(spec: LevelSpec, registry: ContentRegistry, res
 		_validate_vector(encounter_data, path, result)
 		if encounter_data.has("required_for_completion") and not encounter_data.get("required_for_completion") is bool:
 			result.add_error(&"invalid_type", path + ".required_for_completion", "se esperaba bool")
+		if encounter_data.has("enemy_count"):
+			var count_value: Variant = encounter_data.get("enemy_count")
+			if (not count_value is float and not count_value is int) or not is_equal_approx(float(count_value), roundf(float(count_value))):
+				result.add_error(&"invalid_type", path + ".enemy_count", "se esperaba entero")
+			elif int(count_value) < 1:
+				result.add_error(&"invalid_value", path + ".enemy_count", "se requiere al menos una ball")
 		var rule_object_ids: Variant = encounter_data.get("rule_object_ids", [])
 		if not rule_object_ids is Array:
 			result.add_error(&"invalid_type", path + ".rule_object_ids", "se esperaba array")
@@ -233,6 +278,28 @@ static func _validate_encounters(spec: LevelSpec, registry: ContentRegistry, res
 				_validate_identity(object_id, "%s.rule_object_ids[%d]" % [path, rule_index], result)
 				if object_id not in available_rule_object_ids:
 					result.add_error(&"unknown_local_reference", "%s.rule_object_ids[%d]" % [path, rule_index], "rule object no declarado '%s'" % object_id)
+		var resource_ids: Variant = encounter_data.get("resource_ids", [])
+		if not resource_ids is Array:
+			result.add_error(&"invalid_type", path + ".resource_ids", "se esperaba array")
+		else:
+			var available_resource_ids: Array[StringName] = []
+			for resource_value: Variant in spec.data.get("resources", []) as Array:
+				if resource_value is Dictionary:
+					available_resource_ids.append(StringName(String((resource_value as Dictionary).get("id"))))
+			for resource_index: int in (resource_ids as Array).size():
+				var resource_id := StringName(String((resource_ids as Array)[resource_index]))
+				_validate_identity(resource_id, "%s.resource_ids[%d]" % [path, resource_index], result)
+				if resource_id not in available_resource_ids:
+					result.add_error(&"unknown_local_reference", "%s.resource_ids[%d]" % [path, resource_index], "recurso no declarado '%s'" % resource_id)
+		if encounter_data.has("resolution_gate_id"):
+			var resolution_gate_id := StringName(String(encounter_data.get("resolution_gate_id")))
+			_validate_identity(resolution_gate_id, path + ".resolution_gate_id", result)
+			var available_gate_ids: Array[StringName] = []
+			for gate_value: Variant in spec.data.get("gates", []) as Array:
+				if gate_value is Dictionary:
+					available_gate_ids.append(StringName(String((gate_value as Dictionary).get("id"))))
+			if resolution_gate_id not in available_gate_ids:
+				result.add_error(&"unknown_local_reference", path + ".resolution_gate_id", "gate no declarado '%s'" % resolution_gate_id)
 		var definition_id: Variant = encounter_data.get("definition_id", "")
 		_validate_reference(registry, ContentRegistry.Kind.ENCOUNTER_DEFINITION, definition_id, path + ".definition_id", result)
 		var definition := registry.get_definition(ContentRegistry.Kind.ENCOUNTER_DEFINITION, StringName(String(definition_id))) as EncounterDefinition
@@ -268,6 +335,10 @@ static func _validate_resources(value: Variant, result: LevelValidationResult) -
 		var ownership := String(resource_data.get("ownership", ""))
 		if ownership not in RESOURCE_OWNERSHIP:
 			result.add_error(&"invalid_ownership", path + ".ownership", "semántica desconocida '%s'" % ownership)
+		if resource_data.has("effect_id") and StringName(String(resource_data.get("effect_id"))) != &"health_restore":
+			result.add_error(&"invalid_pickup_effect", path + ".effect_id", "efecto de pickup desconocido")
+		if resource_data.has("effect_amount") and (not resource_data.get("effect_amount") is float and not resource_data.get("effect_amount") is int):
+			result.add_error(&"invalid_type", path + ".effect_amount", "se esperaba número")
 
 
 static func _validate_mission_rewards_on_base_route(spec: LevelSpec, result: LevelValidationResult) -> void:
@@ -323,11 +394,21 @@ static func _validate_checkpoints(value: Variant, result: LevelValidationResult)
 			result.add_error(&"missing_field", path, "faltan respawn_x/respawn_y")
 
 
-static func _validate_gates(value: Variant, registry: ContentRegistry, rule_ids_value: Variant, result: LevelValidationResult) -> void:
+static func _validate_gates(spec: LevelSpec, registry: ContentRegistry, result: LevelValidationResult) -> void:
+	var value: Variant = spec.data.get("gates", [])
 	if not value is Array:
 		result.add_error(&"invalid_type", "gates", "se esperaba array")
 		return
 	var counterplay_tags: Array[StringName] = []
+	var encounter_gate_ids: Dictionary = {}
+	var encounters_value: Variant = spec.data.get("encounters", [])
+	if encounters_value is Array:
+		for encounter_value: Variant in encounters_value as Array:
+			if encounter_value is Dictionary:
+				var encounter_gate_id := StringName(String((encounter_value as Dictionary).get("resolution_gate_id", "")))
+				if not encounter_gate_id.is_empty():
+					encounter_gate_ids[encounter_gate_id] = true
+	var rule_ids_value: Variant = spec.data.get("ideology_rule_ids")
 	if rule_ids_value is Array and not (rule_ids_value as Array).is_empty():
 		var rule := registry.get_definition(ContentRegistry.Kind.IDEOLOGY_RULE, StringName(String((rule_ids_value as Array)[0]))) as IdeologyRuleDefinition
 		if rule != null:
@@ -343,6 +424,11 @@ static func _validate_gates(value: Variant, registry: ContentRegistry, rule_ids_
 		_validate_vector(gate, path, result)
 		var required_tag := StringName(String(gate.get("required_tag", "")))
 		_validate_identity(required_tag, path + ".required_tag", result)
+		if required_tag == &"encounter_resolution":
+			var gate_id := StringName(String(gate.get("id", "")))
+			if not encounter_gate_ids.has(gate_id):
+				result.add_error(&"orphan_encounter_gate", path + ".id", "ningún encuentro resuelve esta barrera")
+			continue
 		if required_tag not in counterplay_tags:
 			result.add_error(&"missing_counterplay", path + ".required_tag", "el tag no está declarado por la regla activa")
 
@@ -400,6 +486,49 @@ static func _validate_rule_objects(spec: LevelSpec, registry: ContentRegistry, r
 			result.add_error(&"missing_counterplay", path + ".interaction_tag", "el tag no está declarado por la regla activa")
 
 
+static func _validate_contracts(spec: LevelSpec, registry: ContentRegistry, result: LevelValidationResult) -> void:
+	var value: Variant = spec.data.get("contracts", [])
+	if not value is Array:
+		result.add_error(&"invalid_type", "contracts", "se esperaba array")
+		return
+	var gate_ids: Array[StringName] = []
+	for gate_value: Variant in spec.data.get("gates", []) as Array:
+		if gate_value is Dictionary:
+			gate_ids.append(StringName(String((gate_value as Dictionary).get("id", ""))))
+	var encounter_ids: Array[StringName] = []
+	for encounter_value: Variant in spec.data.get("encounters", []) as Array:
+		if encounter_value is Dictionary:
+			encounter_ids.append(StringName(String((encounter_value as Dictionary).get("id", ""))))
+	var bounds := spec.data.get("bounds", {}) as Dictionary
+	for index: int in (value as Array).size():
+		var path := "contracts[%d]" % index
+		var placement_value: Variant = (value as Array)[index]
+		if not placement_value is Dictionary:
+			result.add_error(&"invalid_type", path, "se esperaba objeto")
+			continue
+		var placement := placement_value as Dictionary
+		_validate_identity(placement.get("id", ""), path + ".id", result)
+		_validate_vector(placement, path, result)
+		_validate_reference(registry, ContentRegistry.Kind.CONTRACT_DEFINITION, placement.get("definition_id", ""), path + ".definition_id", result)
+		for field: String in ["acceptance_gate_id", "resolution_gate_id"]:
+			var gate_id := StringName(String(placement.get(field, "")))
+			_validate_identity(gate_id, path + "." + field, result)
+			if gate_id not in gate_ids:
+				result.add_error(&"unknown_local_reference", path + "." + field, "gate no declarado '%s'" % gate_id)
+		var encounter_id := StringName(String(placement.get("encounter_id", "")))
+		_validate_identity(encounter_id, path + ".encounter_id", result)
+		if encounter_id not in encounter_ids:
+			result.add_error(&"unknown_local_reference", path + ".encounter_id", "encounter no declarado '%s'" % encounter_id)
+		for field: String in ["performance_x", "resolution_x", "resolution_y", "counterparty_escape_x"]:
+			if not placement.has(field) or (not placement.get(field) is float and not placement.get(field) is int):
+				result.add_error(&"invalid_type", path + "." + field, "se esperaba número")
+		if float(placement.get("performance_x", -1.0)) < 0.0 or float(placement.get("performance_x", -1.0)) > float(bounds.get("width", 0.0)):
+			result.add_error(&"point_out_of_bounds", path + ".performance_x", "debe quedar dentro de bounds")
+		_validate_point_in_bounds({"x": placement.get("resolution_x", -1.0), "y": placement.get("resolution_y", -1.0)}, bounds, path + ".resolution", result)
+		if float(placement.get("counterparty_escape_x", -1.0)) < 0.0 or float(placement.get("counterparty_escape_x", -1.0)) > float(bounds.get("width", 0.0)):
+			result.add_error(&"point_out_of_bounds", path + ".counterparty_escape_x", "debe quedar dentro de bounds")
+
+
 static func _validate_unique_local_ids(spec: LevelSpec, result: LevelValidationResult) -> void:
 	var locations: Dictionary = {}
 	for collection: String in LOCAL_ID_COLLECTIONS:
@@ -424,7 +553,7 @@ static func _validate_placement_bounds(spec: LevelSpec, result: LevelValidationR
 	var bounds: Variant = spec.data.get("bounds")
 	if not bounds is Dictionary:
 		return
-	for collection: String in ["encounters", "resources", "checkpoints", "gates", "rule_objects"]:
+	for collection: String in ["encounters", "resources", "checkpoints", "gates", "rule_objects", "contracts", "actors"]:
 		var value: Variant = spec.data.get(collection, [])
 		if not value is Array:
 			continue

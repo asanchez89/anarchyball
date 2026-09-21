@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 256 256" shape-rendering="crispEdges">
+  <rect width="256" height="256" fill="#191524"/>
+  <g stroke="#443754" stroke-width="0.5">
+    <path d="M32 0V256M64 0V256M96 0V256M128 0V256M160 0V256M192 0V256M224 0V256"/>
+    <path d="M0 32H256M0 64H256M0 96H256M0 128H256M0 160H256M0 192H256M0 224H256"/>
+  </g>
+  <g stroke="#d34fc5" stroke-width="0.5" stroke-dasharray="2 2">
+    <path d="M0 28H256M0 60H256M0 92H256M0 124H256M0 156H256M0 188H256M0 220H256M0 252H256"/>
+  </g>
+  <g fill="#f2e9ff" font-family="monospace" font-size="3">
+    <text x="1" y="4">idle 6</text>
+    <text x="1" y="36">move 8</text>
+    <text x="1" y="68">jump 8</text>
+    <text x="1" y="100">fire 4</text>
+    <text x="1" y="132">hurt 4</text>
+    <text x="1" y="164">threatening 4</text>
+    <text x="1" y="196">surrendering 6</text>
+    <text x="1" y="228">neutralized 4</text>
+  </g>
+  <g fill="#57d7dd">
+    <rect x="15.5" y="27.5" width="1" height="1"/>
+    <rect x="47.5" y="27.5" width="1" height="1"/>
+    <rect x="79.5" y="27.5" width="1" height="1"/>
+    <rect x="111.5" y="27.5" width="1" height="1"/>
+    <rect x="143.5" y="27.5" width="1" height="1"/>
+    <rect x="175.5" y="27.5" width="1" height="1"/>
+    <rect x="207.5" y="27.5" width="1" height="1"/>
+    <rect x="239.5" y="27.5" width="1" height="1"/>
+  </g>
+</svg>

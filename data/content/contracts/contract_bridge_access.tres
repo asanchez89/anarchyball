@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ContractDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/contract_definition.gd" id="2_contract"]
+
+[resource]
+script = ExtResource("2_contract")
+content_id = &"contract_bridge_access"
+display_name = "Bridge Access Agreement"
+tags = Array[StringName]([&"contract", &"bridge_access"])
+issuer_id = &"npc_egoist_counterparty"
+objective_id = &"deliver_bridge_manifest"
+reward_id = &"pickup_bridge_payment"
+optional_cost_id = &"carry_sealed_manifest"
+failure_condition_id = &"counterparty_refuses_return_access"
+completion_flag_ids = Array[StringName]([&"manifest_delivered", &"return_access_due"])
+allowed_resolutions = Array[StringName]([&"reroute_bridge_control", &"bypass_and_exit"])

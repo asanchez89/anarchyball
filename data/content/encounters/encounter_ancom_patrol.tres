@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_ancom_patrol"
+display_name = "Wary Ancom Patrol"
+entry_condition = &"on_section_enter"
+objective = &"signal_truce_withdraw_or_defend_after_commitment"
+enemy_archetype_ids = Array[StringName]([&"enemy_ancom_patrol"])
+aggression_trigger_ids = Array[StringName]([&"patrol_attack_committed"])
+success_condition_ids = Array[StringName]([&"truce_signal_operated", &"patrol_surrenders"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"early_resolve_threshold"])
+allowed_resolutions = Array[StringName]([&"signal_truce", &"force_patrol_surrender"])
+neutralization_resolution = &"force_patrol_surrender"
+rule_interaction_resolution = &"signal_truce"
+telemetry_tags = Array[StringName]([&"deescalation", &"avoidable_conflict"])

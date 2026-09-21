@@ -50,6 +50,80 @@ func test_first_aggression_level_profile_and_required_encounter_validate() -> vo
 	assert_int((profile_result["errors"] as PackedStringArray).size()).is_equal(0)
 	assert_bool(bool(((load_result.spec.data["encounters"] as Array)[0] as Dictionary)["required_for_completion"])).is_true()
 	assert_int((load_result.spec.data["checkpoints"] as Array).size()).is_equal(1)
+	assert_int((load_result.spec.data["encounters"] as Array).size()).is_equal(2)
+	var optional_platforms := (load_result.spec.data["platforms"] as Array).filter(
+		func(platform: Dictionary) -> bool: return not bool(platform.get("required", true))
+	)
+	assert_int(optional_platforms.size()).is_equal(7)
+	var route_tags: Array = []
+	for platform_value: Variant in optional_platforms:
+		route_tags.append_array((platform_value as Dictionary).get("route_tags", []) as Array)
+	assert_array(route_tags).contains(["upper_supply_route", "merchant_rescue_vantage", "upper_ruin_bypass"])
+
+
+func test_optional_roadblock_adds_two_telegraphed_adversaries_without_blocking_exit() -> void:
+	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
+	builder.build_on_ready = false
+	builder.start_in_menu = false
+	add_child(builder)
+	var validation := builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog)
+	assert_bool(validation.is_valid()).is_true()
+	var roadblock_adversaries: Array[CombatTarget] = [
+		builder.get_node("Generated/Encounters/enemy_frontier_raider") as CombatTarget,
+		builder.get_node("Generated/Encounters/enemy_frontier_lookout") as CombatTarget,
+	]
+	for adversary: CombatTarget in roadblock_adversaries:
+		assert_object(adversary).is_not_null()
+		assert_int(adversary.initial_state).is_equal(ConflictStateComponent.State.NEUTRAL)
+		assert_int(adversary.behavior).is_equal(CombatTarget.Behavior.ATTACK_PLAYER)
+	assert_array(builder.required_unresolved_encounter_ids()).contains_exactly([&"encounter_merchant_robbery"])
+
+
+func test_neutral_frontier_guide_delivers_short_mechanical_dialogue() -> void:
+	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
+	builder.build_on_ready = false
+	builder.start_in_menu = false
+	add_child(builder)
+	var validation := builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog)
+	var guide := builder.get_node_or_null("Generated/Actors/frontier_tutorial_guide") as CombatTarget
+	var dialogue := guide.get_node_or_null("NpcDialogue") as NpcDialogueBubble
+
+	assert_bool(validation.is_valid()).is_true()
+	assert_object(guide).is_not_null()
+	assert_int(guide.initial_state).is_equal(ConflictStateComponent.State.NEUTRAL)
+	assert_object(dialogue).is_not_null()
+	assert_int(dialogue.lines.size()).is_equal(3)
+	assert_str(dialogue.lines[0]).contains("neutral")
+	assert_str(dialogue.lines[1]).contains("agresor")
+	assert_str(dialogue.lines[2]).contains("RESOLVE")
+	assert_bool(dialogue.start()).is_true()
+	assert_str(dialogue.current_line()).is_equal(dialogue.lines[0])
+	assert_bool(dialogue.is_typing()).is_true()
+	assert_bool(dialogue.advance()).is_true()
+	assert_bool(dialogue.is_typing()).is_false()
+	assert_bool(dialogue.advance()).is_true()
+	assert_str(dialogue.current_line()).is_equal(dialogue.lines[1])
+	var bubble_art := dialogue.get_node("DialogueBubble/PixelBubbleArt") as TextureRect
+	var bubble_margin := dialogue.get_node("DialogueBubble/MarginContainer") as MarginContainer
+	var line_label := dialogue.get_node("DialogueBubble/MarginContainer/VBoxContainer/Line") as Label
+	assert_str(bubble_art.texture.resource_path).is_equal("res://assets/art/ui/dialogue_bubble_16bit.png")
+	assert_float(bubble_margin.anchor_right).is_equal(1.0)
+	assert_float(bubble_margin.anchor_bottom).is_equal(1.0)
+	assert_bool(bubble_margin.clip_contents).is_true()
+	assert_int(bubble_margin.get_theme_constant("margin_left")).is_equal(34)
+	assert_int(bubble_margin.get_theme_constant("margin_top")).is_equal(30)
+	assert_int(bubble_margin.get_theme_constant("margin_bottom")).is_equal(72)
+	assert_str(line_label.get_theme_font("font").resource_path).is_equal("res://assets/fonts/press_start_2p/PressStart2P-Regular.ttf")
+	assert_int(line_label.get_theme_font_size("font_size")).is_equal(10)
+	var player := builder.get_node("Generated/Player") as PlayerController
+	var visual := guide.get_node("BallVisual") as BallVisual
+	player.global_position.x = guide.global_position.x - 80.0
+	guide._on_dialogue_player_proximity_changed(player, true)
+	guide._face_dialogue_player()
+	var left_scale := visual.scale.x
+	player.global_position.x = guide.global_position.x + 80.0
+	guide._face_dialogue_player()
+	assert_float(visual.scale.x).is_equal(-left_scale)
 
 
 func test_required_for_completion_rejects_non_boolean_values() -> void:

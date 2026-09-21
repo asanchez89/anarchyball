@@ -15,6 +15,7 @@ const SUPPORTED_EVENTS: Array[StringName] = [
 	&"defeat",
 	&"softlock_error",
 	&"level_completed",
+	&"contract_state_changed",
 ]
 const PLAYTEST_PROFILES: Array[StringName] = [
 	&"unspecified",
@@ -179,6 +180,8 @@ func _has_required_payload(event_type: StringName, payload: Dictionary) -> bool:
 			required_fields = PackedStringArray(["encounter_id", "resolution"])
 		&"invalid_target_attempt":
 			required_fields = PackedStringArray(["target_id", "decision"])
+		&"contract_state_changed":
+			required_fields = PackedStringArray(["contract_id", "from_state", "to_state"])
 	for field: String in required_fields:
 		if not payload.has(field):
 			return false

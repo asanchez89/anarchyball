@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="2_enemy"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/merchant_ball_visual.tres" id="3_visual"]
+
+[resource]
+script = ExtResource("2_enemy")
+content_id = &"npc_frontier_guide"
+display_name = "FrontierGuideBall · NEUTRAL"
+tags = Array[StringName]([&"ball", &"neutral", &"tutorial_guide"])
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 40.0
+behavior_id = &"static"
+dialogue_lines = Array[String](["Una disputa no convierte a otra ball en objetivo. Si es neutral, tus disparos serán bloqueados.", "Una amenaza te permite prepararte. Espera el acto coercitivo: entonces el agresor quedará marcado.", "Defiende a terceros reduciendo RESOLVE. Cuando una ball se rinde, deja de ser un objetivo válido."])
+dialogue_auto_start = true
+visual_definition = ExtResource("3_visual")

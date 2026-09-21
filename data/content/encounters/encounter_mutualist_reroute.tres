@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_mutualist_reroute"
+display_name = "Mutualist Dispatch Reroute"
+entry_condition = &"on_section_enter"
+objective = &"restore_dispatch_hoist"
+success_condition_ids = Array[StringName]([&"dispatch_hoist_operated"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+allowed_resolutions = Array[StringName]([&"operate_dispatch_hoist"])
+rule_interaction_resolution = &"operate_dispatch_hoist"
+telemetry_tags = Array[StringName]([&"mutualist", &"reroute", &"vertical_traversal"])

@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/art_lab.gd" id="1_lab"]
+[ext_resource type="Script" path="res://src/presentation/pixel_ball_prototype.gd" id="2_ball"]
+[ext_resource type="Texture2D" path="res://assets/art/world_0/frontier_forest/preview.png" id="3_background"]
+[ext_resource type="Texture2D" path="res://assets/art/art_bible/concepts/anarchy_ball_compact_concept.png" id="4_compact"]
+[ext_resource type="Texture2D" path="res://assets/art/art_bible/concepts/anarchy_ball_ancap_surface_concept_v2.png" id="5_detailed"]
+
+[node name="ArtLab" type="Node2D"]
+script = ExtResource("1_lab")
+compact_concept = ExtResource("4_compact")
+detailed_concept = ExtResource("5_detailed")
+
+[node name="TwilightReference" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("3_background")
+centered = false
+scale = Vector2(3, 3)
+
+[node name="CompactBall" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(390, 500)
+script = ExtResource("2_ball")
+
+[node name="DetailedBall" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(870, 500)
+script = ExtResource("2_ball")
+variant = 1

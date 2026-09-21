@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://src/actors/player/player_controller.gd" id="1_controller"]
 [ext_resource type="Resource" path="res://data/player/default_movement_profile.tres" id="2_profile"]
@@ -9,6 +9,9 @@
 [ext_resource type="Script" path="res://src/combat/effects/combat_identity_component.gd" id="7_identity"]
 [ext_resource type="Script" path="res://src/combat/effects/health_component.gd" id="8_health"]
 [ext_resource type="Script" path="res://src/combat/effects/effect_receiver_component.gd" id="9_receiver"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/anarchy_ball_visual.tres" id="10_visual"]
+[ext_resource type="Script" path="res://src/audio/gameplay_sfx_emitter.gd" id="11_sfx"]
+[ext_resource type="Resource" path="res://data/audio/world0_gameplay_audio.tres" id="12_audio"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 23.0
@@ -27,11 +30,18 @@ shape = SubResource("Capsule_player")
 [node name="Visual" type="Node2D" parent="."]
 unique_name_in_owner = true
 script = ExtResource("3_visual")
+visual_definition = ExtResource("10_visual")
 
 [node name="ProbeLauncher" type="Node2D" parent="."]
-position = Vector2(0, -2)
+position = Vector2(0, -10)
 script = ExtResource("5_launcher")
 probe_scene = ExtResource("6_probe")
+muzzle_distance = 55.0
+
+[node name="Sfx" type="Node" parent="."]
+script = ExtResource("11_sfx")
+profile = ExtResource("12_audio")
+spatial = false
 
 [node name="Identity" type="Node" parent="."]
 script = ExtResource("7_identity")

@@ -241,7 +241,7 @@ Construir sus segmentos con el patrón enseñar, demostrar, desafiar, combinar y
 
 El plan operativo vive en [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). La producción comienza por P7.0 y `w0_01_first_aggression`; las demás misiones no entran simultáneamente al backlog detallado.
 
-P7.1 ya dispone de shell local, progreso versionado, checkpoint por nivel, finalización condicionada, outcomes de telemetría y el draft independiente `w0_01_first_aggression`. Su promoción queda bloqueada hasta completar teclado/gamepad y reunir tres recorridos `first_clear` y tres `clean_replay`.
+P7.1 ya dispone de shell local, progreso versionado, checkpoint por nivel, finalización condicionada, outcomes de telemetría y el draft independiente `w0_01_first_aggression`. P7.2 incorpora `w0_02_contract_bridge`, el primer contrato data-driven de campaña, su state machine, gates, recompensa condicionada, EgoistBall disputado y una resolución no ofensiva. P7.3 añade `w0_03_occupancy_workshop` como misión separada del fixture de Phase 6, con MutualistBall neutral, maquinaria abandonada/ocupada/disputada y dos resoluciones para la disputa de título. La promoción de las tres misiones queda bloqueada hasta completar teclado/gamepad y reunir tres recorridos `first_clear` y tres `clean_replay` por candidato.
 
 ### Phase 8 - Classes, Agora and RPG Lite
 
@@ -336,12 +336,12 @@ El sobre provisional completo es de 44 misiones/viñetas y 403-514 minutos de pr
 
 El MVP y **Phase 6 - Content Factory v1** están aprobados. Phase 6 cerró el 2026-09-20 con `occupancy_workshop_draft` retenido como prototipo técnico no promocionable. Sus recorridos históricos sin perfil no se reclasifican; el gate de tres primeras vueltas y tres repeticiones limpias se aplicará al primer candidato real a shipping.
 
-El próximo hito es **Phase 7 - World 0: The Anarchist Frontier**:
+El hito activo es **Phase 7 - World 0: The Anarchist Frontier**:
 
-1. crear el plan ejecutable de World 0 a partir del paquete provisional de siete misiones;
-2. producir primero un slice de campaña pequeño con brief, cinco beats, presupuesto y ficha editorial;
-3. mantener `occupancy_workshop_draft` como fixture y crear `w0_03_occupancy_workshop` como LevelSpec independiente cuando corresponda;
-4. reutilizar los contratos del MVP y abrir extensiones únicamente ante gaps comprobados;
-5. validar, medir y curar cada candidato antes de ampliar el siguiente lote.
+1. validar manualmente `w0_01_first_aggression`, `w0_02_contract_bridge` y `w0_03_occupancy_workshop` con teclado y gamepad;
+2. comprobar en P7.3 restauración de maquinaria abandonada, exclusión por uso actual, disputa sin agresión automática y ambas resoluciones;
+3. reunir tres recorridos `first_clear` y tres `clean_replay` por candidato y ajustar pacing con esa evidencia;
+4. conservar `occupancy_workshop_draft` como fixture técnico y comparar comprensión, no geometría, contra P7.3;
+5. abrir P7.4 solo después de revisar el gate humano del slice actual.
 
 Las clases restantes, The Agora y el RPG siguen fuera de alcance hasta Phase 8. La comprobación del build en máquina limpia y la observación del CI remoto continúan como tareas operativas previas a un release público.

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
 [ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="2_enemy"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/merchant_ball_visual.tres" id="3_visual"]
 
 [resource]
 script = ExtResource("2_enemy")
@@ -11,3 +12,4 @@ tags = Array[StringName]([&"ball", &"neutral", &"protected_npc"])
 actor_scene_path = "res://src/debug/combat_target.tscn"
 maximum_resolve = 40.0
 behavior_id = &"static"
+visual_definition = ExtResource("3_visual")

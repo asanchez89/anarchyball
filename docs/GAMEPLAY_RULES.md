@@ -419,6 +419,8 @@ When Resolve reaches its surrender threshold, the default transition is:
 AGGRESSOR -> SURRENDERING -> NEUTRALIZED
 ```
 
+The surrender threshold and defeat response are archetype policy, not faction-name checks. Actors inclined to preserve themselves may use a raised threshold and surrender after limited Resolve pressure. A committed occupation enforcer may instead resist until its Resolve is depleted and transition directly to `NEUTRALIZED`; this never makes it immortal, lethal by default or targetable after neutralization.
+
 ## GR-COMBAT-001 - Lethality is not the default reward loop
 
 The game does not award bonus experience for killing balls. Progression comes from encounters, objectives, exploration, contracts, bosses and discoveries.
@@ -832,6 +834,8 @@ When one world contains more than one ideological current, every current keeps a
 
 World 0 is both tutorial and ideological foundation. Mechanics must be introduced one at a time and later recombined. The segments below are teaching beats, not a one-to-one mandate for level files; production packaging is governed by `PROJECT_PLAN.md` §12.8.
 
+Leviathan security agencies already maintain a fragmented occupation when World 0 begins. Early raids provide recurring action pressure, while the final incursion is an escalation with reinforcements rather than their first appearance. Institutional affiliation never replaces an inspectable aggression source: an occupation unit may begin an encounter as `AGGRESSOR` only when the scene establishes that it is already carrying out detention, confiscation, attack or another immediate coercive act.
+
 ## 12.1 Segment A - AnarchyBall / aggression tutorial
 
 Required encounter:
@@ -873,6 +877,14 @@ DISPUTED
 A previously abandoned industrial object becomes useful when occupied/operated by MutualistBalls.
 
 The level physically changes through cranes/platforms/machinery.
+
+The workshop must read as a connected communal production space. Elevated floors use their dedicated ledge art and continuous columns down to a lower structural surface. Required-route status and visual construction style are separate data; a required platform may still be column-supported. Floating platforms and road tiles reused as unsupported ledges are invalid presentation for this mission.
+
+The workshop challenge curve begins with an occupation PoliceBall so the player first demonstrates defensive neutralization. Later corridors alternate occupation units with wary Ancom patrols and Egoist route disputes. Ancom and Egoist encounters must expose an observable non-offensive interaction before commitment; ignoring the telegraph may produce aggression and early surrender. Arena closures may block forward progress until the local encounter resolves, but each non-police encounter must retain its declared de-escalation interaction.
+
+Their non-offensive verbs must remain mechanically distinct. An Ancom patrol is resolved by reaching and operating a visible truce signal before attack commitment. An Egoist route dispute is resolved by traversing to and claiming a declared useful cache; the pickup must provide its advertised gameplay effect rather than acting as a decorative key. Mutualist operators own the workshop reroute controls and moving machinery. Repeated encounters add participants and combine these verbs with vertical traversal instead of merely repeating a stronger copy of the first room.
+
+Machinery must create more than static ledges. At least one workshop machine drives a visible moving elevator, while other controls may reveal bypasses or reroute access. Moving machinery is optional traversal utility and may not become the only way to recover from a fall or leave the current arena.
 
 Later, another actor presents an older title claim, moving the conflict to `DISPUTED` rather than immediately creating an aggressor.
 
@@ -949,11 +961,15 @@ Secondary tension:
 
 A finite shared resource cannot power all desired systems simultaneously, forcing visible prioritization.
 
+Some Ancom patrols distrust AnarchyBall. They may observe, follow, block or telegraph an attack, but the encounter must preserve an exit, avoidance route or de-escalation opportunity. If they commit an attack they transition to `AGGRESSOR`; ideology alone never makes them a valid target.
+
+If an Ancom patrol does commit aggression, its preferred response to meaningful defensive pressure is withdrawal or early surrender rather than fighting to depletion. This preference does not bypass the ordinary `TargetValidity` transition: before commitment it remains non-hostile, and after surrender it immediately ceases to be a valid offensive target.
+
 The system must demonstrate a genuine strength (resilience through cooperation) as well as a coordination/scarcity tension.
 
 ## 12.8 Segment H - Leviathan incursion
 
-The Ancom duel is interrupted or followed by state incursion.
+The Ancom duel is interrupted or followed by a major escalation of the existing state occupation.
 
 Leviathan forces classify all unlicensed associations as targets regardless of their economic disagreements.
 
@@ -1375,6 +1391,14 @@ Not every short level needs all five stages, but a world gimmick should follow t
 
 ## GR-LEVEL-002 - Readability before decoration
 
+Todas las balls jugables y de World 0 deben comunicar sus estados mediante animación real: cada estado runtime dispone de al menos cuatro frames visualmente distintos. Respiración, desplazamiento, salto, acción, daño, amenaza, rendición y neutralización no pueden simular animación repitiendo una misma pose estática.
+
+La acción de disparo conserva el cuerpo orientado hacia su objetivo y muestra el arma en un socket lateral compartido. Una pose de golpe, giro corporal o daño no puede reutilizarse como disparo ni como desplazamiento; esas siluetas pertenecen únicamente a su estado correspondiente.
+
+Antes de crear un proyectil, el atacante actualiza su orientación horizontal según la dirección del disparo. El proyectil nace en el lateral del arma, nunca desde el centro ni desde la espalda de la ball.
+
+Las barreras obligatorias deben mostrar arte integrado del nivel y retirar su colisión al resolverse el encuentro asociado. Un mensaje de “paso abierto” sin paso físico constituye un fallo bloqueante del nivel.
+
 Enemy, hazard, platform and interactable silhouettes must remain readable over ideology-themed art.
 
 ## GR-LEVEL-003 - Required path uses baseline movement
@@ -1433,6 +1457,12 @@ Waiting, repeated waves, forced backtracking and non-interactive dialogue must n
 ## GR-LEVEL-009 - Checkpoints follow risk and elapsed play
 
 Standard missions target a checkpoint every 2.5-4 minutes of active play and before a climax that changes the kind of challenge. Checkpoint placement is adjusted from human retry and section-time data, not from distance alone.
+
+## GR-LEVEL-010 - Elevated floors require structural support
+
+A traversable floor may not read as an unexplained floating rectangle. Every elevated platform must connect visually to terrain, architecture or machinery through supports appropriate to the level's art set, such as columns, walls, scaffolding, roots, suspended mechanisms or natural rock.
+
+When a route adds additional stories, its support system continues or stacks coherently to the structure below. Ground roads and elevated floors use their corresponding tiles instead of reusing the same surface indiscriminately. Exceptions require an explicit diegetic reason, such as a visibly powered levitation mechanism.
 
 ---
 

@@ -1,0 +1,32 @@
+{
+  "ball_id": "ball_template",
+  "display_name": "Ball Template",
+  "surface": {
+    "description": "Describe the internal color fields, partition geometry and optional symbol.",
+    "colors": ["#000000", "#ffffff"],
+    "partition": "solid",
+    "symbol": null
+  },
+  "eyes": {
+    "personality": "neutral and observant",
+    "white_only": true,
+    "pupils": false
+  },
+  "accessory": {
+    "description": "none",
+    "required": false
+  },
+  "equipment": {
+    "description": "none",
+    "socket": "none"
+  },
+  "sheet": {
+    "cell_width": 96,
+    "cell_height": 96,
+    "columns": 8,
+    "rows": 8,
+    "origin_x": 48,
+    "origin_y": 90,
+    "runtime_scale": 1
+  }
+}

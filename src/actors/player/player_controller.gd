@@ -12,22 +12,31 @@ enum LocomotionState {
 
 @onready var visual: PlayerVisual = %Visual
 @onready var player_camera: PlayerCamera = %PlayerCamera
+@onready var probe_launcher: SandboxProbeLauncher = $ProbeLauncher
+@onready var health: HealthComponent = $Health
+@onready var sfx: GameplaySfxEmitter = $Sfx
 
 var locomotion_state: LocomotionState = LocomotionState.AIR
 var facing_direction: float = 1.0
 var _movement_assist := MovementAssistState.new()
+var _previous_health: float
+var _gameplay_input_suppressed: bool = false
 
 
 func _ready() -> void:
 	assert(movement_profile != null and movement_profile.is_valid(), "PlayerMovementProfile inválido")
+	_previous_health = health.current_health
+	probe_launcher.probe_fired.connect(_on_probe_fired)
+	health.health_changed.connect(_on_health_changed)
 
 
 func _physics_process(delta: float) -> void:
+	_update_input_release_guard()
 	var grounded_before_move: bool = is_on_floor()
 	_movement_assist.tick(delta)
 	if grounded_before_move:
 		_movement_assist.refresh_coyote(movement_profile.coyote_time)
-	if InputActions.is_jump_just_pressed():
+	if not _gameplay_input_suppressed and InputActions.is_jump_just_pressed():
 		_movement_assist.buffer_jump(movement_profile.jump_buffer_time)
 
 	var movement_axis: float = InputActions.movement_axis()
@@ -57,7 +66,23 @@ func _physics_process(delta: float) -> void:
 		_movement_assist.refresh_coyote(movement_profile.coyote_time)
 		_try_consume_jump(true)
 	_set_locomotion_state(LocomotionState.GROUND if is_on_floor() else LocomotionState.AIR)
-	visual.update_motion(velocity.x, facing_direction)
+	visual.update_motion(velocity.x, velocity.y, not is_on_floor(), facing_direction)
+
+
+func _on_health_changed(current: float, _maximum: float) -> void:
+	if current < _previous_health:
+		visual.play_hurt()
+		sfx.play_cue(&"hurt")
+	_previous_health = current
+
+
+func _on_probe_fired() -> void:
+	var aim := probe_launcher.aim_direction()
+	if not is_zero_approx(aim.x):
+		facing_direction = signf(aim.x)
+		visual.update_motion(0.0, velocity.y, not is_on_floor(), facing_direction)
+	visual.play_action()
+	sfx.play_cue(&"fire")
 
 
 func reset_at(world_position: Vector2) -> void:
@@ -68,6 +93,25 @@ func reset_at(world_position: Vector2) -> void:
 
 func add_camera_shake(strength: float) -> void:
 	player_camera.add_shake(strength)
+
+
+func suppress_gameplay_input_until_released() -> void:
+	_gameplay_input_suppressed = true
+	_movement_assist.reset()
+	probe_launcher.input_enabled = false
+
+
+func is_gameplay_input_suppressed() -> bool:
+	return _gameplay_input_suppressed
+
+
+func _update_input_release_guard() -> void:
+	if not _gameplay_input_suppressed:
+		return
+	if Input.is_action_pressed(InputActions.JUMP) or Input.is_action_pressed(InputActions.ATTACK_PRIMARY):
+		return
+	_gameplay_input_suppressed = false
+	probe_launcher.input_enabled = true
 
 
 func get_coyote_remaining() -> float:
@@ -87,6 +131,7 @@ func _try_consume_jump(is_grounded: bool) -> bool:
 		return false
 	velocity.y = -movement_profile.jump_velocity
 	_movement_assist.consume_jump()
+	sfx.play_cue(&"jump")
 	return true
 
 

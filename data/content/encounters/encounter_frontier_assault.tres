@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_frontier_assault"
+display_name = "Frontier Assault"
+entry_condition = &"on_section_enter"
+objective = &"cross_or_bypass_coordinated_assault"
+enemy_archetype_ids = Array[StringName]([&"enemy_frontier_raider", &"enemy_frontier_lookout", &"enemy_frontier_raider"])
+aggression_trigger_ids = Array[StringName]([&"assault_attack_committed"])
+success_condition_ids = Array[StringName]([&"assault_surrenders", &"upper_route_reached"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"resolve_depleted"])
+allowed_resolutions = Array[StringName]([&"force_assault_surrender", &"take_upper_ruin_route"])
+neutralization_resolution = &"force_assault_surrender"
+class_shortcut_tags = Array[StringName]([&"upper_ruin_bypass", &"baseline_movement"])
+telemetry_tags = Array[StringName]([&"late_assault", &"route_choice"])

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="2_encounter"]
+
+[resource]
+script = ExtResource("2_encounter")
+content_id = &"encounter_egoist_route_dispute"
+display_name = "Egoist Route Dispute"
+entry_condition = &"on_section_enter"
+objective = &"claim_helpful_cache_or_defend_after_commitment"
+enemy_archetype_ids = Array[StringName]([&"enemy_egoist_disputer"])
+aggression_trigger_ids = Array[StringName]([&"egoist_attack_committed"])
+success_condition_ids = Array[StringName]([&"helpful_cache_collected", &"egoist_surrenders"])
+failure_condition_ids = Array[StringName]([&"player_defeated"])
+surrender_condition_ids = Array[StringName]([&"early_resolve_threshold"])
+allowed_resolutions = Array[StringName]([&"collect_helpful_cache", &"force_egoist_surrender"])
+neutralization_resolution = &"force_egoist_surrender"
+resource_collection_resolution = &"collect_helpful_cache"
+telemetry_tags = Array[StringName]([&"dispute", &"non_offensive_resolution"])

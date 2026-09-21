@@ -1,0 +1,76 @@
+SCIFI SOUND DESIGN PACK — VOLUME 1
+ROYALTY-FREE END USER LICENSE AGREEMENT
+Version 1.0 — August 2, 2026
+
+Copyright © 2026 Clint Wagoner. All rights reserved.
+
+This license applies to the audio files included in SciFi Sound Design Pack — Volume 1 (the “Licensed Content”). By downloading, copying, or using the Licensed Content, you agree to these terms.
+
+1. LICENSE GRANT
+
+Clint Wagoner (the “Creator”) grants the lawful recipient (“you”) a non-exclusive, worldwide, perpetual, non-transferable, royalty-free license to use, copy, edit, process, combine, and synchronize the Licensed Content in personal or commercial creative projects (“Projects”), subject to this agreement.
+
+“Royalty-free” means that no ongoing royalties or per-use fees are owed after lawful acquisition. It does not mean that the Licensed Content is copyright-free or in the public domain.
+
+2. PERMITTED USES
+
+You may:
+
+- Use the Licensed Content in games, films, videos, trailers, animation, podcasts, broadcasts, live productions, music, applications, websites, installations, and other creative Projects.
+- Edit, trim, loop, layer, pitch-shift, process, mix, or otherwise modify the Licensed Content for a Project.
+- Use the Licensed Content in client work when the sounds are incorporated into a completed Project.
+- Distribute, publish, broadcast, sell, or monetize a completed Project containing the Licensed Content.
+- Make reasonable backup and working copies for your own licensed use.
+
+Attribution is appreciated but not required.
+
+3. PROHIBITED REDISTRIBUTION AND RESALE
+
+You may not:
+
+- Sell, share, sublicense, upload, distribute, or make available any Licensed Content as standalone audio files, source assets, stock media, samples, presets, or downloadable resources.
+- Repackage the Licensed Content, modified or unmodified, as a sound library, sample pack, asset pack, template, soundboard, generator, or competing product.
+- Include the Licensed Content in a product whose primary value is access to the sounds themselves or from which the sounds are intentionally exposed for extraction or reuse.
+- Transfer this license to another person or organization. A client may receive a completed Project, but not the raw source library as a reusable asset collection.
+- Claim authorship or ownership of the original Licensed Content.
+
+4. ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING PROHIBITION
+
+The Licensed Content may not be used, directly or indirectly, to train, fine-tune, instruct, evaluate, validate, benchmark, test, or otherwise develop any artificial-intelligence, machine-learning, neural-network, generative, audio-synthesis, source-separation, classification, or similar computational model or system.
+
+You may not:
+
+- Place the Licensed Content, modified or unmodified, into any training, validation, evaluation, benchmark, or test dataset or corpus.
+- Use the Licensed Content to create model weights, learned parameters, embeddings intended for model development, synthetic training material, or an AI-generated sound library.
+- Upload or provide the Licensed Content to a service, platform, vendor, or third party when its terms permit the content to be retained or used for AI or machine-learning training.
+- Permit any third party to perform a prohibited AI or machine-learning use on your behalf.
+
+AI-assisted editing or restoration of a licensed Project is permitted only when the tool and provider do not train on, retain for training, or add the Licensed Content to any dataset, and when the resulting audio remains used solely within a permitted Project.
+
+This Section 4 is a material condition of the license and survives termination.
+
+5. OWNERSHIP
+
+The Creator retains all copyright, title, and ownership in the Licensed Content. You own your original contributions to a Project, but you do not acquire ownership of the underlying Licensed Content.
+
+6. NO TRADEMARK OR ENDORSEMENT
+
+This agreement does not grant any right to use the Creator’s name, trademarks, branding, or likeness, or to imply sponsorship or endorsement.
+
+7. WARRANTY DISCLAIMER AND LIMITATION OF LIABILITY
+
+The Licensed Content is provided “as is” without warranties of any kind, express or implied, to the maximum extent allowed by law. The Creator is not liable for indirect, incidental, special, consequential, or punitive damages arising from use of the Licensed Content. To the maximum extent allowed by law, the Creator’s total liability will not exceed the amount you paid for the Licensed Content.
+
+8. TERMINATION
+
+This license terminates automatically if you materially breach these terms. Upon termination, you must stop new use of the Licensed Content and delete all raw copies in your possession or control. Rights in completed Projects distributed before termination remain in place only if the breach is cured where curable and the Project itself complies with this agreement. Sections concerning ownership, prohibited redistribution, AI and machine learning, disclaimers, and liability survive termination.
+
+9. GOVERNING LAW AND SEVERABILITY
+
+This agreement is governed by the laws of the State of Texas, USA, without regard to conflict-of-law principles. If any provision is held unenforceable, the remaining provisions remain in effect, and the affected provision will be limited only as necessary to make it enforceable.
+
+10. ENTIRE AGREEMENT
+
+This document is the complete license for the Licensed Content unless the Creator provides you with a separate written agreement signed by the Creator. Product-page summaries are for convenience; this license controls if there is a conflict.
+
+END OF LICENSE

@@ -1,6 +1,8 @@
 class_name SandboxProbeLauncher
 extends Node2D
 
+signal probe_fired()
+
 @export var probe_scene: PackedScene
 @export_range(0.05, 2.0, 0.01) var fire_cooldown: float = 0.18
 @export_range(0.0, 100.0, 1.0) var muzzle_distance: float = 34.0
@@ -9,10 +11,13 @@ var _cooldown_remaining: float = 0.0
 var _last_aim_direction: Vector2 = Vector2.RIGHT
 var cooldown_multiplier: float = 1.0
 var effect_amount_multiplier: float = 1.0
+var input_enabled: bool = true
 
 
 func _physics_process(delta: float) -> void:
 	_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
+	if not input_enabled:
+		return
 	var player := get_parent() as PlayerController
 	var facing: float = player.facing_direction if player != null else 1.0
 	var directional_aim: Vector2 = InputActions.directional_aim_vector()
@@ -49,3 +54,4 @@ func _fire_probe() -> void:
 	probe.effect_amount *= effect_amount_multiplier
 	probe.configure(_last_aim_direction, source_identity, context)
 	_cooldown_remaining = fire_cooldown * cooldown_multiplier
+	probe_fired.emit()

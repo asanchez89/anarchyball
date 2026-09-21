@@ -1,0 +1,15 @@
+{
+  "world_id": "world_0",
+  "concept_only": true,
+  "balls": [
+    {"ball_id":"anarchy_ball","display_name":"AnarchyBall","role":"player","surface":"yellow/near-black diagonal","concept_path":"res://assets/art/art_bible/concepts/anarchy_ball_ancap_surface_concept_v2.png"},
+    {"ball_id":"merchant_ball","display_name":"MerchantBall","role":"neutral_npc","surface":"cream/deep-teal diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/merchant_ball_concept.png"},
+    {"ball_id":"robber_ball","display_name":"RobberBall","role":"confiscation_aggressor","surface":"wine-red/charcoal diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/robber_ball_concept.png"},
+    {"ball_id":"egoist_ball","display_name":"EgoistBall","role":"contract_counterparty","surface":"teal/near-black diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/egoist_ball_concept_v2.png"},
+    {"ball_id":"agorist_ball","display_name":"AgoristBall","role":"counter_economy_ally","surface":"grey/charcoal diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/agorist_ball_concept_v2.png"},
+    {"ball_id":"mutualist_ball","display_name":"MutualistBall","role":"workshop_operator","surface":"orange/near-black diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/mutualist_ball_concept_v2.png"},
+    {"ball_id":"left_libertarian_ball","display_name":"LeftLibertarianBall","role":"claim_counterparty","surface":"yellow-gold/deep-violet diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/left_libertarian_ball_concept.png"},
+    {"ball_id":"black_anarchy_ball","display_name":"BlackAnarchyBall","role":"community_coordinator","surface":"green/red/near-black bands","concept_path":"res://assets/art/actors/balls/world_0/concepts/black_anarchy_ball_concept.png"},
+    {"ball_id":"ancom_ball","display_name":"The AncomBall","role":"boss_rival_ally","surface":"red/near-black diagonal","concept_path":"res://assets/art/actors/balls/world_0/concepts/ancom_ball_concept.png"}
+  ]
+}

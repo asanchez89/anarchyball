@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/content/builder/level_builder.gd" id="1_builder"]
+[ext_resource type="Resource" path="res://data/content/default_catalog.tres" id="2_catalog"]
+[ext_resource type="PackedScene" path="res://levels/world_0/presentation/world0_frontier_presentation.tscn" id="3_presentation"]
+
+[node name="W002ContractBridge" type="Node2D"]
+script = ExtResource("1_builder")
+level_spec_path = "res://data/levels/w0_02_contract_bridge.json"
+content_catalog = ExtResource("2_catalog")
+presentation_scene = ExtResource("3_presentation")
+art_surface_depth = 32.0
+start_in_menu = true

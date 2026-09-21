@@ -4,8 +4,8 @@
   "display_name": "World 0 · First Aggression",
   "slice": {
     "title": "FIRST AGGRESSION",
-    "objective": "Reach MerchantBall, wait for RobberBall to commit aggression, force surrender, collect the thanks and exit",
-    "intro": "Move and aim through the frontier. MerchantBall is protected: attacks against a neutral target are blocked. RobberBall first threatens confiscation, then becomes a valid defensive target only after committing aggression. Reduce resolve until surrender and continue to EXIT.",
+    "objective": "Explore the ruin routes, defend MerchantBall after committed aggression, then cross or bypass the optional roadblock",
+    "intro": "The ground road is always viable, while supported upper ruins hide supplies and tactical routes. MerchantBall is protected: attacks against a neutral target are blocked. RobberBall becomes a valid defensive target only after committing confiscation. Later, cross the roadside ambush after its attack is committed or stay above it on the marked ruin bypass.",
     "completion": "MerchantBall is safe and RobberBall surrendered. This campaign attempt and its route evidence were saved locally."
   },
   "player_spawn": {"x": 120, "y": 596},
@@ -14,6 +14,9 @@
   "movement_profile_path": "res://data/player/default_movement_profile.tres",
   "class_loadout_id": "class_contractor",
   "ideology_rule_ids": [],
+  "actors": [
+    {"id": "frontier_tutorial_guide", "archetype_id": "npc_frontier_guide", "x": 760, "y": 570}
+  ],
   "platforms": [
     {"id": "ground_onboarding", "x": 0, "y": 620, "width": 1100, "height": 100, "required": true, "route_tags": []},
     {"id": "ground_aim", "x": 1180, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
@@ -24,9 +27,13 @@
     {"id": "ground_traverse", "x": 6830, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
     {"id": "ground_confirm", "x": 7960, "y": 600, "width": 900, "height": 120, "required": true, "route_tags": []},
     {"id": "ground_exit", "x": 8940, "y": 620, "width": 860, "height": 100, "required": true, "route_tags": []},
-    {"id": "aim_perch", "x": 1650, "y": 445, "width": 280, "height": 24, "required": false, "route_tags": ["aim_practice"]},
-    {"id": "encounter_overlook", "x": 5000, "y": 455, "width": 300, "height": 24, "required": false, "route_tags": ["defense_overlook"]},
-    {"id": "return_perch", "x": 7200, "y": 450, "width": 300, "height": 24, "required": false, "route_tags": ["clean_replay"]}
+    {"id": "aim_ruin_entry", "x": 1450, "y": 525, "width": 650, "height": 24, "required": false, "route_tags": ["aim_practice", "upper_supply_route"]},
+    {"id": "aim_ruin_link", "x": 2160, "y": 525, "width": 420, "height": 24, "required": false, "route_tags": ["upper_supply_route"]},
+    {"id": "encounter_overlook", "x": 4620, "y": 525, "width": 900, "height": 24, "required": false, "route_tags": ["defense_overlook", "merchant_rescue_vantage"]},
+    {"id": "recovery_ruin", "x": 5580, "y": 525, "width": 520, "height": 24, "required": false, "route_tags": ["merchant_rescue_vantage", "recovery_cache"]},
+    {"id": "roadblock_bypass_entry", "x": 6580, "y": 525, "width": 430, "height": 24, "required": false, "route_tags": ["upper_ruin_bypass"]},
+    {"id": "roadblock_bypass_mid", "x": 7070, "y": 525, "width": 650, "height": 24, "required": false, "route_tags": ["upper_ruin_bypass", "clean_replay"]},
+    {"id": "roadblock_bypass_exit", "x": 7780, "y": 525, "width": 520, "height": 24, "required": false, "route_tags": ["upper_ruin_bypass"]}
   ],
   "encounters": [
     {
@@ -35,11 +42,21 @@
       "x": 4850,
       "y": 590,
       "required_for_completion": true
+    },
+    {
+      "id": "encounter_frontier_roadblock",
+      "definition_id": "encounter_frontier_roadblock",
+      "x": 7220,
+      "y": 590,
+      "required_for_completion": false
     }
   ],
   "resources": [
     {"id": "pickup_frontier_supply", "kind": "training_supply", "x": 2050, "y": 550, "ownership": "unowned_collectible"},
     {"id": "pickup_merchant_thanks", "kind": "mission_reward", "x": 6030, "y": 550, "ownership": "mission_reward"},
+    {"id": "pickup_upper_supply", "kind": "training_supply", "x": 2380, "y": 480, "ownership": "unowned_collectible"},
+    {"id": "pickup_recovery_cache", "kind": "permitted_salvage", "x": 5860, "y": 480, "ownership": "permitted_salvage"},
+    {"id": "pickup_roadblock_cache", "kind": "permitted_salvage", "x": 7520, "y": 480, "ownership": "permitted_salvage"},
     {"id": "pickup_road_salvage", "kind": "permitted_salvage", "x": 8500, "y": 550, "ownership": "permitted_salvage"}
   ],
   "sections": [

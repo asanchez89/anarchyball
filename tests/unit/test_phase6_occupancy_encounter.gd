@@ -24,6 +24,9 @@ func test_occupancy_enforcer_and_encounter_are_registered_from_data() -> void:
 	assert_object(archetype).is_not_null()
 	assert_int(archetype.initial_conflict_state).is_equal(ConflictStateComponent.State.DISPUTED)
 	assert_int(archetype.aggressor_reason).is_equal(ConflictStateComponent.AggressorReason.DETAIN_ORDER_EXECUTED)
+	assert_int(archetype.defeat_response).is_equal(EnemyArchetype.DefeatResponse.RESIST_UNTIL_NEUTRALIZED)
+	assert_bool(archetype.sustained_attack).is_true()
+	assert_float(archetype.attack_interval).is_equal_approx(0.8, 0.001)
 	assert_str(archetype.threat_text).is_not_empty()
 	assert_object(encounter).is_not_null()
 	assert_array(encounter.allowed_resolutions).contains_exactly([&"neutralize_enforcer", &"operate_or_bypass_machine"])
@@ -44,6 +47,30 @@ func test_declared_reason_drives_disputed_threatening_aggressor_sequence() -> vo
 	assert_bool(actor.conflict_state.commit_aggression(actor.aggressor_reason)).is_true()
 	assert_int(actor.conflict_state.current_state).is_equal(ConflictStateComponent.State.AGGRESSOR)
 	assert_int(actor.conflict_state.aggressor_reason).is_equal(ConflictStateComponent.AggressorReason.DETAIN_ORDER_EXECUTED)
+	assert_str(actor.presentation_state_id()).is_equal("threatening")
+	actor._begin_attack_visual()
+	assert_str(actor.presentation_state_id()).is_equal("action")
+	actor._process(actor.attack_visual_duration)
+	assert_str(actor.presentation_state_id()).is_equal("threatening")
+	root.free()
+
+
+func test_occupancy_enforcer_resists_until_direct_neutralization() -> void:
+	var root := Node2D.new()
+	add_child(root)
+	var actor := (load("res://src/debug/combat_target.tscn") as PackedScene).instantiate() as CombatTarget
+	actor.apply_archetype(load("res://data/content/enemies/enemy_occupancy_enforcer.tres") as EnemyArchetype)
+	root.add_child(actor)
+
+	assert_bool(actor.conflict_state.begin_threatening()).is_true()
+	assert_bool(actor.conflict_state.commit_aggression(actor.aggressor_reason)).is_true()
+	actor._on_surrender_threshold_reached()
+
+	assert_int(actor.conflict_state.current_state).is_equal(ConflictStateComponent.State.NEUTRALIZED)
+	var source := CombatIdentityComponent.new()
+	source.authority = CombatIdentityComponent.Authority.PLAYER
+	assert_bool(TargetValidity.evaluate(source, actor.receiver, EffectContext.offensive()).allowed).is_false()
+	source.free()
 	root.free()
 
 

@@ -22,3 +22,13 @@ Thumbs.db
 Desktop.ini
 *.bak
 *.tmp
+
+# Third-party source packs are local working material. Only curated, integrated
+# assets and their licenses are versioned.
+/assets/__MACOSX/
+/assets/Warped Collection Files/
+/assets/Warped Music/
+/assets/Beat 'em Up Combat Effects – 2D Pixel Art VFX Pack*/
+/assets/Beat _em Up Combat Effects – 2D Pixel Art VFX Pack*/
+/assets/Combat Effects – 2D Pixel Art VFX Pack*/
+/assets/sounds/

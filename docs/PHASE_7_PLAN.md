@@ -1,8 +1,9 @@
 # Phase 7 - World 0: The Anarchist Frontier
 
-- **Estado:** EN DESARROLLO; P7.0 COMPLETADA, P7.1 IMPLEMENTADA Y PENDIENTE DE EVIDENCIA HUMANA
+- **Estado:** EN DESARROLLO; P7.0 COMPLETADA, P7.1-P7.3 IMPLEMENTADAS Y PENDIENTES DE EVIDENCIA HUMANA
 - **Inicio:** 2026-09-20
 - **Dependencia:** Phase 6 aprobada y cerrada el 2026-09-20
+- **Plan visual propuesto:** [`PHASE_7_ART_INTEGRATION_PLAN.md`](PHASE_7_ART_INTEGRATION_PLAN.md)
 - **Reglas afectadas:** `GR-WORLD-001` a `GR-WORLD-005`, `GR-LEVEL-001` a `GR-LEVEL-009`, `GR-ENCOUNTER-001/002`, `GR-TELEM-001/002` y las reglas canónicas de conflicto aplicables
 
 ## Objetivo
@@ -95,25 +96,33 @@ Estado técnico al 2026-09-20: shell y misión están integrados como escena pri
 
 ### P7.2 - `w0_02_contract_bridge`
 
-- [ ] definir un contrato simple, consentimiento explícito, cumplimiento observable y salida disponible;
-- [ ] introducir EgoistBall sin convertirlo en una facción criminal genérica;
-- [ ] expresar bridge/access contract mediante datos y el componente más pequeño que cubra sus usos reales;
-- [ ] construir cinco beats a lo largo de 12-18 pantallas efectivas y 1-2 checkpoints;
-- [ ] ofrecer al menos una resolución no ofensiva y registrar incumplimiento, persecución o puzzle;
+- [x] definir un contrato simple, consentimiento explícito, cumplimiento observable y salida disponible;
+- [x] introducir EgoistBall sin convertirlo en una facción criminal genérica;
+- [x] expresar bridge/access contract mediante datos y el componente más pequeño que cubra sus usos reales;
+- [x] construir cinco beats a lo largo de 12-18 pantallas efectivas y 1-2 checkpoints;
+- [x] ofrecer al menos una resolución no ofensiva y registrar incumplimiento, persecución o puzzle;
 - [ ] curar el candidato con evidencia humana propia.
 
 Gate: la mecánica demuestra que escribir una norma y hacerla cumplir son problemas distintos, sin declarar un ganador filosófico mediante diálogo.
 
+Estado técnico al 2026-09-20: `w0_02_contract_bridge` está registrado como segunda misión real de campaña y usa un contrato data-driven con estados `offered -> active -> performed -> breached -> resolved`. El consentimiento abre el acceso, el incumplimiento activa una persecución/puzzle sin volver ofensivamente válido a EgoistBall, la resolución por desvío reabre el retorno y habilita la recompensa, y la ruta base permite rechazar el contrato y completar el nivel. La extensión de `LevelSpec v0` está documentada en ADR-0008 y cuenta con validación de referencias, checkpoint, telemetría y pruebas deterministas. Importación, lote de 7 LevelSpecs y 3 perfiles, arranque de campaña y misión, 110/110 tests y export Windows pasan sobre el árbol combinado con la integración audiovisual. Permanecen abiertos el playtest humano con teclado/gamepad, la comprobación de los cinco beats y la evidencia `first_clear`/`clean_replay` antes de promover el draft.
+
 ### P7.3 - `w0_03_occupancy_workshop`
 
-- [ ] crear un LevelSpec y perfil de campaña separados del fixture de Phase 6;
-- [ ] reutilizar `occupancy_machine` y el enforcer únicamente donde encajen;
-- [ ] mostrar primero utilidad real de maquinaria abandonada y después exclusión/disputa;
-- [ ] diseñar 12-18 pantallas efectivas, 1-2 checkpoints y cinco beats de misión estándar;
-- [ ] incluir rutas que usen la maquinaria sin volverla requisito de clase;
+- [x] crear un LevelSpec y perfil de campaña separados del fixture de Phase 6;
+- [x] reutilizar `occupancy_machine` y el enforcer únicamente donde encajen;
+- [x] mostrar primero utilidad real de maquinaria abandonada y después exclusión/disputa;
+- [x] diseñar 12-18 pantallas efectivas, 1-2 checkpoints y cinco beats de misión estándar;
+- [x] incluir rutas que usen la maquinaria sin volverla requisito de clase;
 - [ ] comparar pacing y comprensión contra los hallazgos del prototipo, no contra su geometría.
+- [x] separar ruta obligatoria de estilo visual y reconstruir los ascensos finales con piso elevado y columnas continuas;
+- [ ] ambientar el recorrido como taller comunal conectado y sustituir pasillos vacíos por desafíos de ocupación estatal y decisiones de traversal;
+- [x] abrir con una PoliceBall obligatoria y alternar arenas cerradas de policía, patrullas Ancom desescalables y disputas Egoist con resolución observable;
+- [x] añadir un ascensor activable y conservar una ruta baja de recuperación para evitar bloqueos de progreso;
 
 Gate: el candidato cumple 10-12 min de primera vuelta por decisiones y recombinación, no por inflar el prototipo.
+
+Estado técnico al 2026-09-20: `w0_03_occupancy_workshop` es una tercera misión independiente de 14 pantallas equivalentes, cinco secciones y dos checkpoints. Añade placements mínimos de actores neutrales y los estados compatibles `abandoned`/`disputed` mediante ADR-0009. La ruta enseña restauración de maquinaria, muestra una operación actual que excluye uso simultáneo y termina en una disputa con dos resoluciones: operar una máquina alternativa antes de la agresión o responder defensivamente después de una orden de detención comprometida. `occupancy_workshop_draft` permanece intacto como fixture. Importación, lote de 8 LevelSpecs y 4 perfiles, arranque de campaña y misión, 117/117 tests y export Windows pasan; queda abierta la comparación humana de pacing y comprensión.
 
 ### P7.4 - `w0_04_claim_and_access`
 
@@ -144,12 +153,14 @@ Gate: el jugador experimenta la diferencia entre coordinación, influencia infor
 - [ ] construir el duelo reglado con The AncomBall sin habilitar fuerza fuera de su contexto;
 - [ ] evitar que focused DPS ignore la red de apoyo;
 - [ ] preparar la interrupción o transición hacia la incursión sin incluir todavía el mundo final.
+- [ ] introducir patrullas Ancom desconfiadas con evasión/desescalada y agresión solo tras compromiso observable.
+- [ ] configurar las patrullas Ancom para surrender/retirada temprana tras escalar, reutilizando la política de arquetipo sin condicionar por facción.
 
 Gate: cooperación y escasez se entienden jugando; el duelo usa consentimiento y conserva surrender/target validity.
 
 ### P7.7 - `w0_07_leviathan_escape`
 
-- [ ] introducir una fuerza del Leviatán que clasifica asociaciones sin borrar sus diferencias;
+- [ ] escalar la ocupación ya visible mediante refuerzos del Leviatán que clasifican asociaciones sin borrar sus diferencias;
 - [ ] recombinar mutual aid, maquinaria, rutas de escape, movimiento y defensa de terceros;
 - [ ] reutilizar reglas anteriores con recordatorios seguros y breves;
 - [ ] construir presión de escape sin autoscroll injusto ni espera pasiva;
@@ -194,4 +205,4 @@ Cada subfase debe incluir:
 
 ## Primer paso recomendado
 
-El siguiente paso es **validar P7.1 manualmente** con teclado y gamepad, incluida salida bloqueada antes de la rendición, reanudación desde checkpoint y retorno al shell. Después se reunirán tres muestras `first_clear` y tres `clean_replay`; con ese gate aprobado puede comenzar P7.2. No se implementarán contratos, occupancy, claims, influencia o CommonPool antes de que una misión activa demuestre la necesidad.
+El siguiente paso es **validar P7.1, P7.2 y P7.3 manualmente** con teclado y gamepad. Para P7.3 se debe comprobar que una máquina abandonada habilita utilidad real, una máquina ocupada rechaza uso simultáneo, la máquina disputada no concede permiso ofensivo, ambas resoluciones del encounter funcionan y los dos checkpoints restauran estados. Después se reunirán tres muestras `first_clear` y tres `clean_replay` de cada candidato. P7.4 no comenzará hasta revisar esa evidencia y decidir si el pacing del slice requiere curación.

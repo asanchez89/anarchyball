@@ -59,6 +59,10 @@ static func _validate_catalog(
 			var enemy_id := definition.enemy_archetype_ids[enemy_index]
 			if not registry.has(ContentRegistry.Kind.ENEMY_ARCHETYPE, enemy_id):
 				_add_error(errors, source_path, field + ".enemy_archetype_ids[%d]" % enemy_index, &"unknown_reference", "ID no registrado '%s'" % enemy_id)
+	for index: int in catalog.contract_definitions.size():
+		var definition := catalog.contract_definitions[index]
+		if definition == null or not definition.is_structurally_valid():
+			_add_error(errors, source_path, "contract_definitions[%d]" % index, &"invalid_contract", "requiere issuer, objetivo, reward, failure, flags y resoluciones")
 
 
 static func _validate_level(path: String, registry: ContentRegistry, errors: PackedStringArray) -> void:

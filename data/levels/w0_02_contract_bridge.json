@@ -1,0 +1,83 @@
+{
+  "schema_version": 0,
+  "level_id": "w0_02_contract_bridge",
+  "display_name": "World 0 · Contract Bridge",
+  "slice": {
+    "title": "CONTRACT BRIDGE",
+    "objective": "Choose whether to accept the bridge agreement, perform it, then resolve the breach or take the open bypass",
+    "intro": "EgoistBall is a disputed counterparty, not an enemy: do not shoot it. F / gamepad X accepts at the contract terminal. After the breach, use F / X at COMPLIANCE CONTROL to reroute the gate, or take the upper bypass. A written agreement changes access, but cannot enforce itself.",
+    "completion": "You crossed without treating a contract dispute as aggression. The run records acceptance, performance, breach, puzzle resolution and bypass choices separately."
+  },
+  "player_spawn": {"x": 120, "y": 596},
+  "exit": {"x": 16520, "y": 576},
+  "bounds": {"width": 16800, "height": 720},
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": ["rule_access_contract"],
+  "platforms": [
+    {"id": "ground_arrival", "x": 0, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_offer", "x": 1130, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_choice", "x": 2260, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_bridge_one", "x": 3390, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_bridge_two", "x": 4520, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_checkpoint_one", "x": 5650, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_performance", "x": 6780, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_breach", "x": 7910, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_chase", "x": 9040, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_control", "x": 10170, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_return_gate", "x": 11300, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_checkpoint_two", "x": 12430, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_recombine", "x": 13560, "y": 620, "width": 1050, "height": 100, "required": true, "route_tags": []},
+    {"id": "ground_final", "x": 14690, "y": 600, "width": 1050, "height": 120, "required": true, "route_tags": []},
+    {"id": "ground_exit", "x": 15820, "y": 620, "width": 980, "height": 100, "required": true, "route_tags": []},
+    {"id": "entry_baseline_bypass", "x": 2860, "y": 525, "width": 820, "height": 24, "required": false, "route_tags": ["baseline_bypass"]},
+    {"id": "bridge_observation_route", "x": 4920, "y": 525, "width": 420, "height": 24, "required": false, "route_tags": ["bridge_observation"]},
+    {"id": "breach_chase_route", "x": 8500, "y": 525, "width": 680, "height": 24, "required": false, "route_tags": ["contract_breach_chase"]},
+    {"id": "return_baseline_bypass", "x": 11320, "y": 525, "width": 900, "height": 24, "required": false, "route_tags": ["baseline_bypass"]},
+    {"id": "final_clean_route", "x": 14100, "y": 525, "width": 620, "height": 24, "required": false, "route_tags": ["clean_replay"]}
+  ],
+  "encounters": [
+    {
+      "id": "encounter_egoist_breach",
+      "definition_id": "encounter_contract_breach",
+      "x": 8500,
+      "y": 570,
+      "required_for_completion": false
+    }
+  ],
+  "resources": [
+    {"id": "pickup_bridge_supply", "kind": "travel_supply", "x": 5220, "y": 550, "ownership": "unowned_collectible"},
+    {"id": "pickup_bridge_payment", "kind": "contract_payment", "x": 12850, "y": 550, "ownership": "mission_reward"},
+    {"id": "pickup_exit_salvage", "kind": "road_salvage", "x": 15350, "y": 550, "ownership": "permitted_salvage"}
+  ],
+  "sections": [
+    {"id": "section_offer_and_consent", "from_x": 0, "to_x": 3400},
+    {"id": "section_access_changes", "from_x": 3400, "to_x": 6700},
+    {"id": "section_perform_agreement", "from_x": 6700, "to_x": 9000},
+    {"id": "section_breach_and_puzzle", "from_x": 9000, "to_x": 12500},
+    {"id": "section_exit_without_force", "from_x": 12500, "to_x": 16800}
+  ],
+  "checkpoints": [
+    {"id": "checkpoint_bridge_midpoint", "x": 5940, "y": 545, "respawn_x": 5860, "respawn_y": 565},
+    {"id": "checkpoint_after_breach", "x": 12530, "y": 545, "respawn_x": 12470, "respawn_y": 565}
+  ],
+  "gates": [
+    {"id": "gate_bridge_entry", "x": 3260, "y": 535, "width": 46, "height": 170, "required_tag": "contract_acceptance", "label": "Accept bridge agreement or use upper bypass"},
+    {"id": "gate_return_access", "x": 11820, "y": 535, "width": 46, "height": 170, "required_tag": "contract_acceptance", "label": "Return access withheld · reroute or bypass"}
+  ],
+  "contracts": [
+    {
+      "id": "contract_manifest_crossing",
+      "definition_id": "contract_bridge_access",
+      "x": 2850,
+      "y": 550,
+      "acceptance_gate_id": "gate_bridge_entry",
+      "resolution_gate_id": "gate_return_access",
+      "encounter_id": "encounter_egoist_breach",
+      "performance_x": 7600,
+      "resolution_x": 10450,
+      "resolution_y": 540,
+      "counterparty_escape_x": 10800
+    }
+  ]
+}

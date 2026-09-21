@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/content_definition.gd" id="1_base"]
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="2_enemy"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/robber_ball_visual.tres" id="3_visual"]
+
+[resource]
+script = ExtResource("2_enemy")
+content_id = &"enemy_frontier_raider"
+display_name = "Frontier RaiderBall"
+tags = Array[StringName]([&"ball", &"roadside_aggression", &"ranged"])
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 20.0
+behavior_id = &"attack_player"
+aggressor_reason = 1
+threat_text = "ROADBLOCK: DROP YOUR SUPPLIES"
+attack_interval = 1.6
+activation_distance = 75.0
+patrol_distance = 30.0
+patrol_speed = 34.0
+telegraph_delay = 1.4
+visual_definition = ExtResource("3_visual")

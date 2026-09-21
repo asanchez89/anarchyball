@@ -1,0 +1,32 @@
+{
+  "ball_id": "anarchy_ball",
+  "display_name": "AnarchyBall",
+  "surface": {
+    "description": "A clean diagonal yellow upper-left field over a near-black lower-right field, wrapped around the spherical volume; no large front emblem.",
+    "colors": ["#ffe21a", "#17131d"],
+    "partition": "diagonal_upper_left_to_lower_right",
+    "symbol": null
+  },
+  "eyes": {
+    "personality": "confident, alert and expressive",
+    "white_only": true,
+    "pupils": false
+  },
+  "accessory": {
+    "description": "small asymmetrical dark pennant without an emblem",
+    "required": true
+  },
+  "equipment": {
+    "description": "compact cyan-magenta defensive energy emitter",
+    "socket": "side_facing"
+  },
+  "sheet": {
+    "cell_width": 96,
+    "cell_height": 96,
+    "columns": 8,
+    "rows": 8,
+    "origin_x": 48,
+    "origin_y": 90,
+    "runtime_scale": 1
+  }
+}

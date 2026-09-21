@@ -17,9 +17,11 @@ var _boss_bar: ProgressBar
 var _boss_label: Label
 var _feedback_label: Label
 var _subtitle_label: Label
+var _audio_cue_label: Label
 var _panel: VBoxContainer
 var _settings: AccessibilitySettings
 var _feedback_remaining: float = 0.0
+var _audio_cue_remaining: float = 0.0
 
 
 func configure(
@@ -91,6 +93,13 @@ func _ready() -> void:
 	_subtitle_label.add_theme_font_size_override("font_size", 17)
 	_subtitle_label.add_theme_color_override("font_color", Color.WHITE)
 	add_child(_subtitle_label)
+	_audio_cue_label = Label.new()
+	_audio_cue_label.position = Vector2(930.0, 675.0)
+	_audio_cue_label.size = Vector2(330.0, 28.0)
+	_audio_cue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_audio_cue_label.add_theme_font_size_override("font_size", 12)
+	_audio_cue_label.add_theme_color_override("font_color", Color("76e6ff"))
+	add_child(_audio_cue_label)
 	if _settings != null:
 		apply_accessibility(_settings)
 
@@ -121,8 +130,10 @@ func _process(delta: float) -> void:
 		_boss_bar.max_value = _boss.resolve.maximum_resolve
 		_boss_bar.value = _boss.resolve.current_resolve
 	_feedback_remaining = maxf(_feedback_remaining - delta, 0.0)
+	_audio_cue_remaining = maxf(_audio_cue_remaining - delta, 0.0)
 	_feedback_label.visible = _feedback_remaining > 0.0
 	_subtitle_label.visible = _settings != null and _settings.subtitles_enabled and _feedback_remaining > 0.0 and not _subtitle_label.text.is_empty()
+	_audio_cue_label.visible = _audio_cue_remaining > 0.0
 
 
 func show_feedback(message: String, duration: float = 2.0, subtitle: String = "") -> void:
@@ -130,6 +141,14 @@ func show_feedback(message: String, duration: float = 2.0, subtitle: String = ""
 	_subtitle_label.text = subtitle
 	_feedback_remaining = duration
 	_feedback_label.visible = true
+
+
+func show_audio_cue(source_name: String, cue_id: StringName) -> void:
+	if _audio_cue_label == null:
+		return
+	_audio_cue_label.text = "SFX · %s / %s" % [source_name, String(cue_id)]
+	_audio_cue_remaining = 1.5
+	_audio_cue_label.visible = true
 
 
 func _make_bar(fill_color: Color) -> ProgressBar:

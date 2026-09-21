@@ -19,6 +19,17 @@ func complete(mission_id: StringName, world: WorldDefinition) -> void:
 	active_mission_id = world.missions[index + 1].mission_id if index >= 0 and index + 1 < world.missions.size() else mission_id
 
 
+func reconcile(world: WorldDefinition) -> void:
+	if world == null or world.missions.is_empty():
+		return
+	var candidate := world.missions[0].mission_id
+	for mission: CampaignMissionDefinition in world.missions:
+		candidate = mission.mission_id
+		if mission.mission_id not in completed_mission_ids:
+			break
+	active_mission_id = candidate
+
+
 func to_dictionary() -> Dictionary:
 	var completed: Array[String] = []
 	for mission_id: StringName in completed_mission_ids:

@@ -13,4 +13,4 @@ parameters = {
 "gate_label": "Acceso: contrato o ruta alternativa",
 "primary_color": "3f527e"
 }
-counterplay_tags = Array[StringName]([&"contractor_access", &"baseline_bypass"])
+counterplay_tags = Array[StringName]([&"contractor_access", &"contract_acceptance", &"baseline_bypass"])

@@ -105,6 +105,14 @@ func test_nested_unknown_field_is_rejected() -> void:
 	assert_bool(_has_issue(validation, &"unknown_field", "platforms[0].script")).is_true()
 
 
+func test_platform_art_style_rejects_unknown_visual_construction() -> void:
+	var modified := _valid_data()
+	var platform := (modified["platforms"] as Array)[0] as Dictionary
+	platform["art_style"] = "floating_wall"
+	var validation := LevelValidator.validate(LevelSpec.new(modified, "res://fixture_platform_art.json"), _registry())
+	assert_bool(_has_issue(validation, &"invalid_platform_art_style", "platforms[0].art_style")).is_true()
+
+
 func test_level_geometry_and_sections_must_stay_inside_bounds() -> void:
 	var modified := _valid_data()
 	var platform := (modified["platforms"] as Array)[0] as Dictionary

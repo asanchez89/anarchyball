@@ -6,6 +6,7 @@ enum Kind {
 	ENEMY_ARCHETYPE,
 	ENCOUNTER_DEFINITION,
 	IDEOLOGY_RULE,
+	CONTRACT_DEFINITION,
 }
 
 var _definitions: Dictionary = {}
@@ -26,6 +27,8 @@ func register_catalog(catalog: ContentCatalog, source_path: String = "<catalog>"
 		_register(Kind.ENCOUNTER_DEFINITION, definition, source_path, "encounter_definitions")
 	for definition: IdeologyRuleDefinition in catalog.ideology_rules:
 		_register(Kind.IDEOLOGY_RULE, definition, source_path, "ideology_rules")
+	for definition: ContractDefinition in catalog.contract_definitions:
+		_register(Kind.CONTRACT_DEFINITION, definition, source_path, "contract_definitions")
 	return _errors.is_empty()
 
 

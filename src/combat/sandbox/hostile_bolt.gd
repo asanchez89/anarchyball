@@ -7,15 +7,19 @@ extends Area2D
 
 var direction: Vector2 = Vector2.LEFT
 var source_identity: CombatIdentityComponent
+var _animation_elapsed: float = 0.0
+
+@onready var missile_sprite: Sprite2D = $MissileSprite
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-	queue_redraw()
 
 
 func _physics_process(delta: float) -> void:
 	global_position += direction * speed * delta
+	_animation_elapsed += delta
+	missile_sprite.frame = int(_animation_elapsed * 12.0) % missile_sprite.hframes
 	lifetime -= delta
 	if lifetime <= 0.0:
 		queue_free()
@@ -25,11 +29,6 @@ func configure(new_direction: Vector2, source: CombatIdentityComponent) -> void:
 	direction = new_direction.normalized() if not new_direction.is_zero_approx() else Vector2.LEFT
 	source_identity = source
 	rotation = direction.angle()
-
-
-func _draw() -> void:
-	draw_circle(Vector2.ZERO, 7.0, Color("ff7a75"))
-	draw_line(Vector2(-18.0, 0.0), Vector2(-6.0, 0.0), Color("ff7a7580"), 5.0, true)
 
 
 func _on_body_entered(body: Node2D) -> void:

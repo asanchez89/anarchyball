@@ -14,6 +14,8 @@ enum State {
 	AVAILABLE,
 	OCCUPIED,
 	DISABLED,
+	ABANDONED,
+	DISPUTED,
 }
 
 const STATE_IDS: Array[StringName] = [
@@ -21,6 +23,8 @@ const STATE_IDS: Array[StringName] = [
 	&"available",
 	&"occupied",
 	&"disabled",
+	&"abandoned",
+	&"disputed",
 ]
 
 var rule_id: StringName = &""
@@ -28,9 +32,11 @@ var object_id: StringName = &"rule_object"
 var interaction_tag: StringName = &""
 var machine_label: String = "OCCUPANCY MACHINE"
 var current_state: State = State.INACTIVE
+var targets_enabled_before_interaction: bool = false
 var target_platforms: Array[DebugPlatform] = []
 var _player_nearby: bool = false
 var _label: Label
+var _machine_sprite: Sprite2D
 
 
 func _ready() -> void:
@@ -43,13 +49,30 @@ func _ready() -> void:
 	add_child(shape_node)
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	_machine_sprite = Sprite2D.new()
+	_machine_sprite.name = "MachineArt"
+	_machine_sprite.texture = _texture_for_machine()
+	_machine_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_machine_sprite.z_index = -1
+	_machine_sprite.scale = Vector2.ONE * World0ArtMetrics.MACHINE_SCALE
+	_machine_sprite.position = Vector2(
+		0.0,
+		-float(_machine_sprite.texture.get_height()) * World0ArtMetrics.MACHINE_SCALE * 0.5
+	)
+	add_child(_machine_sprite)
 	_label = Label.new()
-	_label.position = Vector2(-125.0, -118.0)
-	_label.size = Vector2(250.0, 82.0)
+	_label.position = Vector2(-180.0, -156.0)
+	_label.size = Vector2(360.0, 102.0)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.add_theme_font_size_override("font_size", 13)
 	add_child(_label)
 	_apply_state()
+
+
+func _texture_for_machine() -> Texture2D:
+	if "press" in String(object_id) or "mill" in String(object_id):
+		return load("res://assets/art/props/world_0/machine_table.png") as Texture2D
+	return load("res://assets/art/props/world_0/machine_console.png") as Texture2D
 
 
 func _process(_delta: float) -> void:
@@ -63,13 +86,13 @@ func configure_targets(platforms: Array[DebugPlatform]) -> void:
 
 
 func interact() -> bool:
-	if current_state != State.AVAILABLE:
+	if current_state != State.AVAILABLE and current_state != State.ABANDONED:
 		return false
 	return transition_to(State.OCCUPIED)
 
 
 func transition_to(next_state: State, emit_event: bool = true) -> bool:
-	if next_state < State.INACTIVE or next_state > State.DISABLED or next_state == current_state:
+	if next_state < State.INACTIVE or next_state > State.DISPUTED or next_state == current_state:
 		return false
 	var previous := current_state
 	current_state = next_state
@@ -104,11 +127,26 @@ static func state_from_id(value: StringName) -> int:
 func _apply_state() -> void:
 	_apply_targets()
 	_update_label()
+	_update_machine_art()
 	queue_redraw()
 
 
+func _update_machine_art() -> void:
+	if _machine_sprite == null:
+		return
+	var colors: Array[Color] = [
+		Color("8991a3"), Color("ffd277"), Color("9dffc5"),
+		Color("d17a82"), Color("c3ad82"), Color("c8a9ff"),
+	]
+	_machine_sprite.modulate = colors[current_state]
+
+
 func _apply_targets() -> void:
-	var enabled := current_state == State.OCCUPIED
+	var enabled := (
+		current_state == State.OCCUPIED
+		or current_state == State.DISPUTED
+		or (targets_enabled_before_interaction and current_state in [State.AVAILABLE, State.ABANDONED])
+	)
 	for platform: DebugPlatform in target_platforms:
 		if is_instance_valid(platform):
 			platform.set_rule_enabled(enabled)
@@ -117,16 +155,29 @@ func _apply_targets() -> void:
 func _update_label() -> void:
 	if _label == null:
 		return
-	var prompt := ""
-	if current_state == State.AVAILABLE:
-		prompt = "\nF / X: OCCUPY + OPERATE" if _player_nearby else "\nAPPROACH TO OPERATE"
-	elif current_state == State.INACTIVE:
-		prompt = "\nNO CURRENT OPERATOR"
-	elif current_state == State.DISABLED:
-		prompt = "\nOUT OF SERVICE"
-	else:
-		prompt = "\nPLATFORM ACTIVE"
-	_label.text = "%s · %s\n%s  %s%s" % [machine_label, String(object_id).to_upper(), _state_symbol(), String(state_id()).to_upper(), prompt]
+	_label.text = "%s · %s\n%s  %s\n%s" % [
+		machine_label,
+		String(object_id).to_upper(),
+		_state_symbol(),
+		String(state_id()).to_upper(),
+		guidance_text(),
+	]
+
+
+func guidance_text() -> String:
+	match current_state:
+		State.AVAILABLE:
+			return "F / X: OCCUPY + OPERATE" if _player_nearby else "APPROACH · THEN PRESS F / X"
+		State.ABANDONED:
+			return "F / X: RESTORE + OPERATE" if _player_nearby else "CAN BE RESTORED · APPROACH"
+		State.INACTIVE:
+			return "NO CURRENT OPERATOR · CONTINUE"
+		State.DISABLED:
+			return "OUT OF SERVICE · USE OPEN ROUTE"
+		State.DISPUTED:
+			return "DO NOT ATTACK · FIND ◇ ALTERNATE MACHINE"
+		_:
+			return "NO ACTION HERE · CURRENT USE · CONTINUE RIGHT"
 
 
 func _state_symbol() -> String:
@@ -137,17 +188,16 @@ func _state_symbol() -> String:
 			return "[◆]"
 		State.DISABLED:
 			return "[×]"
+		State.ABANDONED:
+			return "[◇]"
+		State.DISPUTED:
+			return "[?]"
 		_:
 			return "[–]"
 
 
 func _draw() -> void:
-	var colors: Array[Color] = [Color("70788a"), Color("f4b942"), Color("72d6a0"), Color("b2555b")]
-	var color := colors[current_state]
-	draw_rect(Rect2(-46.0, -40.0, 92.0, 80.0), Color(color, 0.32), true)
-	draw_rect(Rect2(-46.0, -40.0, 92.0, 80.0), color, false, 4.0)
-	draw_circle(Vector2.ZERO, 22.0, color, false, 4.0)
-	draw_line(Vector2(-30.0, 34.0), Vector2(30.0, 34.0), color, 5.0)
+	pass
 
 
 func _on_body_entered(body: Node2D) -> void:
