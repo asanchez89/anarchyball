@@ -98,114 +98,6 @@ func test_machine_guidance_distinguishes_action_lesson_and_resolution() -> void:
 	assert_str(machine.guidance_text()).contains("ALTERNATE MACHINE")
 
 
-func test_workshop_is_independent_standard_mission_with_extended_final_challenge() -> void:
-	var load_result := LevelSpecLoader.load_file(LEVEL_PATH)
-	var validation := LevelValidator.validate(load_result.spec, _registry())
-	var data := load_result.spec.data
-	var prototype := LevelSpecLoader.load_file("res://data/levels/occupancy_workshop_draft.json").spec
-	var profile_result := LevelPlaytestProfile.load_and_validate(PROFILE_PATH, PackedStringArray(["w0_03_occupancy_workshop"]))
-
-	assert_bool(load_result.is_success()).is_true()
-	assert_bool(validation.is_valid()).is_true()
-	assert_int((profile_result["errors"] as PackedStringArray).size()).is_equal(0)
-	assert_str(load_result.spec.level_id()).is_equal("w0_03_occupancy_workshop")
-	assert_bool(data.get("bounds") != prototype.data.get("bounds")).is_true()
-	assert_int((data.get("sections") as Array).size()).is_equal(6)
-	assert_int((data.get("checkpoints") as Array).size()).is_equal(2)
-	assert_float(float((data.get("bounds") as Dictionary).get("width")) / 1280.0).is_between(12.0, 18.0)
-	assert_object(load("res://levels/world_0/w0_03_occupancy_workshop.tscn") as PackedScene).is_not_null()
-
-
-func test_workshop_distributes_resistance_and_ends_with_vertical_traversal() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var encounters := data.get("encounters", []) as Array
-	var challenge_x_positions: Array[float] = []
-	var challenge_sequence: Array[StringName] = []
-	for encounter_value: Variant in encounters:
-		var encounter := encounter_value as Dictionary
-		var definition_id := StringName(String(encounter.get("definition_id")))
-		if definition_id in [&"encounter_occupancy_dispute", &"encounter_ancom_patrol", &"encounter_egoist_route_dispute"]:
-			challenge_x_positions.append(float(encounter.get("x")))
-			challenge_sequence.append(definition_id)
-	assert_int(challenge_x_positions.size()).is_greater_equal(8)
-	assert_float(challenge_x_positions.min()).is_less(1080.0)
-	assert_float(challenge_x_positions.max()).is_greater(20000.0)
-	assert_array(challenge_sequence.slice(0, 4)).contains_exactly([
-		&"encounter_occupancy_dispute", &"encounter_ancom_patrol",
-		&"encounter_egoist_route_dispute", &"encounter_occupancy_dispute",
-	])
-	var platform_by_id: Dictionary = {}
-	for platform_value: Variant in data.get("platforms", []) as Array:
-		var platform := platform_value as Dictionary
-		platform_by_id[String(platform.get("id"))] = platform
-	var climb_ids: Array[String] = [
-		"climb_lower_approach", "climb_middle", "climb_upper",
-		"descent_middle", "descent_lower",
-	]
-	var previous_end := float((platform_by_id["ground_checkpoint_two"] as Dictionary).get("x")) + float((platform_by_id["ground_checkpoint_two"] as Dictionary).get("width"))
-	for platform_id: String in climb_ids:
-		var platform := platform_by_id[platform_id] as Dictionary
-		var gap := float(platform.get("x")) - previous_end
-		assert_float(gap).is_greater_equal(140.0)
-		previous_end = float(platform.get("x")) + float(platform.get("width"))
-	assert_float(float((platform_by_id["climb_lower_approach"] as Dictionary).get("y"))).is_greater(float((platform_by_id["climb_upper"] as Dictionary).get("y")))
-
-
-func test_repeated_encounters_increase_visible_ball_count() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var counts: Array[int] = []
-	for encounter_value: Variant in data.get("encounters", []) as Array:
-		var encounter := encounter_value as Dictionary
-		if String(encounter.get("definition_id")) == "encounter_occupancy_dispute":
-			counts.append(int(encounter.get("enemy_count", 1)))
-	assert_array(counts).contains_exactly([1, 2, 2, 2, 3])
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var final_police := builder.get_node("Generated/EncounterObservers/encounter_dispatch_roadblock") as EncounterRuntimeObserver
-	var final_police_actors := final_police.get("_actors") as Array
-	assert_int(final_police_actors.size()).is_equal(3)
-
-
-func test_workshop_builds_world_actor_and_two_dispute_resolutions() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	var validation := builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog)
-	var mutualist := builder.get_node_or_null("Generated/Actors/mutualist_current_operator") as CombatTarget
-	var enforcer := builder.get_node_or_null("Generated/Encounters/enemy_occupancy_enforcer") as CombatTarget
-	var claimant := builder.get_node_or_null("Generated/Encounters/npc_mutualist_claimant") as CombatTarget
-	var alternate := builder.get_node_or_null("Generated/RuleObjects/machine_alternate_press") as RuleStateObject
-	var observer := builder.get_node_or_null("Generated/EncounterObservers/encounter_title_claim") as EncounterRuntimeObserver
-
-	assert_bool(validation.is_valid()).is_true()
-	assert_object(mutualist).is_not_null()
-	assert_int(mutualist.conflict_state.current_state).is_equal(ConflictStateComponent.State.NEUTRAL)
-	assert_object(claimant).is_not_null()
-	assert_object(claimant.get_node_or_null("NpcDialogue")).is_null()
-	assert_int(enforcer.conflict_state.current_state).is_equal(ConflictStateComponent.State.DISPUTED)
-	assert_bool(observer.is_resolved()).is_false()
-	assert_bool(alternate.interact()).is_true()
-	assert_bool(observer.is_resolved()).is_true()
-	assert_array(builder.required_unresolved_encounter_ids()).contains_exactly([
-		&"encounter_arrival_scout",
-		&"encounter_restored_output_raiders",
-		&"encounter_exclusion_corridor_raiders",
-		&"encounter_shared_line_raiders",
-		&"encounter_resolution_corridor_assault",
-		&"encounter_workshop_raiders",
-		&"encounter_exit_lookouts",
-		&"encounter_communal_yard_assault",
-		&"encounter_dispatch_roadblock",
-		&"encounter_dispatch_ancom",
-		&"encounter_dispatch_egoist",
-		&"encounter_dispatch_mutualist",
-	])
-
-
 func test_neutral_mutualist_and_disputed_enforcer_are_not_offensive_targets() -> void:
 	var source := auto_free(CombatIdentityComponent.new()) as CombatIdentityComponent
 	source.stable_id = &"player"
@@ -245,6 +137,17 @@ func test_frontier_enemies_patrol_and_expose_pixel_status_icon() -> void:
 	var actor := auto_free((load("res://src/debug/combat_target.tscn") as PackedScene).instantiate()) as CombatTarget
 	actor.apply_archetype(archetype)
 	add_child(actor)
+	actor.set_process(false)
+	var floor_body := auto_free(StaticBody2D.new()) as StaticBody2D
+	var floor_shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(500, 20)
+	floor_shape.shape = rectangle
+	floor_body.position = Vector2(0, 34)
+	floor_body.add_child(floor_shape)
+	add_child(floor_body)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
 	var origin_x := actor.position.x
 	actor._update_patrol(0.5)
 	assert_float(actor.position.x).is_greater(origin_x)
@@ -267,244 +170,330 @@ func test_built_enemy_actors_share_the_global_grounding_rule() -> void:
 	var expected := WorldPropPlacement.grounded_position(
 		builder.loaded_spec.data.get("platforms", []) as Array,
 		raider.position.x,
-		570.0,
+		630.0,
 		builder.art_surface_depth,
 		WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
 	)
 	assert_float(raider.position.y).is_equal(expected.y)
 
 
-func test_early_encounters_open_their_workshop_gates_only_on_resolution() -> void:
+
+func test_police_detects_at_longer_range_without_skipping_the_warning() -> void:
+	var builder := _build()
+	var police := builder.get_node("Generated/Encounters/enemy_occupancy_enforcer") as CombatTarget
+	assert_float(police.activation_distance).is_equal(600.0)
+	builder._player.global_position = police.global_position - Vector2(601.0, 0.0)
+	police._update_behavior(3.0)
+	assert_float(police._behavior_elapsed).is_equal(0.0)
+	assert_bool(police._aggression_committed).is_false()
+	builder._player.global_position = police.global_position - Vector2(550.0, 0.0)
+	police._update_behavior(0.9)
+	assert_int(police.conflict_state.current_state).is_equal(ConflictStateComponent.State.THREATENING)
+	assert_bool(police._aggression_committed).is_false()
+	police._update_behavior(2.0)
+	assert_int(police.conflict_state.current_state).is_equal(ConflictStateComponent.State.AGGRESSOR)
+	assert_bool(police._aggression_committed).is_true()
+
+
+func test_police_projectile_deals_five_health_without_changing_other_archetypes() -> void:
+	var builder := _build()
+	var police := builder.get_node("Generated/Encounters/enemy_occupancy_enforcer") as CombatTarget
+	assert_float(police.projectile_damage).is_equal(5.0)
+	assert_float(EnemyArchetype.new().projectile_damage).is_equal(10.0)
+	police._launch_bolt_direction(Vector2.LEFT)
+	var bolt: HostileBolt
+	for child: Node in police.get_parent().get_children():
+		if child is HostileBolt:
+			bolt = child as HostileBolt
+	assert_object(bolt).is_not_null()
+	assert_float(bolt.damage_amount).is_equal(5.0)
+	var health := builder._player.get_node("Health") as HealthComponent
+	var before := health.current_health
+	bolt._on_body_entered(builder._player)
+	assert_float(health.current_health).is_equal(before - 5.0)
+
+
+func test_archetype_rejects_invalid_projectile_damage() -> void:
+	var archetype := (load("res://data/content/enemies/enemy_occupancy_enforcer.tres") as EnemyArchetype).duplicate() as EnemyArchetype
+	assert_bool(archetype.is_structurally_valid()).is_true()
+	archetype.projectile_damage = -1.0
+	assert_bool(archetype.is_structurally_valid()).is_false()
+	archetype.projectile_damage = NAN
+	assert_bool(archetype.is_structurally_valid()).is_false()
+
+
+func test_projectile_passes_surrendered_balls_and_hits_next_aggressor_once() -> void:
+	var builder := _build()
+	var target := builder.get_node("Generated/Encounters/enemy_occupancy_enforcer") as CombatTarget
+	var source := auto_free(CombatIdentityComponent.new()) as CombatIdentityComponent
+	source.authority = CombatIdentityComponent.Authority.PLAYER
+	source.stable_id = &"player"
+	var probe := load("res://src/combat/sandbox/aim_probe.tscn").instantiate() as AimProbe
+	builder.add_child(probe)
+	probe.configure(Vector2.RIGHT, source, EffectContext.offensive())
+	var before := target.resolve.current_resolve
+	for state: ConflictStateComponent.State in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
+		target.conflict_state.reset_conflict(state)
+		probe._on_area_entered(target)
+		assert_bool(probe.is_queued_for_deletion()).is_false()
+		assert_float(target.resolve.current_resolve).is_equal(before)
+	var next_target := load("res://src/debug/combat_target.tscn").instantiate() as CombatTarget
+	builder.add_child(next_target)
+	next_target.conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	var next_before := next_target.resolve.current_resolve
+	probe._on_area_entered(next_target)
+	assert_bool(probe.is_queued_for_deletion()).is_true()
+	assert_float(next_target.resolve.current_resolve).is_equal(next_before - probe.effect_amount)
+	probe._on_area_entered(next_target)
+	assert_float(next_target.resolve.current_resolve).is_equal(next_before - probe.effect_amount)
+
+
+func _build() -> LevelBuilder:
 	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
 	builder.build_on_ready = false
 	builder.start_in_menu = false
 	add_child(builder)
 	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var police_gate := builder.get_node("Generated/Gates/gate_after_police_tutorial") as AccessGate
-	var police_observer := builder.get_node("Generated/EncounterObservers/encounter_arrival_scout") as EncounterRuntimeObserver
-	assert_bool(police_gate.is_open()).is_false()
-	assert_bool(police_observer.try_resolve(&"neutralize_enforcer")).is_true()
-	assert_bool(police_gate.is_open()).is_true()
-	await get_tree().process_frame
-	await get_tree().process_frame
-	assert_bool(police_gate.is_collision_enabled()).is_false()
-	assert_object(police_gate.get_node_or_null("WarpedGateArt")).is_not_null()
-	var ancom_gate := builder.get_node("Generated/Gates/gate_after_ancom_patrol") as AccessGate
-	var truce_machine := builder.get_node("Generated/RuleObjects/machine_ancom_truce_one") as RuleStateObject
-	assert_bool(ancom_gate.is_open()).is_false()
-	assert_bool(truce_machine.interact()).is_true()
-	assert_bool(ancom_gate.is_open()).is_true()
-	await get_tree().process_frame
-	await get_tree().process_frame
-	assert_bool(ancom_gate.is_collision_enabled()).is_false()
+	return builder
 
 
-func test_every_required_workshop_challenge_has_an_unskippable_gate() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var data := builder.loaded_spec.data
-	var police_count := 0
-	for encounter_value: Variant in data.get("encounters", []) as Array:
-		var encounter := encounter_value as Dictionary
-		if not bool(encounter.get("required_for_completion", false)):
-			continue
-		var gate_id := String(encounter.get("resolution_gate_id", ""))
-		assert_str(gate_id).is_not_empty()
-		var gate := builder.get_node("Generated/Gates/%s" % gate_id) as AccessGate
-		assert_bool(gate.is_open()).is_false()
-		var collision := gate.get_child(0) as CollisionShape2D
-		assert_float((collision.shape as RectangleShape2D).size.y).is_greater_equal(720.0)
-		if String(encounter.get("definition_id")) == "encounter_occupancy_dispute":
-			police_count += 1
-	assert_int(police_count).is_greater_equal(5)
+func test_five_areas_have_only_reception_and_dispatch_as_mandatory_closures() -> void:
+	var builder := _build()
+	assert_int((builder.loaded_spec.data["sections"] as Array).size()).is_equal(5)
+	assert_int((builder.loaded_spec.data["gates"] as Array).size()).is_equal(2)
+	assert_int((builder.loaded_spec.data["checkpoints"] as Array).size()).is_equal(2)
+	assert_array(builder.required_unresolved_encounter_ids()).contains_exactly([
+		&"encounter_arrival_scout", &"encounter_dispatch_roadblock",
+	])
+	var profile := LevelPlaytestProfile.load_and_validate(PROFILE_PATH, PackedStringArray(["w0_03_occupancy_workshop"]))
+	assert_int((profile["errors"] as PackedStringArray).size()).is_equal(0)
 
 
-func test_inactive_machine_platforms_are_not_used_to_ground_world_actors() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var supporting_ids: Array[String] = []
-	for platform_value: Variant in builder._initially_supporting_platforms():
-		supporting_ids.append(String((platform_value as Dictionary).get("id")))
-	assert_bool("platform_ancom_overlook" in supporting_ids).is_true()
-	for disabled_id: String in [
-		"platform_restored_lift",
-		"platform_final_crane", "platform_communal_hoist", "platform_final_dispatch_lift",
-	]:
-		assert_bool(disabled_id in supporting_ids).is_false()
-	assert_bool("platform_egoist_bypass" in supporting_ids).is_true()
-	assert_bool("platform_final_conveyor" in supporting_ids).is_true()
-	assert_bool("platform_final_conveyor_secondary" in supporting_ids).is_true()
+func test_upper_control_requires_feeder_and_lift_can_be_recalled() -> void:
+	var builder := _build()
+	var control := builder.get_node("Generated/RuleObjects/control_production_transfer") as RuleStateObject
+	var feeder := builder.get_node("Generated/RuleObjects/machine_production_feeder") as RuleStateObject
+	var call_button := builder.get_node("Generated/RuleObjects/call_production_lift") as RuleStateObject
+	var lift := builder.get_node("Generated/Platforms/platform_restored_lift") as DebugPlatform
+	var bridge := builder.get_node("Generated/Platforms/production_transfer") as DebugPlatform
+	assert_bool(control.interact()).is_false()
+	assert_bool(call_button.interact()).is_false()
+	assert_bool(lift.is_rule_enabled()).is_false()
+	assert_bool(bridge.is_rule_enabled()).is_false()
+	assert_str(control.guidance_text()).contains("SIN ALIMENTACIÓN")
+	assert_bool(feeder.interact()).is_true()
+	assert_bool(lift.is_rule_enabled()).is_true()
+	assert_bool(control.interact()).is_true()
+	assert_bool(bridge.is_rule_enabled()).is_true()
+	assert_bool(call_button.interact()).is_true()
+	assert_bool(lift.is_rule_enabled()).is_true()
 
 
-func test_egoist_cache_restores_health_and_resolves_without_machine_interaction() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
+func test_truce_and_defensive_surrender_both_release_service_walkway() -> void:
+	for use_truce: bool in [true, false]:
+		var builder := _build()
+		var observer := builder.get_node("Generated/EncounterObservers/encounter_depot_patrol") as EncounterRuntimeObserver
+		var bridge := builder.get_node("Generated/Platforms/depot_service_walkway") as DebugPlatform
+		assert_bool(bridge.is_rule_enabled()).is_false()
+		if use_truce:
+			assert_bool((builder.get_node("Generated/RuleObjects/signal_depot_truce") as RuleStateObject).interact()).is_true()
+		else:
+			for actor: CombatTarget in observer._actors:
+				actor.conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+				actor.conflict_state.neutralize()
+		assert_bool(observer.is_resolved()).is_true()
+		assert_bool(bridge.is_rule_enabled()).is_true()
+
+
+func test_withdrawing_from_warning_clears_timer_without_committing_aggression() -> void:
+	var builder := _build()
+	var observer := builder.get_node("Generated/EncounterObservers/encounter_depot_patrol") as EncounterRuntimeObserver
+	var actor := observer._actors[0]
+	var player := builder.get_node("Generated/Player") as PlayerController
+	player.position = actor.position + Vector2(40, 0)
+	actor._update_behavior(1.0)
+	assert_int(actor.conflict_state.current_state).is_equal(ConflictStateComponent.State.THREATENING)
+	player.position.x -= 500.0
+	actor._update_behavior(0.1)
+	assert_int(actor.conflict_state.current_state).is_equal(actor.initial_state)
+	assert_float(actor._behavior_elapsed).is_equal(0.0)
+
+
+func test_egoist_permits_recovery_and_cache_provides_real_health() -> void:
+	var builder := _build()
+	var observer := builder.get_node("Generated/EncounterObservers/encounter_storage_cache") as EncounterRuntimeObserver
 	var player := builder.get_node("Generated/Player") as PlayerController
 	var health := player.get_node("Health") as HealthComponent
-	assert_bool(health.damage(50.0)).is_true()
-	var pickup := builder.get_node("Generated/Resources/pickup_egoist_health_cache") as DebugPickup
-	var observer := builder.get_node("Generated/EncounterObservers/encounter_exclusion_corridor_raiders") as EncounterRuntimeObserver
-	var gate := builder.get_node("Generated/Gates/gate_after_egoist_dispute") as AccessGate
-	pickup._on_body_entered(player)
-	assert_float(health.current_health).is_equal(85.0)
-	assert_bool(pickup.is_collected()).is_true()
-	assert_bool(observer.is_resolved()).is_true()
-	assert_bool(gate.is_open()).is_true()
-
-
-func test_final_gate_requires_police_ancom_egoist_and_mutualist_resolutions() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var gate := builder.get_node("Generated/Gates/gate_after_dispatch_police") as AccessGate
-	var police := builder.get_node("Generated/EncounterObservers/encounter_dispatch_roadblock") as EncounterRuntimeObserver
-	var truce := builder.get_node("Generated/RuleObjects/machine_final_truce_signal") as RuleStateObject
-	var cache := builder.get_node("Generated/Resources/pickup_final_egoist_health_cache") as DebugPickup
-	var reroute := builder.get_node("Generated/RuleObjects/machine_final_dispatch_reroute") as RuleStateObject
-	var player := builder.get_node("Generated/Player") as PlayerController
-	assert_bool(police.try_resolve(&"neutralize_enforcer")).is_true()
-	assert_bool(gate.is_open()).is_false()
-	assert_bool(truce.interact()).is_true()
-	assert_bool(gate.is_open()).is_false()
-	assert_bool(reroute.interact()).is_true()
-	assert_bool(gate.is_open()).is_false()
+	var cache := builder.get_node("Generated/Resources/pickup_storage_health") as DebugPickup
+	var actor := observer._actors[0]
+	player.position = actor.position
+	actor._update_behavior(20.0)
+	assert_int(actor.behavior).is_equal(CombatTarget.Behavior.STATIC)
+	assert_int(actor.conflict_state.current_state).is_not_equal(ConflictStateComponent.State.AGGRESSOR)
+	assert_str(cache.ownership).is_equal("permitted_salvage")
+	health.restore(40.0)
 	cache._on_body_entered(player)
+	assert_float(health.current_health).is_equal(75.0)
+	assert_bool(observer.is_resolved()).is_true()
+	cache._on_body_entered(player)
+	assert_float(health.current_health).is_equal(75.0)
+
+
+func test_dispatch_escape_works_under_fire_without_requiring_truce_or_cache() -> void:
+	var builder := _build()
+	var observer := builder.get_node("Generated/EncounterObservers/encounter_dispatch_roadblock") as EncounterRuntimeObserver
+	var gate := builder.get_node("Generated/Gates/gate_dispatch") as AccessGate
+	for actor: CombatTarget in observer._actors:
+		actor.conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	var control := builder.get_node("Generated/RuleObjects/control_dispatch_exit") as RuleStateObject
+	assert_bool(control.interact()).is_false()
+	assert_bool((builder.get_node("Generated/RuleObjects/machine_dispatch_feeder") as RuleStateObject).interact()).is_true()
+	assert_bool(control.interact()).is_true()
 	assert_bool(gate.is_open()).is_true()
+	assert_bool(observer.is_resolved()).is_true()
+	for actor: CombatTarget in observer._actors:
+		assert_int(actor.conflict_state.current_state).is_equal(ConflictStateComponent.State.AGGRESSOR)
+	assert_bool((builder.get_node("Generated/Resources/pickup_dispatch_health") as DebugPickup).is_collected()).is_false()
+	assert_array(builder.required_unresolved_encounter_ids()).contains_exactly([&"encounter_arrival_scout"])
 
 
-func test_mutualist_machine_activates_a_visible_moving_elevator_without_blocking_ground_route() -> void:
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
+func test_combat_resolution_removes_actual_reception_and_dispatch_barriers() -> void:
+	var builder := _build()
+	for pair: Array in [["encounter_arrival_scout", "gate_reception"], ["encounter_dispatch_roadblock", "gate_dispatch"]]:
+		var observer := builder.get_node("Generated/EncounterObservers/" + String(pair[0])) as EncounterRuntimeObserver
+		var gate := builder.get_node("Generated/Gates/" + String(pair[1])) as AccessGate
+		assert_bool(gate.is_open()).is_false()
+		for actor: CombatTarget in observer._actors:
+			actor.conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+			actor.conflict_state.neutralize()
+		await get_tree().process_frame
+		await get_tree().process_frame
+		assert_bool(gate.is_open()).is_true()
+		assert_bool(gate.is_collision_enabled()).is_false()
+	assert_array(builder.required_unresolved_encounter_ids()).is_empty()
+
+
+func test_checkpoint_restores_unresolved_patrol_and_releases_again_on_truce() -> void:
+	var builder := _build()
+	var signal_control := builder.get_node("Generated/RuleObjects/signal_depot_truce") as RuleStateObject
+	var observer := builder.get_node("Generated/EncounterObservers/encounter_depot_patrol") as EncounterRuntimeObserver
+	var bridge := builder.get_node("Generated/Platforms/depot_service_walkway") as DebugPlatform
+	builder.activate_checkpoint(&"test_before_truce", Vector2(4300, 620))
+	signal_control.interact()
+	assert_bool(bridge.is_rule_enabled()).is_true()
+	assert_int(observer._actors[0].behavior).is_equal(CombatTarget.Behavior.STATIC)
+	builder.retry_from_checkpoint()
+	assert_bool(bridge.is_rule_enabled()).is_false()
+	assert_bool(observer.is_resolved()).is_false()
+	assert_int(observer._actors[0].behavior).is_equal(CombatTarget.Behavior.ATTACK_PLAYER)
+	signal_control.interact()
+	builder.activate_checkpoint(&"test_after_truce", Vector2(6400, 620))
+	builder.retry_from_checkpoint()
+	assert_bool(bridge.is_rule_enabled()).is_true()
+
+
+func test_checkpoint_mid_combat_does_not_lose_previously_neutralized_actor() -> void:
+	var builder := _build()
+	var observer := builder.get_node("Generated/EncounterObservers/encounter_dispatch_roadblock") as EncounterRuntimeObserver
+	observer._actors[0].conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	observer._actors[0].conflict_state.neutralize()
+	builder.activate_checkpoint(&"test_partial", Vector2(10060, 590))
+	builder.retry_from_checkpoint()
+	observer._actors[1].conflict_state.commit_aggression(ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	observer._actors[1].conflict_state.neutralize()
+	assert_bool(observer.is_resolved()).is_true()
+
+
+func test_invalid_and_cyclic_machine_dependencies_are_rejected() -> void:
+	for dependency: String in ["missing_control", "control_production_transfer"]:
+		var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data.duplicate(true)
+		for machine: Dictionary in data["rule_objects"]:
+			if machine["id"] == "machine_production_feeder":
+				machine["requires"] = [dependency]
+		assert_bool(LevelValidator.validate(LevelSpec.new(data, "test"), _registry()).is_valid()).is_false()
+
+
+func test_locked_and_moving_platforms_never_ground_stationary_actors() -> void:
+	var builder := _build()
+	var supporting_ids: Array[String] = []
+	for platform: Dictionary in builder._initially_supporting_platforms():
+		supporting_ids.append(String(platform["id"]))
+	assert_bool("depot_service_walkway" in supporting_ids).is_false()
+	assert_bool("dispatch_lift" in supporting_ids).is_false()
+	assert_bool("production_transfer" in supporting_ids).is_false()
+
+
+func test_elevator_art_matches_full_physics_width_including_partial_last_tile() -> void:
+	var lift := auto_free(DebugPlatform.new()) as DebugPlatform
+	lift.size = Vector2(300, 24)
+	lift.collision_surface_depth = 32
+	lift.configure_motion(-180, 64, load("res://assets/art/world_0/frontier_forest/tileset.png") as Texture2D)
+	add_child(lift)
+	var visible_right := -INF
+	for child: Node in lift.get_children():
+		if child is Sprite2D:
+			var sprite := child as Sprite2D
+			visible_right = maxf(visible_right, sprite.position.x + sprite.texture.get_width() * sprite.scale.x)
+	assert_float(visible_right).is_equal_approx(150.0, 0.01)
+	assert_bool((lift.get_child(0) as CollisionShape2D).one_way_collision).is_true()
+
+
+class RidingProbe extends CharacterBody2D:
+	func _physics_process(delta: float) -> void:
+		velocity.y += 1800.0 * delta
+		move_and_slide()
+
+
+func test_lift_carries_a_physics_body_through_ascent() -> void:
+	var lift := auto_free(DebugPlatform.new()) as DebugPlatform
+	lift.size = Vector2(288, 24)
+	lift.position = Vector2(600, 600)
+	lift.configure_motion(-180, 64)
+	add_child(lift)
+	var rider := auto_free(RidingProbe.new()) as RidingProbe
+	rider.position = Vector2(600, 562)
+	rider.collision_layer = 2
+	rider.collision_mask = 1
+	var shape_node := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(46, 48)
+	shape_node.shape = shape
+	rider.add_child(shape_node)
+	add_child(rider)
+	await get_tree().create_timer(2.3).timeout
+	assert_bool(rider.is_on_floor()).is_true()
+	assert_float(rider.position.y).is_less(510.0)
+	assert_float(absf(rider.position.y + 24.0 - (lift.position.y - 12.0))).is_less(3.0)
+
+
+func test_workshop_presentation_loads_authored_assets_and_grounded_stations() -> void:
+	var scene := load("res://levels/world_0/presentation/world0_workshop_presentation.tscn") as PackedScene
+	var presentation := auto_free(scene.instantiate()) as Node2D
+	add_child(presentation)
+	presentation.call("configure", LevelSpecLoader.load_file(LEVEL_PATH).spec)
+	assert_int(presentation.get_node("WorkshopStations").get_child_count()).is_greater(20)
+	assert_object(presentation.get_node_or_null("TerrainArt/platform_restored_liftGuide00_0")).is_not_null()
+	for child: Node in presentation.get_node("WorkshopStations").get_children():
+		if child is Sprite2D:
+			assert_object((child as Sprite2D).texture).is_not_null()
+
+
+func test_scene_keeps_terrain_behind_actors_and_marks_inactive_surfaces() -> void:
+	var scene := load("res://levels/world_0/w0_03_occupancy_workshop.tscn") as PackedScene
+	var builder := auto_free(scene.instantiate()) as LevelBuilder
 	builder.start_in_menu = false
 	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var elevator := builder.get_node("Generated/Platforms/platform_restored_lift") as DebugPlatform
-	var machine := builder.get_node("Generated/RuleObjects/machine_abandoned_lift") as RuleStateObject
-	var origin_y := elevator.position.y
-	assert_bool(elevator.is_moving_platform()).is_true()
-	assert_bool(elevator.is_rule_enabled()).is_false()
-	assert_bool(machine.interact()).is_true()
-	elevator._physics_process(1.0)
-	assert_float(elevator.position.y).is_less(origin_y)
-	assert_object(elevator.get_node_or_null("ElevatorTop0")).is_not_null()
-
-
-func test_first_ancom_challenge_reads_actor_then_machine_before_gate() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var ancom_x := 0.0
-	var machine_x := 0.0
-	var gate_x := 0.0
-	for encounter_value: Variant in data.get("encounters", []) as Array:
-		var encounter := encounter_value as Dictionary
-		if String(encounter.get("id")) == "encounter_restored_output_raiders":
-			ancom_x = float(encounter.get("x"))
-	for machine_value: Variant in data.get("rule_objects", []) as Array:
-		var machine := machine_value as Dictionary
-		if String(machine.get("id")) == "machine_ancom_truce_one":
-			machine_x = float(machine.get("x"))
-	for gate_value: Variant in data.get("gates", []) as Array:
-		var gate := gate_value as Dictionary
-		if String(gate.get("id")) == "gate_after_ancom_patrol":
-			gate_x = float(gate.get("x"))
-	assert_float(ancom_x).is_greater(0.0)
-	assert_float(ancom_x).is_less(machine_x)
-	assert_float(machine_x).is_less(gate_x)
-	var builder := auto_free(LevelBuilder.new()) as LevelBuilder
-	builder.build_on_ready = false
-	builder.start_in_menu = false
-	add_child(builder)
-	assert_bool(builder.build_from_file(LEVEL_PATH, load(CATALOG_PATH) as ContentCatalog).is_valid()).is_true()
-	var access_platform := builder.get_node("Generated/Platforms/platform_ancom_overlook") as DebugPlatform
-	var truce_machine := builder.get_node("Generated/RuleObjects/machine_ancom_truce_one") as RuleStateObject
-	assert_bool(access_platform.is_rule_enabled()).is_true()
-	assert_bool(truce_machine.interact()).is_true()
-
-
-func test_first_elevator_places_its_reward_beyond_base_jump_and_at_upper_stop() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var elevator: Dictionary = {}
-	var ground: Dictionary = {}
-	var reward: Dictionary = {}
-	for platform_value: Variant in data.get("platforms", []) as Array:
-		var platform := platform_value as Dictionary
-		match String(platform.get("id")):
-			"platform_restored_lift": elevator = platform
-			"ground_abandoned_lift": ground = platform
-	for resource_value: Variant in data.get("resources", []) as Array:
-		var resource := resource_value as Dictionary
-		if String(resource.get("id")) == "pickup_restored_output":
-			reward = resource
-	var profile := load(String(data.get("movement_profile_path"))) as PlayerMovementProfile
-	var base_jump_height := MovementMath.maximum_jump_height(profile)
-	var elevator_upper_y := float(elevator.get("y")) + float(elevator.get("motion_distance_y"))
-	assert_float(float(ground.get("y")) - float(reward.get("y"))).is_greater(base_jump_height * 1.5)
-	assert_float(absf(float(reward.get("y")) - elevator_upper_y)).is_less_equal(24.0)
-	assert_float(float(reward.get("x"))).is_between(
-		float(elevator.get("x")),
-		float(elevator.get("x")) + float(elevator.get("width"))
-	)
-
-
-func test_required_workshop_challenges_follow_problem_solution_gate_order() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var machines_by_id: Dictionary = {}
-	var gates_by_id: Dictionary = {}
-	for machine_value: Variant in data.get("rule_objects", []) as Array:
-		var machine := machine_value as Dictionary
-		machines_by_id[String(machine.get("id"))] = machine
-	for gate_value: Variant in data.get("gates", []) as Array:
-		var gate := gate_value as Dictionary
-		gates_by_id[String(gate.get("id"))] = gate
-	for encounter_value: Variant in data.get("encounters", []) as Array:
-		var encounter := encounter_value as Dictionary
-		if not bool(encounter.get("required_for_completion", false)):
-			continue
-		var gate_id := String(encounter.get("resolution_gate_id", ""))
-		assert_bool(gates_by_id.has(gate_id)).is_true()
-		var encounter_x := float(encounter.get("x"))
-		var gate_x := float((gates_by_id[gate_id] as Dictionary).get("x"))
-		assert_float(encounter_x).is_less(gate_x)
-		for machine_id_value: Variant in encounter.get("rule_object_ids", []) as Array:
-			var machine := machines_by_id[String(machine_id_value)] as Dictionary
-			assert_float(float(machine.get("x"))).is_between(encounter_x, gate_x)
-
-
-func test_abandoned_crane_reward_requires_its_enabled_platform() -> void:
-	var data := LevelSpecLoader.load_file(LEVEL_PATH).spec.data
-	var platform: Dictionary = {}
-	var ground: Dictionary = {}
-	var reward: Dictionary = {}
-	for platform_value: Variant in data.get("platforms", []) as Array:
-		var candidate := platform_value as Dictionary
-		match String(candidate.get("id")):
-			"platform_abandoned_crane": platform = candidate
-			"ground_crane_choice": ground = candidate
-	for resource_value: Variant in data.get("resources", []) as Array:
-		var candidate := resource_value as Dictionary
-		if String(candidate.get("id")) == "pickup_shared_spares":
-			reward = candidate
-	var profile := load(String(data.get("movement_profile_path"))) as PlayerMovementProfile
-	var jump_height := MovementMath.maximum_jump_height(profile)
-	assert_float(float(ground.get("y")) - float(reward.get("y"))).is_greater(jump_height * 1.5)
-	assert_float(float(platform.get("y")) - float(reward.get("y"))).is_less(jump_height)
-	assert_float(float(reward.get("x"))).is_between(
-		float(platform.get("x")),
-		float(platform.get("x")) + float(platform.get("width"))
-	)
+	var presentation := builder.get_node("Generated/Presentation") as Node2D
+	var terrain := presentation.get_node("TerrainArt") as Node2D
+	assert_int(presentation.z_index + terrain.z_index).is_less(0)
+	var platform := builder.get_node("Generated/Platforms/production_transfer") as DebugPlatform
+	assert_int(platform.surface_art.size()).is_greater(0)
+	assert_float(platform.surface_art[0].modulate.a).is_less(0.3)
+	platform.set_rule_enabled(true)
+	assert_float(platform.surface_art[0].modulate.a).is_equal_approx(1.0, 0.01)
 
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
-	registry.register_catalog(load(CATALOG_PATH) as ContentCatalog, CATALOG_PATH)
+	assert_bool(registry.register_catalog(load(CATALOG_PATH) as ContentCatalog, CATALOG_PATH)).is_true()
 	return registry

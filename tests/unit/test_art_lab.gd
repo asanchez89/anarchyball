@@ -87,8 +87,8 @@ func test_world0_runtime_visuals_use_exact_atlas_contracts() -> void:
 		assert_int(definition.keypose_atlas.get_width()).is_equal(768)
 		assert_int(definition.keypose_atlas.get_height()).is_equal(96)
 		assert_object(definition.animation_atlas).is_not_null()
-		assert_int(definition.animation_atlas.get_width()).is_equal(768)
-		assert_int(definition.animation_atlas.get_height()).is_equal(768)
+		assert_int(definition.animation_atlas.get_width()).is_equal(definition.cell_size.x * definition.animation_columns)
+		assert_int(definition.animation_atlas.get_height()).is_equal(definition.cell_size.y * 8)
 		assert_object(definition.action_equipment).is_not_null()
 		assert_vector(definition.action_equipment_socket).is_equal(Vector2(-35.0, -10.0))
 		assert_bool(definition.action_equipment_behind_body).is_true()
@@ -117,7 +117,7 @@ func test_every_ball_state_contains_at_least_four_distinct_animation_frames() ->
 			var unique_frames: Dictionary = {}
 			var row := definition.row_for(state_id)
 			for frame: int in range(definition.frame_count_for(state_id)):
-				var cell := atlas.get_region(Rect2i(frame * 96, row * 96, 96, 96))
+				var cell := atlas.get_region(Rect2i(Vector2i(frame, row) * definition.cell_size, definition.cell_size))
 				unique_frames[hash(cell.get_data())] = true
 			assert_int(unique_frames.size()).is_greater_equal(4)
 
@@ -127,10 +127,35 @@ func test_ancom_action_frames_keep_horizontal_transparency_gutters() -> void:
 	var atlas := definition.animation_atlas.get_image()
 	var row := definition.row_for(&"action")
 	for frame: int in range(definition.frame_count_for(&"action")):
-		var cell := atlas.get_region(Rect2i(frame * 96, row * 96, 96, 96))
-		for y: int in range(96):
-			assert_float(cell.get_pixel(0, y).a).is_equal(0.0)
-			assert_float(cell.get_pixel(95, y).a).is_equal(0.0)
+		var cell := atlas.get_region(Rect2i(Vector2i(frame, row) * definition.cell_size, definition.cell_size))
+		for y: int in range(definition.cell_size.y):
+			assert_float(cell.get_pixel(0, y).a).is_less(0.01)
+			assert_float(cell.get_pixel(definition.cell_size.x - 1, y).a).is_less(0.01)
+
+
+func test_ancom_diagonal_red_extends_below_forehead_in_every_frame() -> void:
+	var definition := load("res://assets/art/actors/balls/world_0/runtime/ancom_ball_visual.tres") as BallVisualDefinition
+	var atlas := definition.texture().get_image()
+	var visual := auto_free(BallVisual.new()) as BallVisual
+	visual.definition = definition
+	add_child(visual)
+	for row: int in 8:
+		for frame: int in 8:
+			var body := definition.frame_body_bounds[row * 8 + frame]
+			var red_lower_left: int = 0
+			for y: int in range(int(body.position.y + body.size.y * 0.5), int(body.end.y)):
+				for x: int in range(int(body.position.x), int(body.get_center().x)):
+					var color := atlas.get_pixel(frame * 157 + x, row * 157 + y)
+					if color.a > 0.5 and color.r > 0.25 and color.r > color.g * 2.0 and color.r > color.b * 1.8:
+						red_lower_left += 1
+			assert_int(red_lower_left).is_greater(60)
+			visual._state_id = [&"idle", &"move", &"jump", &"action", &"hurt", &"threatening", &"surrendering", &"neutralized"][row]
+			visual._elapsed = float(frame) / definition.fps_for(visual._state_id)
+			visual._update_frame()
+			var sprite := visual.get_node("KeyposeSprite") as Sprite2D
+			assert_vector(body.size * sprite.scale).is_equal(Vector2(76, 76))
+			var foot := sprite.position + (Vector2(body.get_center().x, body.end.y) - Vector2(definition.cell_size) * 0.5) * sprite.scale
+			assert_float(foot.y).is_equal_approx(18.0, 0.01)
 
 
 func test_ancom_subdued_keyposes_do_not_include_side_particles() -> void:
@@ -349,11 +374,11 @@ func test_workshop_required_climb_uses_column_floor_instead_of_road_art() -> voi
 	assert_bool(load_result.is_success()).is_true()
 	presentation.call("configure", load_result.spec)
 	var terrain := presentation.get_node("TerrainArt") as Node2D
-	var ledge := terrain.get_node("climb_middleTop0") as Sprite2D
+	var ledge := terrain.get_node("production_upperTop0") as Sprite2D
 	var ledge_atlas := ledge.texture as AtlasTexture
 	assert_vector(ledge_atlas.region.position).is_equal(Vector2(112.0, 32.0))
-	assert_object(terrain.get_node_or_null("climb_middleBacking")).is_not_null()
-	assert_int(terrain.find_children("climb_middleSupport*_0", "Sprite2D", false, false).size()).is_greater_equal(2)
+	assert_object(terrain.get_node_or_null("production_upperBacking")).is_not_null()
+	assert_int(terrain.find_children("production_upperSupport*_0", "Sprite2D", false, false).size()).is_greater_equal(2)
 
 
 func test_world0_optional_platforms_keep_a_jump_safety_margin() -> void:
@@ -367,25 +392,23 @@ func test_world0_optional_platforms_keep_a_jump_safety_margin() -> void:
 	]:
 		var spec := _load_json(spec_path)
 		var platforms := spec.get("platforms", []) as Array
+		var reachable: Array = platforms.filter(func(value: Dictionary) -> bool: return bool(value.get("required", true)))
+		# Grow from the baseline route, including lift top stops and intermediate
+		# ledges. Unreachable cycles must not validate one another.
+		for _iteration: int in platforms.size():
+			for candidate: Dictionary in platforms:
+				if candidate in reachable:
+					continue
+				for source: Dictionary in reachable.duplicate():
+					var gap := maxf(0.0, maxf(float(candidate.x) - float(source.x) - float(source.width), float(source.x) - float(candidate.x) - float(candidate.width)))
+					var source_y := float(source.y) + minf(0.0, float(source.get("motion_distance_y", 0.0)))
+					if gap <= safe_horizontal_reach and source_y - float(candidate.y) <= safe_jump_rise:
+						reachable.append(candidate)
+						break
 		for platform_value: Variant in platforms:
 			var platform := platform_value as Dictionary
 			if not bool(platform.get("required", true)):
-				var safest_rise := INF
-				var optional_x := float(platform.get("x", 0.0))
-				var optional_end := optional_x + float(platform.get("width", 0.0))
-				for required_value: Variant in platforms:
-					var required := required_value as Dictionary
-					if not bool(required.get("required", true)):
-						continue
-					var required_x := float(required.get("x", 0.0))
-					var required_end := required_x + float(required.get("width", 0.0))
-					var horizontal_gap := maxf(0.0, maxf(optional_x - required_end, required_x - optional_end))
-					if horizontal_gap <= safe_horizontal_reach:
-						safest_rise = minf(
-							safest_rise,
-							float(required.get("y", 0.0)) - float(platform.get("y", 0.0))
-						)
-				assert_float(safest_rise).is_less_equal(safe_jump_rise)
+				assert_bool(platform in reachable).is_true()
 
 
 func _load_json(path: String) -> Dictionary:

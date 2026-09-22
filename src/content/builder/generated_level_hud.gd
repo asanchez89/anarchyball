@@ -119,6 +119,10 @@ func _process(delta: float) -> void:
 		_rule_text,
 		"ACTIVE %.1fs" % _ability.remaining if ability_active else "READY ON AGGRESSION",
 	]
+	if _player.inventory != null:
+		var inventory := _player.inventory
+		_status_label.text = _status_label.text.replace("PROBE ∞", "LIGERA %d · PESADA %d · BTC %d sats" % [inventory.count("light_ammo"), inventory.count("heavy_ammo"), inventory.satoshis])
+		_status_label.text += "\nI / VIEW: ESTADÍSTICAS E INVENTARIO"
 	var boss_visible := _boss != null and _boss.conflict_state.current_state in [
 		ConflictStateComponent.State.THREATENING,
 		ConflictStateComponent.State.AGGRESSOR,

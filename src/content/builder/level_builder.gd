@@ -15,6 +15,8 @@ signal return_to_campaign_requested(level_id: StringName)
 @export var campaign_mode: bool = false
 @export var resume_from_checkpoint: bool = false
 @export var presentation_scene: PackedScene
+@export var crew_coordination_setups: Array[CrewCoordinationDefinition] = []
+@export var economy_profile: RunEconomyDefinition
 @export_range(0.0, 64.0, 1.0) var art_surface_depth: float = 0.0
 @export var platform_fill_color: Color = Color("28314f")
 @export var platform_edge_color: Color = Color("76e6ff")
@@ -124,6 +126,18 @@ func build_from_file(path: String, catalog: ContentCatalog) -> LevelValidationRe
 		return last_validation
 	loaded_spec = load_result.spec
 	last_validation = LevelValidator.validate(loaded_spec, registry)
+	for gate: Dictionary in loaded_spec.data.get("gates", []):
+		if String(gate.get("required_tag", "")) == "mission_key" and (economy_profile == null or not economy_profile.key_gates.has(String(gate.id))):
+			last_validation.add_error(&"missing_key_inventory", "gates", "puerta con llave sin inventario configurado")
+	if economy_profile != null:
+		for error: String in economy_profile.validation_errors(loaded_spec):
+			last_validation.add_error(&"invalid_economy", "economy_profile", error)
+		for id: String in economy_profile.actor_drop_rewards:
+			if not registry.has(ContentRegistry.Kind.ENEMY_ARCHETYPE, StringName(id)):
+				last_validation.add_error(&"invalid_economy", "actor_drop_rewards", "Arquetipo desconocido: " + id)
+	for setup: CrewCoordinationDefinition in crew_coordination_setups:
+		for error: String in setup.validation_errors(loaded_spec):
+			last_validation.add_error(&"invalid_coordination", "crew_coordination_setups", error)
 	if not last_validation.is_valid():
 		_show_errors(last_validation)
 		return last_validation
@@ -166,7 +180,13 @@ func _build_valid_spec(spec: LevelSpec) -> void:
 	_build_gates(spec, generated)
 	_build_rule_objects(spec, generated)
 	_build_encounter_observers(spec, generated)
+	_build_coordination(generated)
 	_build_contracts(spec, generated)
+	if economy_profile != null:
+		var economy := WorkshopEconomy.new()
+		economy.name = "Economy"
+		generated.add_child(economy)
+		economy.configure(self, economy_profile)
 	_build_checkpoints(spec, generated)
 	_build_exit(spec, generated)
 	_build_rule_label(spec, generated)
@@ -203,6 +223,8 @@ func _build_presentation(spec: LevelSpec, parent: Node2D) -> void:
 		return
 	var presentation := presentation_scene.instantiate() as Node2D
 	presentation.name = "Presentation"
+	# Background, structural supports and scenery must remain behind actors.
+	presentation.z_index = -10
 	parent.add_child(presentation)
 	if presentation.has_method("configure"):
 		presentation.call("configure", spec)
@@ -228,6 +250,9 @@ func _build_platforms(spec: LevelSpec, parent: Node2D) -> void:
 		)
 		if platform.is_moving_platform():
 			platform.art_backed = true
+		var presentation := parent.get_node_or_null("Presentation")
+		if presentation != null and presentation.has_method("configure_platform_visual"):
+			presentation.call("configure_platform_visual", platform)
 		platform.position = Vector2(
 			float(data.get("x")) + platform.size.x * 0.5,
 			float(data.get("y")) + platform.size.y * 0.5
@@ -235,6 +260,11 @@ func _build_platforms(spec: LevelSpec, parent: Node2D) -> void:
 		if not bool(data.get("required", true)):
 			platform.edge_color = optional_platform_edge_color
 		container.add_child(platform)
+		var terrain := parent.get_node_or_null("Presentation/TerrainArt")
+		if terrain != null:
+			for item: Node in terrain.get_children():
+				if item is CanvasItem and String(item.name).begins_with(String(platform.name) + "Top"):
+					platform.surface_art.append(item as CanvasItem)
 		if not bool(data.get("required", true)):
 			var trigger := RouteTrigger.new()
 			trigger.name = "%sRoute" % String(data.get("id"))
@@ -289,6 +319,7 @@ func _build_sections(spec: LevelSpec, parent: Node2D) -> void:
 
 
 func _build_actors(spec: LevelSpec, parent: Node2D) -> void:
+	var introduced: Dictionary = {}
 	var container := Node2D.new()
 	container.name = "Actors"
 	parent.add_child(container)
@@ -299,7 +330,11 @@ func _build_actors(spec: LevelSpec, parent: Node2D) -> void:
 			StringName(String(placement.get("archetype_id")))
 		) as EnemyArchetype
 		var actor := _instantiate_actor(archetype, placement, -1)
+		if archetype.dialogue_first_placement_only and introduced.has(archetype.content_id):
+			actor._dialogue_lines = []
+		introduced[archetype.content_id] = true
 		actor.name = String(placement.get("id"))
+		actor.stable_id = StringName(String(placement.get("id")))
 		container.add_child(actor)
 
 
@@ -362,9 +397,14 @@ func _instantiate_actor(archetype: EnemyArchetype, placement: Dictionary, index:
 	var actor := scene.instantiate() as CombatTarget
 	actor.name = String(archetype.content_id)
 	var actor_x := float(placement.get("x")) + maxf(index, 0) * 130.0
+	var actor_y := float(placement.get("y"))
+	if index >= 0 and placement.has("enemy_positions"):
+		var point: Dictionary = placement.enemy_positions[index]
+		actor_x = float(point.x)
+		actor_y = float(point.y)
 	actor.position = _grounded_placement(
 		actor_x,
-		float(placement.get("y")),
+		actor_y,
 		WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
 	)
 	actor.apply_archetype(archetype)
@@ -435,6 +475,10 @@ func _build_rule_objects(spec: LevelSpec, parent: Node2D) -> void:
 		machine.machine_label = String(rule.parameters.get("machine_label", rule.display_name))
 		machine.current_state = RuleStateObject.state_from_id(StringName(String(data.get("initial_state"))))
 		machine.targets_enabled_before_interaction = bool(data.get("targets_enabled_before_interaction", false))
+		machine.machine_label = String(data.get("label", machine.machine_label))
+		machine.action_hint = String(data.get("hint", ""))
+		machine.visual_kind = String(data.get("visual_kind", "machine"))
+		machine.call_only = bool(data.get("call_only", false))
 		var machine_x := float(data.get("x"))
 		machine.position = _grounded_placement(machine_x, float(data.get("y")))
 		var targets: Array[DebugPlatform] = []
@@ -444,6 +488,14 @@ func _build_rule_objects(spec: LevelSpec, parent: Node2D) -> void:
 		machine.configure_targets(targets)
 		machine.state_changed.connect(_on_rule_state_changed)
 		container.add_child(machine)
+	for object_value: Variant in spec.data.get("rule_objects", []) as Array:
+		var data := object_value as Dictionary
+		var machine := container.get_node(String(data.get("id"))) as RuleStateObject
+		for prerequisite_id: Variant in data.get("requires", []) as Array:
+			var prerequisite := container.get_node(String(prerequisite_id)) as RuleStateObject
+			machine.prerequisites.append(prerequisite)
+			prerequisite.state_changed.connect(func(_r: StringName, _o: StringName, _p: StringName, _c: StringName, _t: StringName) -> void: machine._update_label())
+		machine._update_label()
 
 
 func _build_encounter_observers(spec: LevelSpec, parent: Node2D) -> void:
@@ -472,8 +524,35 @@ func _build_encounter_observers(spec: LevelSpec, parent: Node2D) -> void:
 		var observer := EncounterRuntimeObserver.new()
 		observer.name = String(encounter_id)
 		observer.configure(encounter_id, definition, actors, rule_objects, resources)
+		for platform_id: Variant in placement.get("resolution_platform_ids", []) as Array:
+			observer.resolution_platforms.append(parent.get_node("Platforms/%s" % String(platform_id)) as DebugPlatform)
+		observer._apply_resolution_platforms()
 		observer.resolved.connect(_on_encounter_resolved)
 		container.add_child(observer)
+		if definition.ceasefire_challenge != null:
+			observer.challenge = CeasefireChallenge.new()
+			observer.challenge.name = "CeasefireChallenge"
+			observer.challenge.configure(observer, definition.ceasefire_challenge, _player)
+			observer.add_child(observer.challenge)
+
+
+func _build_coordination(parent: Node2D) -> void:
+	for setup: CrewCoordinationDefinition in crew_coordination_setups:
+		var crew := CrewCoordination.new()
+		crew.name = String(setup.content_id)
+		crew.definition = setup.duplicate() as CrewCoordinationDefinition
+		for index: int in crew.definition.terminal_positions.size():
+			var point := crew.definition.terminal_positions[index]
+			crew.definition.terminal_positions[index] = _grounded_placement(point.x, point.y)
+		for id: StringName in setup.platform_ids:
+			crew.platforms.append(parent.get_node("Platforms/" + String(id)) as DebugPlatform)
+		crew.power_source = parent.get_node("RuleObjects/" + String(setup.power_object_id)) as RuleStateObject
+		crew.disruptors.assign(_encounter_actors.get(setup.interrupting_encounter_id, []))
+		crew.assignment_changed.connect(func(id: StringName, station: int, local: bool) -> void:
+			telemetry.record_event(&"coordination_changed", {"crew_id": String(id), "station": station, "local": local})
+			_audio.play_cue(&"rule_interaction")
+		)
+		parent.add_child(crew)
 
 
 func _build_contracts(spec: LevelSpec, parent: Node2D) -> void:
@@ -533,6 +612,8 @@ func _build_checkpoints(spec: LevelSpec, parent: Node2D) -> void:
 		checkpoint.collision_layer = 0
 		checkpoint.collision_mask = 2
 		checkpoint.activated.connect(activate_checkpoint)
+		if economy_profile != null:
+			checkpoint.emergency_refill = (parent.get_node("Economy") as WorkshopEconomy).emergency_supply
 		container.add_child(checkpoint)
 
 
@@ -599,9 +680,12 @@ func _initially_supporting_platforms() -> Array:
 		for target_value: Variant in data.get("target_platform_ids", []) as Array:
 			disabled_ids[String(target_value)] = true
 	var supporting: Array = []
+	for encounter_value: Variant in loaded_spec.data.get("encounters", []) as Array:
+		for target: Variant in (encounter_value as Dictionary).get("resolution_platform_ids", []) as Array:
+			disabled_ids[String(target)] = true
 	for platform_value: Variant in loaded_spec.data.get("platforms", []) as Array:
 		var platform := platform_value as Dictionary
-		if not disabled_ids.has(String(platform.get("id"))):
+		if not disabled_ids.has(String(platform.get("id"))) and is_zero_approx(float(platform.get("motion_distance_y", 0.0))):
 			supporting.append(platform)
 	return supporting
 
@@ -696,10 +780,16 @@ func _capture_checkpoint(checkpoint_id: StringName, position: Vector2) -> void:
 			var actor := node as CombatTarget
 			actor_states[String(actor.stable_id)] = actor.capture_runtime_state()
 	var rule_state: Dictionary = {}
+	if _player.inventory != null:
+		rule_state["inventory"] = _player.inventory.capture()
+		rule_state["loot_drops"] = (get_node("Generated/Economy") as WorkshopEconomy).loot.capture()
 	for node: Node in find_children("*", "", true, false):
 		if node is AccessGate:
 			var gate := node as AccessGate
 			rule_state[String(gate.gate_id)] = gate.is_open()
+		elif node is CrewCoordination:
+			var crew := node as CrewCoordination
+			rule_state["crew:" + String(crew.definition.content_id)] = crew.capture_runtime_state()
 		elif node is RuleStateObject:
 			var rule_object := node as RuleStateObject
 			rule_state[String(rule_object.object_id)] = rule_object.capture_runtime_state()
@@ -729,7 +819,27 @@ func _retry_to_checkpoint() -> void:
 func _restore_checkpoint_state() -> void:
 	if _player == null:
 		return
+	for node: Node in find_children("*", "", true, false):
+		if node is CeasefireChallenge:
+			(node as CeasefireChallenge).restoring = true
+		elif node is HostileBolt:
+			node.queue_free()
 	_player.reset_at(_checkpoint.player_position)
+	for node: Node in get_node("Generated").get_children():
+		if node is AimProbe:
+			node.queue_free()
+	if _player.inventory != null:
+		_player.inventory.restore(_checkpoint.world_rule_state.get("inventory", {}))
+		# Legacy snapshots may resume beyond a newly added key gate.
+		if not _checkpoint.world_rule_state.has("inventory"):
+			for id: String in economy_profile.key_gates:
+				var gate := get_node("Generated/Gates/" + id) as AccessGate
+				if _checkpoint.player_position.x > gate.position.x:
+					_player.inventory.grant_once("migration:" + id, {String(economy_profile.key_gates[id]): 1})
+	_collected_reward_ids = _checkpoint.collected_reward_ids.duplicate()
+	for platform_node: Node in get_node("Generated/Platforms").get_children():
+		if platform_node is DebugPlatform:
+			(platform_node as DebugPlatform).reset_motion()
 	telemetry.reset_position_tracking(_checkpoint.player_position)
 	(_player.get_node("Health") as HealthComponent).restore(_checkpoint.health)
 	var response := _player.get_node_or_null("ContractorDefensiveResponse") as ContractorDefensiveResponse
@@ -761,6 +871,15 @@ func _restore_checkpoint_state() -> void:
 			var saved_contract_state: Variant = _checkpoint.world_rule_state.get("contract:%s" % String(contract.contract_id), {})
 			if saved_contract_state is Dictionary:
 				contract.restore_runtime_state(saved_contract_state as Dictionary)
+	# Recompute derived channel state after all power sources and actors restore.
+	if _player.inventory != null:
+		(get_node("Generated/Economy") as WorkshopEconomy).loot.restore(_checkpoint.world_rule_state.get("loot_drops", {}))
+	for node: Node in find_children("*", "", true, false):
+		if node is CeasefireChallenge:
+			(node as CeasefireChallenge).restoring = false
+	for setup: CrewCoordinationDefinition in crew_coordination_setups:
+		var crew := get_node("Generated/" + String(setup.content_id)) as CrewCoordination
+		crew.restore_runtime_state(_checkpoint.world_rule_state.get("crew:" + String(setup.content_id), {}))
 
 
 func _on_pickup_collected(pickup_id: StringName, ownership: StringName) -> void:
@@ -768,12 +887,19 @@ func _on_pickup_collected(pickup_id: StringName, ownership: StringName) -> void:
 		_collected_reward_ids.append(pickup_id)
 	if _hud != null:
 		_hud.show_feedback(
-			"%s COLLECTED · %d TOTAL" % [String(ownership).to_upper(), _collected_reward_ids.size()],
+			_pickup_feedback(pickup_id, ownership),
 			1.8,
 			"[Confirmación: recurso recogido]"
 		)
 	if _audio != null:
 		_audio.play_cue(&"pickup")
+
+
+func _pickup_feedback(id: StringName, ownership: StringName) -> String:
+	var pickup := get_node_or_null("Generated/Resources/" + String(id)) as DebugPickup
+	if pickup != null and not pickup.display_text.is_empty():
+		return "RECOGIDO · " + pickup.display_text
+	return "%s COLLECTED · %d TOTAL" % [String(ownership).to_upper(), _collected_reward_ids.size()]
 
 
 func _connect_audio_diagnostics(generated: Node) -> void:
@@ -791,9 +917,11 @@ func _on_audio_cue_played(cue_id: StringName, source_name: String) -> void:
 
 
 func _on_gate_opened(gate_id: StringName) -> void:
-	telemetry.record_event(&"route_taken", {"route_tags": ["contractor_access"], "gate_id": String(gate_id)})
+	var gate := get_node_or_null("Generated/Gates/" + String(gate_id)) as AccessGate
+	var route_tag := String(gate.required_tag) if gate != null else "access"
+	telemetry.record_event(&"route_taken", {"route_tags": [route_tag], "gate_id": String(gate_id)})
 	if _hud != null:
-		_hud.show_feedback("CONTRACT ACCEPTED · ACCESS GRANTED", 2.0, "[Confirmación: acceso concedido]")
+		_hud.show_feedback("PUERTA ABIERTA · PASO HABILITADO", 2.0, "[Confirmación: puerta abierta]")
 	if _audio != null:
 		_audio.play_cue(&"gate_open")
 
@@ -814,7 +942,7 @@ func _on_rule_state_changed(
 	})
 	if _hud != null:
 		_hud.show_feedback(
-			"MACHINE OCCUPIED · PLATFORM ACTIVE",
+			"CONTROL ACTIVADO · OBSERVA SU DESTINO",
 			2.0,
 			"[Confirmación: la máquina ahora está ocupada y la plataforma está activa]"
 		)
@@ -855,7 +983,7 @@ func _on_encounter_resolved(encounter_id: StringName, resolution: StringName) ->
 			if not gate_id.is_empty():
 				var gate := get_node_or_null("Generated/Gates/%s" % gate_id) as AccessGate
 				if gate != null and _all_gate_encounters_resolved(gate_id):
-					gate.restore_open(true)
+					gate.open_for_resolution()
 			break
 
 
@@ -893,7 +1021,7 @@ func _on_completion_requested() -> void:
 	if _audio != null:
 		_audio.play_cue(&"level_complete")
 	if _flow != null:
-		var total_resources := (loaded_spec.data.get("resources", []) as Array).size()
+		var total_resources := get_node("Generated/Resources").get_child_count()
 		_flow.append_completion_summary(
 			"%s\nRecursos %d/%d" % [
 				TelemetryBalanceSummary.completion_line(telemetry.snapshot()),

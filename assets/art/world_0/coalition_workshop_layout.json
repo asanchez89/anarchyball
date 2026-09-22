@@ -1,0 +1,277 @@
+{
+  "props": [
+    {"id": "receiving_servers", "x": 960, "y": 650, "texture": "res://assets/art/props/world_0/workshop_servers.png", "scale": 3},
+    {"id": "inspection_crates", "x": 1530, "y": 650, "texture": "res://assets/art/props/world_0/workshop_crate.png", "scale": 3},
+    {"id": "inspection_supplies", "x": 2220, "y": 650, "texture": "res://assets/art/props/world_0/workshop_container.png", "scale": 3},
+    {"id": "shop_servers", "x": 3380, "y": 630, "texture": "res://assets/art/props/world_0/workshop_servers.png", "scale": 3},
+    {"id": "production_spares", "x": 5660, "y": 475, "texture": "res://assets/art/props/world_0/workshop_crate.png", "scale": 3},
+    {"id": "depot_servers", "x": 7370, "y": 650, "texture": "res://assets/art/props/world_0/workshop_servers.png", "scale": 3},
+    {"id": "warehouse_spares", "x": 10160, "y": 575, "texture": "res://assets/art/props/world_0/workshop_crate.png", "scale": 3},
+    {"id": "dispatch_servers", "x": 13060, "y": 650, "texture": "res://assets/art/props/world_0/workshop_servers.png", "scale": 3},
+    {"id": "crew_arrival_supplies", "x": 16300, "y": 630, "texture": "res://assets/art/props/world_0/workshop_crate.png", "scale": 3},
+    {"id": "crew_gallery_servers", "x": 17330, "y": 405, "texture": "res://assets/art/props/world_0/workshop_servers.png", "scale": 3},
+    {"id": "crew_lower_supplies", "x": 17680, "y": 650, "texture": "res://assets/art/props/world_0/workshop_container.png", "scale": 3},
+    {"id": "crew_exit_supplies", "x": 19540, "y": 630, "texture": "res://assets/art/props/world_0/workshop_crate.png", "scale": 3},
+    {
+      "id": "receiving_console",
+      "x": 360,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "receiving_stack",
+      "x": 2820,
+      "y": 570,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "production_table_one",
+      "x": 4480,
+      "y": 575,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "production_table_two",
+      "x": 4980,
+      "y": 425,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "production_station",
+      "x": 5300,
+      "y": 425,
+      "texture": "res://assets/art/props/world_0/machine_console.png",
+      "scale": 2
+    },
+    {
+      "id": "depot_stack_one",
+      "x": 6550,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "depot_stack_two",
+      "x": 6960,
+      "y": 575,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "depot_watch_console",
+      "x": 7760,
+      "y": 425,
+      "texture": "res://assets/art/props/world_0/machine_console.png",
+      "scale": 2
+    },
+    {
+      "id": "depot_storage",
+      "x": 8680,
+      "y": 500,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "warehouse_station",
+      "x": 9850,
+      "y": 575,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "warehouse_upper",
+      "x": 10870,
+      "y": 350,
+      "texture": "res://assets/art/props/world_0/machine_console.png",
+      "scale": 2
+    },
+    {
+      "id": "warehouse_stacks",
+      "x": 11380,
+      "y": 530,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "dispatch_receiving",
+      "x": 12730,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "dispatch_monitor",
+      "x": 13820,
+      "y": 425,
+      "texture": "res://assets/art/props/world_0/machine_console.png",
+      "scale": 2
+    },
+    {
+      "id": "dispatch_loading",
+      "x": 14530,
+      "y": 575,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "dispatch_exit_console",
+      "x": 15680,
+      "y": 275,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_1",
+      "x": 430,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_2",
+      "x": 4460,
+      "y": 575,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_3",
+      "x": 6660,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_4",
+      "x": 8760,
+      "y": 500,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_5",
+      "x": 10680,
+      "y": 350,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_6",
+      "x": 11310,
+      "y": 530,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_7",
+      "x": 12860,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "supplies_8",
+      "x": 15260,
+      "y": 350,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "crew_workbench",
+      "x": 16820,
+      "y": 555,
+      "texture": "res://assets/art/props/world_0/machine_table.png",
+      "scale": 2
+    },
+    {
+      "id": "crew_storage",
+      "x": 17950,
+      "y": 650,
+      "texture": "res://assets/art/props/world_0/workshop_crate.png",
+      "scale": 3
+    },
+    {
+      "id": "crew_supply_station",
+      "x": 18860,
+      "y": 350,
+      "texture": "res://assets/art/props/world_0/workshop_container.png",
+      "scale": 3
+    }
+  ],
+  "signs": [
+    {
+      "x": 120,
+      "y": 375,
+      "text": "01 · REQUISA EN CURSO\nNEUTRALIZA / REÚNE PIEZAS"
+    },
+    {
+      "x": 3640,
+      "y": 350,
+      "text": "02  PRODUCCIÓN\nSERVICIO MUTUALIST / ASCENSOR A"
+    },
+    {
+      "x": 4840,
+      "y": 235,
+      "text": "PANEL A\nCONECTA EL RETORNO"
+    },
+    {
+      "x": 6180,
+      "y": 375,
+      "text": "03  DEPÓSITO\nCOLECTIVO: ESQUIVA O DEFIÉNDETE"
+    },
+    {
+      "x": 9100,
+      "y": 380,
+      "text": "04  ALMACÉN\nSUMINISTROS AUTORIZADOS"
+    },
+    {
+      "x": 10330,
+      "y": 110,
+      "text": "BOTIQUÍN\nRECUPERA 35 DE SALUD"
+    },
+    {
+      "x": 12120,
+      "y": 350,
+      "text": "05  DESPACHO\nPATRULLA ABAJO / PANEL ARRIBA"
+    },
+    {
+      "x": 15210,
+      "y": 115,
+      "text": "ALIMENTACIÓN C -> PANEL C\nLIBERA LA SALIDA"
+    },
+    {
+      "text": "02 · COORDINACIÓN\nDELEGA LOS RELEVOS",
+      "x": 16260,
+      "y": 260
+    },
+    {
+      "text": "ALMACÉN COMPARTIDO\nALTO EL FUEGO + SUMINISTROS",
+      "x": 18380,
+      "y": 195
+    },
+    {
+      "text": "FIN DEL AVANCE\nCONTINUACIÓN EN DESARROLLO",
+      "x": 19310,
+      "y": 250
+    },
+    {
+      "x": 1300,
+      "y": 370,
+      "text": "02 · REQUISA DOBLE\nDOS UNIDADES / MÁS PIEZAS"
+    },
+    {
+      "x": 2780,
+      "y": 330,
+      "text": "03 · ÚLTIMO CONTROL\nLIBERA LOS SUMINISTROS"
+    },
+    {
+      "x": 3480,
+      "y": 265,
+      "text": "ATM BITCOIN\nVENDE / REPÓN"
+    }
+  ]
+}

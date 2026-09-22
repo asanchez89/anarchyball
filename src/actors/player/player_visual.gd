@@ -51,6 +51,11 @@ func play_action() -> void:
 	_play_override(&"action", 0.28)
 
 
+func set_weapon_art(texture: Texture2D, art_scale: float = 1.0) -> void:
+	if _ball_visual != null:
+		_ball_visual.set_action_equipment(texture, true, art_scale)
+
+
 func play_hurt() -> void:
 	_play_override(&"hurt", 0.36)
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/black_anarchy_ball_visual.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+content_id = &"npc_black_anarchy_facilitator"
+display_name = "BlackAnarchy · FACILITADORA"
+tags = Array[StringName]([&"ball", &"neutral", &"facilitator"])
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 40.0
+behavior_id = &"static"
+initial_conflict_state = 0
+visual_definition = ExtResource("2")
+dialogue_lines = Array[String](["Los dos equipos esperan una sola señal. Si interrumpen el puesto central, se paran ambos.", "Acércate a cada terminal y pulsa F / X para delegar un relevo local. Cada equipo conservará su propia señal.", "Mutualist mantiene la máquina. Ante las patrullas Ancom puedes resistir o forzar una rendición; ante saqueadores Egoist, evita el contacto. Coordinar no sustituye esos desafíos."])

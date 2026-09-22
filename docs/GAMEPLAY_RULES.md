@@ -836,6 +836,24 @@ World 0 is both tutorial and ideological foundation. Mechanics must be introduce
 
 Leviathan security agencies already maintain a fragmented occupation when World 0 begins. Early raids provide recurring action pressure, while the final incursion is an escalation with reinforcements rather than their first appearance. Institutional affiliation never replaces an inspectable aggression source: an occupation unit may begin an encounter as `AGGRESSOR` only when the scene establishes that it is already carrying out detention, confiscation, attack or another immediate coercive act.
 
+## 12.0 Active level packaging — 2026-09-22
+
+Level 1 preserves Mutualist, Ancom and Egoist in part 1; introduces BlackAnarchy
+in part 2 through distributed coordination and role rotation; introduces
+LeftLibertarian in part 3 through reversible resource-use/access decisions; and
+ends in a statist boss encounter with all five allies providing distinct support.
+See `LEVEL_01_COALITION.md`. The numbered segments below are source mechanics,
+not required mission order. The Ancom duel/interruption is a deferred variant,
+not this level's finale. Kraterocracy is a proposed boss identity pending approval.
+Agorist remains a player class, never a required NPC or main-route class gate.
+
+Police aggression must remain inspectable in each part. Friendly coordination
+or refusal of access does not create target eligibility. Required ally support
+is taught before the boss, cannot depend on hidden optional collectibles, and
+must recover after interruption/checkpoint. All indirect attacks use TargetValidity.
+This packaging clarifies GR-WORLD-005, GR-LEVEL-001/003/005/008/009,
+GR-BOSS-001..003 and GR-RETRY-001; it does not relax conflict or combat rules.
+
 ## 12.1 Segment A - AnarchyBall / aggression tutorial
 
 Required encounter:
@@ -880,9 +898,9 @@ The level physically changes through cranes/platforms/machinery.
 
 The workshop must read as a connected communal production space. Elevated floors use their dedicated ledge art and continuous columns down to a lower structural surface. Required-route status and visual construction style are separate data; a required platform may still be column-supported. Floating platforms and road tiles reused as unsupported ledges are invalid presentation for this mission.
 
-The workshop challenge curve begins with an occupation PoliceBall so the player first demonstrates defensive neutralization. Later corridors alternate occupation units with wary Ancom patrols and Egoist route disputes. Ancom and Egoist encounters must expose an observable non-offensive interaction before commitment; ignoring the telegraph may produce aggression and early surrender. Arena closures may block forward progress until the local encounter resolves, but each non-police encounter must retain its declared de-escalation interaction.
+The workshop has five connected work areas: requisitioned reception, production, shared depot, elevated storage and dispatch. Reception and dispatch are the only mandatory combat closures. Intermediate encounters modify local access or offer useful rewards rather than adding a gate to every corridor. Patrols expose observable non-offensive interactions and room to withdraw; withdrawing before commitment clears the warning timer.
 
-Their non-offensive verbs must remain mechanically distinct. An Ancom patrol is resolved by reaching and operating a visible truce signal before attack commitment. An Egoist route dispute is resolved by traversing to and claiming a declared useful cache; the pickup must provide its advertised gameplay effect rather than acting as a decorative key. Mutualist operators own the workshop reroute controls and moving machinery. Repeated encounters add participants and combine these verbs with vertical traversal instead of merely repeating a stronger copy of the first room.
+Their non-offensive verbs remain distinct. An Ancom patrol accepts a visible truce signal, opening its service walkway; defensive surrender also releases that route. Egoist explicitly permits recovery of a useful cache as a challenge, without a proximity attack timer: claiming it grants its advertised effect. Mutualist operators control machinery: restoring a feeder enables an upper control, reached using a lift or baseline recovery stairs. Dependencies and destinations must be visible, and occupied/disputed equipment cannot be seized through interaction. Dispatch can be cleared through defensive neutralization or by reaching and operating the alternate upper control even while police aggression is active. This mechanical escape does not cancel aggression or make police peaceful. Truce and supplies facilitate the escape but are not hidden mandatory checkboxes.
 
 Machinery must create more than static ledges. At least one workshop machine drives a visible moving elevator, while other controls may reveal bypasses or reroute access. Moving machinery is optional traversal utility and may not become the only way to recover from a fall or leave the current arena.
 
@@ -969,7 +987,7 @@ The system must demonstrate a genuine strength (resilience through cooperation) 
 
 ## 12.8 Segment H - Leviathan incursion
 
-The Ancom duel is interrupted or followed by a major escalation of the existing state occupation.
+Historical variant for a later encounter, not the active level 1 finale: the Ancom duel may be interrupted or followed by an escalation of the occupation. Level 1 instead closes with the statist boss and allied support specified in §12.0.
 
 Leviathan forces classify all unlicensed associations as targets regardless of their economic disagreements.
 
@@ -977,7 +995,7 @@ Escape/defense sequence recombines earlier mechanics:
 
 - Ancom mutual aid;
 - Mutualist machinery;
-- Agorist escape route;
+- shared access corridor (class-independent; no required Agorist NPC);
 - movement/traversal;
 - third-party defense.
 
@@ -1258,6 +1276,38 @@ Previously seen pre-boss dialogue should support skip/fast-forward on retry.
 ---
 
 # 19. Resources and economy
+
+Workshop tactical extension (user requested): the first Ancom collective has
+three members. A wounded member can retreat and a healthier member can take
+its position before reaching surrender. One surrender still resolves the entire
+collective, as does survival to the shared ceasefire. No healing or
+invulnerability is granted by a tactical retreat.
+
+Contact raiders have bounded pursuit around their original posts. They return
+by traversing valid terrain, not teleporting. After physically returning and
+ceasing aggression they become neutral; renewed pursuit requires a fresh warning
+and committed act before offensive eligibility. Disengagement is not surrender,
+loot or encounter resolution. Resolve, stolen goods and the shared timer persist.
+The timer pauses when nobody is engaging the player. Both tactical movement modes
+may jump along reachable supported routes; neither may phase through walls.
+
+## GR-ECON-002 - Approved local inventory and workshop trade
+
+Level 1 may use two finite-ammo weapons, deterministic stackable loot, protected
+mission keys/components and fictional bitcoin stored as integer satoshis. A local
+shop sells ammunition/healing and buys declared trade goods. This is not a real
+wallet, random loot economy or persistent economic simulation. Mandatory keys and
+service components cannot be sold or stolen. Checkpoints restore inventory and
+world rewards together; replaying a resolved encounter never duplicates payment.
+See `LEVEL_01_ECONOMY.md`. Existing ownership and target eligibility rules remain
+authoritative, including after surrender.
+
+Collectible presentation/lifetime extension (user approved): every available
+pickup has a visible light aura. Only spawned drops expire; authored level
+pickups, especially required keys/components, remain until collected. Drops
+warn by blinking before expiry. Lifetime uses gameplay time (paused in menus);
+checkpoints restore remaining time and terminal states together with inventory.
+Expiry never grants currency, collection credit or encounter progress.
 
 Resources should remain few and legible.
 

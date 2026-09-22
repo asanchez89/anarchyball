@@ -3,11 +3,13 @@ extends Node2D
 
 @export var world_definition: WorldDefinition
 @export var background_texture: Texture2D
+@export var development_level: PackedScene
 
 var _progress: CampaignProgressState
 var _mission: LevelBuilder
 var _menu: CanvasLayer
 var _status: Label
+var _first_button: Button
 
 
 func _ready() -> void:
@@ -29,6 +31,7 @@ func _build_menu() -> void:
 	_menu.name = "CampaignMenu"
 	add_child(_menu)
 	var backdrop := Control.new()
+	backdrop.theme = preload("res://assets/ui/game_theme.tres")
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_menu.add_child(backdrop)
 	if background_texture != null:
@@ -46,81 +49,76 @@ func _build_menu() -> void:
 	scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	backdrop.add_child(scrim)
 	var card := PanelContainer.new()
-	card.position = Vector2(275.0, 105.0)
-	card.size = Vector2(730.0, 510.0)
-	card.add_theme_stylebox_override("panel", _panel_style())
+	card.position = Vector2(160.0, 40.0)
+	card.size = Vector2(960.0, 640.0)
 	backdrop.add_child(card)
 	var panel := VBoxContainer.new()
 	panel.custom_minimum_size = Vector2(660.0, 450.0)
 	panel.alignment = BoxContainer.ALIGNMENT_CENTER
-	panel.add_theme_constant_override("separation", 18)
+	panel.add_theme_constant_override("separation", 14)
 	card.add_child(panel)
 	var title := Label.new()
-	title.text = "ANARCHYBALL · WORLD 0"
+	title.text = "ANARCHYBALL"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 34)
+	title.add_theme_font_size_override("font_size", 32)
+	title.add_theme_color_override("font_color", Color("ffdb55"))
 	panel.add_child(title)
+	var portrait := TextureRect.new()
+	portrait.name = "HeroPortrait"
+	portrait.custom_minimum_size = Vector2(0, 100)
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var frame := AtlasTexture.new()
+	frame.atlas = preload("res://assets/art/actors/balls/world_0/runtime/anarchy_ball_keyposes.png")
+	frame.region = Rect2(0, 0, 96, 96)
+	portrait.texture = frame
+	panel.add_child(portrait)
 	var subtitle := Label.new()
 	subtitle.text = world_definition.display_name
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_font_size_override("font_size", 20)
+	subtitle.add_theme_font_size_override("font_size", 16)
+	subtitle.add_theme_color_override("font_color", Color("76e6ff"))
 	panel.add_child(subtitle)
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size = Vector2(620.0, 85.0)
+	_status.custom_minimum_size = Vector2(620.0, 56.0)
 	panel.add_child(_status)
+	if development_level != null:
+		var row := HBoxContainer.new()
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		panel.add_child(row)
+		for resume: bool in [false, true]:
+			var button := Button.new()
+			button.text = "CONTINUAR TALLER" if resume else "NUEVO TALLER"
+			button.custom_minimum_size = Vector2(310, 48)
+			if _first_button == null:
+				_first_button = button
+			button.pressed.connect(_start_development_level.bind(resume))
+			row.add_child(button)
 	var new_button := Button.new()
 	new_button.text = "NUEVA MISIÓN"
 	new_button.custom_minimum_size = Vector2(320.0, 48.0)
-	_style_button(new_button)
 	new_button.pressed.connect(_start_active_mission.bind(false))
 	panel.add_child(new_button)
 	var continue_button := Button.new()
 	continue_button.text = "CONTINUAR CHECKPOINT"
 	continue_button.custom_minimum_size = Vector2(320.0, 48.0)
-	_style_button(continue_button)
 	continue_button.pressed.connect(_start_active_mission.bind(true))
 	panel.add_child(continue_button)
 	var controls := Label.new()
-	controls.text = "Teclado y gamepad disponibles · progreso local versionado"
+	controls.text = "FLECHAS / D-PAD: ELEGIR   ·   ENTER / A: ACEPTAR"
+	controls.add_theme_font_size_override("font_size", 12)
 	controls.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	panel.add_child(controls)
-	new_button.grab_focus()
-
-
-func _panel_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("15142ee8")
-	style.border_color = Color("df49bd")
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(14)
-	style.content_margin_left = 34.0
-	style.content_margin_right = 34.0
-	style.content_margin_top = 24.0
-	style.content_margin_bottom = 24.0
-	return style
-
-
-func _style_button(button: Button) -> void:
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("2a1c4a")
-	normal.border_color = Color("8b61d1")
-	normal.set_border_width_all(2)
-	normal.set_corner_radius_all(8)
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("5a255d")
-	hover.border_color = Color("f4a858")
-	var pressed := hover.duplicate() as StyleBoxFlat
-	pressed.bg_color = Color("7b2c66")
-	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("focus", hover)
-	button.add_theme_stylebox_override("pressed", pressed)
+	if _first_button == null:
+		_first_button = new_button
 
 
 func _show_menu() -> void:
 	_menu.visible = true
+	_first_button.grab_focus()
 	var mission := world_definition.mission_by_id(_progress.active_mission_id)
 	_status.text = "%s\nCompletada: %s" % [mission.display_name, "sí" if mission.mission_id in _progress.completed_mission_ids else "no"]
 
@@ -141,6 +139,18 @@ func _start_active_mission(resume: bool) -> void:
 func _on_level_completed(mission_id: StringName) -> void:
 	_progress.complete(mission_id, world_definition)
 	CampaignProgressStore.save(_progress)
+
+
+func _start_development_level(resume: bool) -> void:
+	if development_level == null or _mission != null:
+		return
+	_menu.visible = false
+	_mission = development_level.instantiate() as LevelBuilder
+	_mission.campaign_mode = true
+	_mission.resume_from_checkpoint = resume
+	# A development slice has its own checkpoint; never advances the legacy campaign.
+	_mission.return_to_campaign_requested.connect(_on_return_requested)
+	add_child(_mission)
 
 
 func _on_return_requested(_mission_id: StringName) -> void:

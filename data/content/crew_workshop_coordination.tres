@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CrewCoordinationDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/crew_coordination_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+content_id = &"crew_workshop_coordination"
+terminal_positions = PackedVector2Array(16980, 460, 17700, 630)
+platform_ids = Array[StringName]([&"crew_upper_route", &"crew_cache_route"])
+power_object_id = &"crew_power"
+interrupting_encounter_id = &"crew_raid"

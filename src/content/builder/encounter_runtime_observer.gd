@@ -8,12 +8,15 @@ var allowed_resolutions: Array[StringName] = []
 var neutralization_resolution: StringName = &""
 var rule_interaction_resolution: StringName = &""
 var resource_collection_resolution: StringName = &""
+var interaction_during_aggression: bool = false
+var resolution_platforms: Array[DebugPlatform] = []
 var _actors: Array[CombatTarget] = []
 var _neutralized_actor_ids: Dictionary = {}
 var _resolved: bool = false
 var _resolution: StringName = &""
 var _required_resource_count: int = 0
 var _collected_resource_ids: Dictionary = {}
+var challenge: CeasefireChallenge
 
 
 func configure(
@@ -28,6 +31,7 @@ func configure(
 	neutralization_resolution = definition.neutralization_resolution
 	rule_interaction_resolution = definition.rule_interaction_resolution
 	resource_collection_resolution = definition.resource_collection_resolution
+	interaction_during_aggression = definition.interaction_during_aggression
 	_required_resource_count = resources.size()
 	_actors = actors.duplicate()
 	for actor: CombatTarget in _actors:
@@ -47,6 +51,7 @@ func try_resolve(resolution: StringName) -> bool:
 		return false
 	_resolved = true
 	_resolution = resolution
+	_apply_resolution_platforms()
 	resolved.emit(encounter_id, resolution)
 	return true
 
@@ -55,6 +60,7 @@ func capture_runtime_state() -> Dictionary:
 	return {
 		"resolved": _resolved,
 		"resolution": String(_resolution),
+		"challenge": challenge.capture_runtime_state() if challenge != null else {},
 	}
 
 
@@ -63,11 +69,21 @@ func restore_runtime_state(snapshot: Dictionary) -> void:
 	_resolution = StringName(String(snapshot.get("resolution", "")))
 	_neutralized_actor_ids.clear()
 	_collected_resource_ids.clear()
+	if challenge != null:
+		challenge.restore_runtime_state(snapshot.get("challenge", {}))
+	_apply_resolution_platforms()
+
+
+func _apply_resolution_platforms() -> void:
+	for platform: DebugPlatform in resolution_platforms:
+		platform.set_rule_enabled(_resolved)
 
 
 func _on_actor_neutralized(_target_id: StringName, instance_id: int) -> void:
+	if challenge != null:
+		return
 	_neutralized_actor_ids[instance_id] = true
-	if _neutralized_actor_ids.size() == _actors.size():
+	if _actors.all(func(actor: CombatTarget) -> bool: return actor.conflict_state.current_state == ConflictStateComponent.State.NEUTRALIZED or _neutralized_actor_ids.has(actor.get_instance_id())):
 		try_resolve(neutralization_resolution)
 
 
@@ -78,11 +94,12 @@ func _on_rule_state_changed(
 	current_state: StringName,
 	_interaction_tag: StringName
 ) -> void:
-	if current_state != &"occupied" or _has_committed_aggressor():
+	if current_state != &"occupied" or (_has_committed_aggressor() and not interaction_during_aggression):
 		return
 	if try_resolve(rule_interaction_resolution):
 		for actor: CombatTarget in _actors:
-			actor.stop_behavior()
+			if actor.conflict_state.current_state != ConflictStateComponent.State.AGGRESSOR:
+				actor.stop_behavior()
 
 
 func _on_resource_collected(resource_id: StringName) -> void:

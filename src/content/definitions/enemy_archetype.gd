@@ -11,17 +11,20 @@ enum DefeatResponse {
 @export_range(0.0, 0.95, 0.05) var surrender_resolve_ratio: float = 0.0
 @export var defeat_response: DefeatResponse = DefeatResponse.SURRENDER
 @export var behavior_id: StringName = &"static"
+@export var blocks_projectiles: bool = true
 @export var initial_conflict_state: ConflictStateComponent.State = ConflictStateComponent.State.NEUTRAL
 @export var aggressor_reason: ConflictStateComponent.AggressorReason = ConflictStateComponent.AggressorReason.NONE
 @export_multiline var threat_text: String = ""
 @export var dialogue_lines: Array[String] = []
 @export var dialogue_auto_start: bool = true
+@export var dialogue_first_placement_only: bool = false
 @export var target_kind: EffectReceiverComponent.TargetKind = EffectReceiverComponent.TargetKind.BALL
 @export var machine_permission: EffectReceiverComponent.DamagePermission = EffectReceiverComponent.DamagePermission.OWNED_NEUTRAL
 @export var is_boss: bool = false
 @export_range(0.1, 0.9, 0.05) var phase_two_ratio: float = 0.5
 @export_range(0.2, 5.0, 0.1) var attack_interval: float = 1.2
 @export var sustained_attack: bool = false
+@export_range(0.0, 1000.0, 1.0) var projectile_damage: float = 10.0
 @export_range(50.0, 2000.0, 10.0) var activation_distance: float = 520.0
 @export_range(0.0, 500.0, 1.0) var patrol_distance: float = 0.0
 @export_range(0.0, 300.0, 1.0) var patrol_speed: float = 0.0
@@ -40,6 +43,7 @@ func is_structurally_valid() -> bool:
 		and not behavior_id.is_empty()
 		and (behavior_id == &"static" or aggressor_reason != ConflictStateComponent.AggressorReason.NONE)
 		and attack_interval > 0.0
+		and is_finite(projectile_damage) and projectile_damage >= 0.0
 		and activation_distance > 0.0
 		and patrol_distance >= 0.0
 		and patrol_speed >= 0.0

@@ -13,6 +13,8 @@ var player_tags: Array[StringName] = []
 var size: Vector2 = Vector2(42.0, 150.0)
 var barrier_height: float = 720.0
 var rule_text: String = "Acceso contractual"
+var inventory: RunInventory
+var required_key: String = ""
 var _player_nearby: bool = false
 var _is_open: bool = false
 var _shape_node: CollisionShape2D
@@ -61,9 +63,29 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _player_nearby and not _is_open and required_tag in player_tags and InputActions.is_interact_just_pressed():
-		_set_open(true)
-		opened.emit(gate_id)
+	if _player_nearby and InputActions.is_interact_just_pressed():
+		try_open()
+	if _player_nearby and not required_key.is_empty():
+		_update_label()
+
+
+func try_open() -> bool:
+	if _is_open:
+		return false
+	if not required_key.is_empty():
+		if inventory == null or inventory.count(required_key) <= 0:
+			return false
+	elif required_tag not in player_tags:
+		return false
+	return open_for_resolution()
+
+
+func open_for_resolution() -> bool:
+	if _is_open:
+		return false
+	_set_open(true)
+	opened.emit(gate_id)
+	return true
 
 
 func is_open() -> bool:
@@ -125,11 +147,16 @@ func _update_label() -> void:
 	if _label == null:
 		return
 	if _is_open:
+		if not required_key.is_empty():
+			_label.text = "LLAVE VERIFICADA · PASO ABIERTO"
+			return
 		_label.text = (
 			"DESAFÍO RESUELTO · PASO ABIERTO"
 			if required_tag == &"encounter_resolution"
 			else "CONTRATO VERIFICADO · PASO ABIERTO"
 		)
+	elif not required_key.is_empty():
+		_label.text = "%s\n%s" % [rule_text, "F / X: usar llave" if inventory != null and inventory.count(required_key) > 0 else "Busca la llave en la bifurcación alta"]
 	elif required_tag in player_tags:
 		_label.text = "%s\nF / X: presentar contrato" % rule_text
 	elif required_tag == &"encounter_resolution":

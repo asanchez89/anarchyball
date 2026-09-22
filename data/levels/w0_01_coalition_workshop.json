@@ -1,0 +1,1408 @@
+{
+  "schema_version": 0,
+  "level_id": "w0_01_coalition_workshop",
+  "display_name": "Nivel 1 · Taller y coordinación (avance)",
+  "slice": {
+    "title": "ASOCIACIONES BAJO ASEDIO · AVANCE",
+    "objective": "Libera tres puestos policiales, recoge contratos sociales y véndelos en la tienda. Después paga el servicio Mutualist y explora el taller.",
+    "intro": "Versión en construcción: taller completo y primer desafío acumulativo BlackAnarchy. LeftLibertarian y el jefe aún no forman parte de este recorrido.",
+    "completion": "Fin del avance jugable: taller y coordinación. La tercera parte y el jefe siguen en producción; esto no completa el nivel definitivo.",
+    "briefing_cards": [
+      {
+        "title": "Reconocimiento: taller comunal",
+        "body": "Primaria: clic izquierdo / RT. Secundaria: clic derecho / LT. Supera tres puestos policiales: 1, 2 y 3 unidades. Recoge los contratos sociales abandonados. Después, F / X abre la tienda para venderlos por sats y comprar munición o salud. Más adelante encontrarás las otras balls y la llave del ascensor."
+      },
+      {
+        "title": "PoliceBall de ocupación",
+        "body": "Unidad hostil cuando ejecuta una detención o confiscación. Ataca con frecuencia y no se rinde: reduce su Resolve para neutralizarla y dejar de recibir fuego.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/occupancy_enforcer_ball_keyposes.png",
+        "image_columns": 8,
+        "image_frame": 0
+      },
+      {
+        "title": "AncomBall",
+        "body": "El primer colectivo tiene 3 integrantes. Tras la alerta común inician un ataque coordinado. Las heridas se retiran antes de rendirse y otra con más Resolve ocupa su puesto; pueden saltar entre apoyos. Una rendición sigue retirando a todo el grupo. También puedes esquivar durante 35 segundos. Salir pausa la barra; sobrevivir sin causar daño da sats extra.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/ancom_ball_keyposes.png",
+        "image_columns": 8,
+        "image_frame": 0
+      },
+      {
+        "title": "EgoistBall",
+        "body": "Saqueadores ágiles que saltan y roban al contacto tras advertir. No toman llaves ni componentes de misión. Si te alejas de su puesto regresan caminando y saltando, sin curarse; al volver a cruzarte avisan de nuevo. Resiste 26 segundos bajo presión o ríndelos a todos. Alejarte pausa la tregua. Recuperas lo robado al resolver.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/egoist_ball_keyposes.png",
+        "image_columns": 8,
+        "image_frame": 0
+      },
+      {
+        "title": "MutualistBall",
+        "body": "La prensa ocupada no se puede tomar. La alimentación alternativa cuesta 10 componentes de servicio: el lote está antes de la máquina y no puede venderse. El pago es único. El primer ascensor lleva a munición y una llave; la llave abre la puerta de producción más adelante.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/mutualist_ball_keyposes.png",
+        "image_columns": 8,
+        "image_frame": 0
+      },
+      {
+        "title": "BlackAnarchy · relevo local",
+        "body": "Una redada puede cortar la señal central de dos equipos. Delega desde cada terminal para que su equipo siga operando. La alimentación Mutualist sigue siendo necesaria."
+      }
+    ]
+  },
+  "player_spawn": {
+    "x": 120,
+    "y": 606
+  },
+  "exit": {
+    "x": 19680,
+    "y": 586
+  },
+  "bounds": {
+    "width": 19900,
+    "height": 720
+  },
+  "movement_profile_path": "res://data/player/default_movement_profile.tres",
+  "class_loadout_id": "class_contractor",
+  "ideology_rule_ids": [
+    "rule_occupancy_and_use"
+  ],
+  "platforms": [
+    {"id": "depot_patrol_deck", "x": 6550, "y": 550, "width": 220, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "dispatch_patrol_deck", "x": 12560, "y": 550, "width": 280, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_patrol_deck", "x": 19450, "y": 530, "width": 200, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {
+      "id": "ground_arrival",
+      "x": 0,
+      "y": 650,
+      "width": 2650,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "reception_step",
+      "x": 2650,
+      "y": 570,
+      "width": 330,
+      "height": 150,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "reception_recovery",
+      "x": 2980,
+      "y": 650,
+      "width": 620,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "ground_production",
+      "x": 3600,
+      "y": 650,
+      "width": 700,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "production_step_one",
+      "x": 4300,
+      "y": 575,
+      "width": 280,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_step_two",
+      "x": 4580,
+      "y": 500,
+      "width": 280,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_upper",
+      "x": 4860,
+      "y": 425,
+      "width": 480,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_descent",
+      "x": 5340,
+      "y": 500,
+      "width": 320,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_return",
+      "x": 5660,
+      "y": 575,
+      "width": 300,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "ground_checkpoint_one",
+      "x": 5960,
+      "y": 650,
+      "width": 440,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "depot_approach",
+      "x": 6400,
+      "y": 650,
+      "width": 440,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "depot_step_one",
+      "x": 6840,
+      "y": 575,
+      "width": 260,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_step_two",
+      "x": 7100,
+      "y": 500,
+      "width": 300,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_watch",
+      "x": 7400,
+      "y": 425,
+      "width": 390,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_lower",
+      "x": 7790,
+      "y": 650,
+      "width": 470,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "depot_recovery_step",
+      "x": 8260,
+      "y": 575,
+      "width": 280,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_recovery_upper",
+      "x": 8540,
+      "y": 500,
+      "width": 360,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_exit",
+      "x": 8900,
+      "y": 575,
+      "width": 260,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "ground_storage",
+      "x": 9160,
+      "y": 650,
+      "width": 560,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "storage_step_one",
+      "x": 9720,
+      "y": 575,
+      "width": 250,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_step_two",
+      "x": 9970,
+      "y": 500,
+      "width": 240,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_step_three",
+      "x": 10210,
+      "y": 425,
+      "width": 240,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_top",
+      "x": 10450,
+      "y": 350,
+      "width": 540,
+      "height": 370,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_descent",
+      "x": 10990,
+      "y": 440,
+      "width": 260,
+      "height": 280,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_lower",
+      "x": 11250,
+      "y": 530,
+      "width": 260,
+      "height": 190,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "ground_checkpoint_two",
+      "x": 11510,
+      "y": 620,
+      "width": 890,
+      "height": 100,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "ground_dispatch_entry",
+      "x": 12400,
+      "y": 650,
+      "width": 650,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "dispatch_step_one",
+      "x": 13050,
+      "y": 575,
+      "width": 260,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_step_two",
+      "x": 13310,
+      "y": 500,
+      "width": 260,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_watch",
+      "x": 13570,
+      "y": 425,
+      "width": 370,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "ground_dispatch_floor",
+      "x": 13940,
+      "y": 650,
+      "width": 470,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "dispatch_recovery_one",
+      "x": 14410,
+      "y": 575,
+      "width": 240,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_recovery_two",
+      "x": 14650,
+      "y": 500,
+      "width": 240,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_recovery_three",
+      "x": 14890,
+      "y": 425,
+      "width": 240,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_recovery_four",
+      "x": 15130,
+      "y": 350,
+      "width": 270,
+      "height": 370,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_upper_station",
+      "x": 15400,
+      "y": 275,
+      "width": 360,
+      "height": 445,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "ground_exit",
+      "x": 15760,
+      "y": 630,
+      "width": 440,
+      "height": 90,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "reception_cover",
+      "x": 420,
+      "y": 570,
+      "width": 288,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "upper_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "platform_restored_lift",
+      "x": 3950,
+      "y": 565,
+      "width": 288,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine",
+        "moving_elevator"
+      ],
+      "art_style": "column_supported",
+      "motion_distance_y": -215,
+      "motion_speed": 64
+    },
+    {
+      "id": "production_transfer",
+      "x": 4310,
+      "y": 350,
+      "width": 550,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "platform_mutualist_press",
+      "x": 3700,
+      "y": 560,
+      "width": 180,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "current_use_observation"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "platform_disputed_mill",
+      "x": 5460,
+      "y": 420,
+      "width": 190,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "title_claim_dispute"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_service_walkway",
+      "x": 7780,
+      "y": 425,
+      "width": 470,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "truce_signal"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_signal_perch",
+      "x": 7180,
+      "y": 410,
+      "width": 192,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "truce_signal"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_lift",
+      "x": 9300,
+      "y": 565,
+      "width": 288,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "moving_elevator",
+        "occupy_machine"
+      ],
+      "art_style": "column_supported",
+      "motion_distance_y": -230,
+      "motion_speed": 64
+    },
+    {
+      "id": "storage_transfer",
+      "x": 9630,
+      "y": 335,
+      "width": 340,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_short_step",
+      "x": 10010,
+      "y": 260,
+      "width": 220,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "upper_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_cache_perch",
+      "x": 10290,
+      "y": 260,
+      "width": 384,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "upper_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_truce_perch",
+      "x": 13080,
+      "y": 475,
+      "width": 192,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "truce_signal"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_service_walkway",
+      "x": 13920,
+      "y": 425,
+      "width": 490,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "truce_signal"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_lift",
+      "x": 14100,
+      "y": 565,
+      "width": 288,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine",
+        "moving_elevator"
+      ],
+      "art_style": "column_supported",
+      "motion_distance_y": -230,
+      "motion_speed": 64
+    },
+    {
+      "id": "dispatch_transfer",
+      "x": 14420,
+      "y": 335,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_cache_perch",
+      "x": 14890,
+      "y": 335,
+      "width": 240,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "upper_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_exit_bridge",
+      "x": 15500,
+      "y": 275,
+      "width": 480,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "occupy_machine"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_arrival",
+      "x": 16200,
+      "y": 630,
+      "width": 500,
+      "height": 90,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "crew_step_a",
+      "x": 16700,
+      "y": 555,
+      "width": 260,
+      "height": 165,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_step_b",
+      "x": 16960,
+      "y": 480,
+      "width": 260,
+      "height": 240,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_gallery",
+      "x": 17220,
+      "y": 405,
+      "width": 390,
+      "height": 315,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_lower",
+      "x": 17610,
+      "y": 650,
+      "width": 490,
+      "height": 70,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "crew_return_a",
+      "x": 18100,
+      "y": 575,
+      "width": 240,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_return_b",
+      "x": 18340,
+      "y": 500,
+      "width": 240,
+      "height": 220,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_return_c",
+      "x": 18580,
+      "y": 425,
+      "width": 240,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_cache_roof",
+      "x": 18820,
+      "y": 350,
+      "width": 370,
+      "height": 370,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_exit_step",
+      "x": 19190,
+      "y": 440,
+      "width": 250,
+      "height": 280,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_exit",
+      "x": 19440,
+      "y": 630,
+      "width": 460,
+      "height": 90,
+      "required": true,
+      "route_tags": [],
+      "art_style": "road"
+    },
+    {
+      "id": "crew_lift",
+      "x": 16400,
+      "y": 545,
+      "width": 288,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported",
+      "motion_distance_y": -200,
+      "motion_speed": 64
+    },
+    {
+      "id": "crew_upper_route",
+      "x": 16720,
+      "y": 345,
+      "width": 500,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_cache_route",
+      "x": 17610,
+      "y": 405,
+      "width": 490,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_truce_walkway",
+      "x": 18700,
+      "y": 335,
+      "width": 250,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "arrival_cover_deck",
+      "x": 1400,
+      "y": 570,
+      "width": 180,
+      "height": 150,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    }
+  ],
+  "actors": [
+    {
+      "id": "mutualist_current_operator",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 3780,
+      "y": 630
+    },
+    {
+      "id": "mutualist_final_dispatch_operator",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 14150,
+      "y": 630
+    },
+    {
+      "id": "black_facilitator",
+      "archetype_id": "npc_black_anarchy_facilitator",
+      "x": 16330,
+      "y": 610
+    },
+    {
+      "id": "crew_mutualist",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 16580,
+      "y": 610
+    }
+  ],
+  "encounters": [
+    {
+      "id": "encounter_arrival_scout",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 720,
+      "y": 630,
+      "enemy_count": 1,
+      "resolution_gate_id": "gate_reception",
+      "required_for_completion": true
+    },
+    {
+      "id": "encounter_production_pressure",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 5220,
+      "y": 405
+    },
+    {
+      "id": "encounter_depot_patrol",
+      "definition_id": "encounter_ancom_collective",
+      "x": 6400,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [{"x": 6480, "y": 630}, {"x": 6660, "y": 550}, {"x": 6970, "y": 575}],
+      "resolution_platform_ids": [
+        "depot_service_walkway"
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_encounter_depot_patrol"
+    },
+    {
+      "id": "encounter_storage_cache",
+      "definition_id": "encounter_egoist_raiders",
+      "x": 9240,
+      "y": 630,
+      "enemy_count": 2,
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_encounter_storage_cache"
+    },
+    {
+      "id": "encounter_storage_pressure",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 10800,
+      "y": 330,
+      "enemy_count": 1
+    },
+    {
+      "id": "encounter_dispatch_ancom",
+      "definition_id": "encounter_ancom_collective",
+      "x": 12450,
+      "y": 630,
+      "enemy_count": 6,
+      "enemy_positions": [{"x": 12480, "y": 630}, {"x": 12630, "y": 550}, {"x": 12760, "y": 550}, {"x": 12930, "y": 630}, {"x": 13100, "y": 575}, {"x": 13200, "y": 475}],
+      "resolution_platform_ids": [
+        "dispatch_service_walkway"
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_encounter_dispatch_ancom"
+    },
+    {
+      "id": "encounter_dispatch_egoist",
+      "definition_id": "encounter_egoist_raiders",
+      "x": 13960,
+      "y": 630,
+      "enemy_count": 3,
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_encounter_dispatch_egoist"
+    },
+    {
+      "id": "encounter_dispatch_roadblock",
+      "definition_id": "encounter_dispatch_escape",
+      "x": 14000,
+      "y": 630,
+      "enemy_count": 2,
+      "rule_object_ids": [
+        "control_dispatch_exit"
+      ],
+      "resolution_gate_id": "gate_dispatch",
+      "required_for_completion": true
+    },
+    {
+      "id": "encounter_dispatch_upper_guard",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 14980,
+      "y": 405
+    },
+    {
+      "id": "crew_raid",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 17440,
+      "y": 385,
+      "enemy_count": 1,
+      "required_for_completion": false
+    },
+    {
+      "id": "crew_ancom",
+      "definition_id": "encounter_ancom_collective",
+      "x": 18670,
+      "y": 405,
+      "enemy_count": 7,
+      "enemy_positions": [{"x": 18690, "y": 425}, {"x": 18890, "y": 350}, {"x": 19090, "y": 350}, {"x": 19260, "y": 440}, {"x": 19370, "y": 440}, {"x": 19550, "y": 530}, {"x": 19490, "y": 630}],
+      "required_for_completion": true,
+      "resolution_platform_ids": [
+        "crew_truce_walkway"
+      ],
+      "resolution_gate_id": "gate_crew_ancom"
+    },
+    {
+      "id": "crew_egoist",
+      "definition_id": "encounter_egoist_raiders",
+      "x": 17640,
+      "y": 630,
+      "enemy_count": 4,
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_crew_egoist"
+    },
+    {
+      "id": "encounter_arrival_pair",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 1650,
+      "y": 630,
+      "enemy_count": 2,
+      "resolution_gate_id": "gate_arrival_pair",
+      "required_for_completion": true
+    },
+    {
+      "id": "encounter_arrival_squad",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 3050,
+      "y": 630,
+      "enemy_count": 3,
+      "resolution_gate_id": "gate_arrival_squad",
+      "required_for_completion": true
+    }
+  ],
+  "resources": [
+    {
+      "id": "pickup_arrival_ammo",
+      "kind": "supply",
+      "x": 400,
+      "y": 615,
+      "ownership": "unowned_collectible"
+    },
+    {
+      "id": "pickup_service_parts",
+      "kind": "spares",
+      "x": 3640,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_lift_ammo",
+      "kind": "supply",
+      "x": 4040,
+      "y": 280,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_production_key",
+      "kind": "key",
+      "x": 4150,
+      "y": 225,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_depot_ammo",
+      "kind": "supply",
+      "x": 6140,
+      "y": 615,
+      "ownership": "unowned_collectible"
+    },
+    {
+      "id": "pickup_storage_ammo",
+      "kind": "supply",
+      "x": 9280,
+      "y": 615,
+      "ownership": "unowned_collectible"
+    },
+    {
+      "id": "pickup_dispatch_ammo",
+      "kind": "supply",
+      "x": 12500,
+      "y": 615,
+      "ownership": "unowned_collectible"
+    },
+    {
+      "id": "pickup_crew_ammo",
+      "kind": "supply",
+      "x": 16230,
+      "y": 595,
+      "ownership": "unowned_collectible"
+    },
+    {
+      "id": "pickup_production_supply",
+      "kind": "health_cache",
+      "x": 4630,
+      "y": 315,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 25
+    },
+    {
+      "id": "pickup_depot_supply",
+      "kind": "health_cache",
+      "x": 8020,
+      "y": 390,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 25
+    },
+    {
+      "id": "pickup_storage_health",
+      "kind": "health_cache",
+      "x": 10470,
+      "y": 225,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 35
+    },
+    {
+      "id": "pickup_dispatch_health",
+      "kind": "health_cache",
+      "x": 15020,
+      "y": 300,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 50
+    },
+    {
+      "id": "crew_supplies",
+      "kind": "pickup",
+      "x": 17880,
+      "y": 370,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 35
+    },
+    {
+      "id": "pickup_arrival_refill",
+      "kind": "supply",
+      "x": 2300,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_arrival_health",
+      "kind": "pickup",
+      "x": 2400,
+      "y": 615,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 30
+    }
+  ],
+  "sections": [
+    {
+      "id": "section_reception",
+      "from_x": 0,
+      "to_x": 3600
+    },
+    {
+      "id": "section_production",
+      "from_x": 3600,
+      "to_x": 6300
+    },
+    {
+      "id": "section_shared_depot",
+      "from_x": 6300,
+      "to_x": 9100
+    },
+    {
+      "id": "section_elevated_storage",
+      "from_x": 9100,
+      "to_x": 12100
+    },
+    {
+      "id": "section_dispatch",
+      "from_x": 12100,
+      "to_x": 16200
+    },
+    {
+      "id": "part_two_coordination",
+      "from_x": 16200,
+      "to_x": 19900
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "checkpoint_supply_post",
+      "x": 3510,
+      "y": 650,
+      "respawn_x": 3490,
+      "respawn_y": 620
+    },
+    {
+      "id": "checkpoint_after_production",
+      "x": 6180,
+      "y": 650,
+      "respawn_x": 6110,
+      "respawn_y": 620
+    },
+    {
+      "id": "checkpoint_before_dispatch",
+      "x": 11950,
+      "y": 620,
+      "respawn_x": 11860,
+      "respawn_y": 590
+    },
+    {
+      "id": "checkpoint_crew_entry",
+      "x": 16280,
+      "y": 630,
+      "respawn_x": 16240,
+      "respawn_y": 600
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate_production_key",
+      "x": 5890,
+      "y": 475,
+      "width": 42,
+      "height": 220,
+      "required_tag": "mission_key",
+      "key_resource_id": "pickup_production_key",
+      "label": "PRODUCCIÓN · LLAVE DEL ASCENSOR"
+    },
+    {
+      "id": "gate_reception",
+      "x": 1100,
+      "y": 550,
+      "width": 42,
+      "height": 220,
+      "required_tag": "encounter_resolution",
+      "label": "REQUISA ACTIVA · NEUTRALIZA A LA PATRULLA"
+    },
+    {
+      "id": "gate_dispatch",
+      "x": 16090,
+      "y": 558,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "ACCESO A COORDINACIÓN · PATRULLA O PANEL C"
+    },
+    {
+      "id": "gate_arrival_pair",
+      "x": 2200,
+      "y": 550,
+      "width": 42,
+      "height": 220,
+      "required_tag": "encounter_resolution",
+      "label": "REQUISA 2 · NEUTRALIZA AMBAS UNIDADES"
+    },
+    {
+      "id": "gate_arrival_squad",
+      "x": 3430,
+      "y": 550,
+      "width": 42,
+      "height": 220,
+      "required_tag": "encounter_resolution",
+      "label": "REQUISA 3 · LIBERA EL PUESTO"
+    },
+    {
+      "id": "gate_encounter_depot_patrol",
+      "x": 7300,
+      "y": 390,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "COLECTIVO · RESISTE O FUERZA UNA RENDICIÓN"
+    },
+    {
+      "id": "gate_encounter_storage_cache",
+      "x": 9700,
+      "y": 540,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
+    },
+    {
+      "id": "gate_encounter_dispatch_ancom",
+      "x": 13360,
+      "y": 390,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "COLECTIVO · RESISTE O FUERZA UNA RENDICIÓN"
+    },
+    {
+      "id": "gate_encounter_dispatch_egoist",
+      "x": 14500,
+      "y": 475,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
+    },
+    {
+      "id": "gate_crew_ancom",
+      "x": 19740,
+      "y": 520,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "COLECTIVO · RESISTE O FUERZA UNA RENDICIÓN"
+    },
+    {
+      "id": "gate_crew_egoist",
+      "x": 18260,
+      "y": 475,
+      "width": 42,
+      "height": 300,
+      "required_tag": "encounter_resolution",
+      "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
+    }
+  ],
+  "rule_objects": [
+    {
+      "id": "machine_production_feeder",
+      "hook_id": "occupancy_machine",
+      "x": 3890,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "platform_restored_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "ALIMENTACIÓN A",
+      "hint": "F / X: restaurar alimentación del ascensor"
+    },
+    {
+      "id": "control_production_transfer",
+      "hook_id": "occupancy_machine",
+      "x": 5110,
+      "y": 405,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "production_transfer"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "PANEL A · PASARELA",
+      "hint": "F / X: conectar retorno alto y suministros",
+      "requires": [
+        "machine_production_feeder"
+      ]
+    },
+    {
+      "id": "call_production_lift",
+      "hook_id": "occupancy_machine",
+      "x": 4240,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "platform_restored_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "LLAMADA A",
+      "hint": "F / X: devolver ascensor al embarque",
+      "call_only": true,
+      "requires": [
+        "machine_production_feeder"
+      ]
+    },
+    {
+      "id": "machine_storage_feeder",
+      "hook_id": "occupancy_machine",
+      "x": 9500,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "storage_lift",
+        "storage_transfer"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "MONTACARGAS B",
+      "hint": "F / X: restaurar · atajo hacia el botiquín"
+    },
+    {
+      "id": "call_storage_lift",
+      "hook_id": "occupancy_machine",
+      "x": 9680,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "storage_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "LLAMADA B",
+      "hint": "F / X: devolver montacargas",
+      "call_only": true,
+      "requires": [
+        "machine_storage_feeder"
+      ]
+    },
+    {
+      "id": "machine_dispatch_feeder",
+      "hook_id": "occupancy_machine",
+      "x": 14270,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "dispatch_lift",
+        "dispatch_transfer"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "ALIMENTACIÓN C",
+      "hint": "F / X: alimentar elevador y panel de salida"
+    },
+    {
+      "id": "call_dispatch_lift",
+      "hook_id": "occupancy_machine",
+      "x": 14370,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "dispatch_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "LLAMADA C",
+      "hint": "F / X: devolver elevador",
+      "call_only": true,
+      "requires": [
+        "machine_dispatch_feeder"
+      ]
+    },
+    {
+      "id": "control_dispatch_exit",
+      "hook_id": "occupancy_machine",
+      "x": 15540,
+      "y": 255,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "dispatch_exit_bridge"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "PANEL C · LIBERAR DESPACHO",
+      "hint": "F / X: liberar salida sin limpiar la patrulla",
+      "requires": [
+        "machine_dispatch_feeder"
+      ]
+    },
+    {
+      "id": "crew_power",
+      "hook_id": "occupancy_machine",
+      "x": 16610,
+      "y": 610,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "crew_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "ALIMENTACIÓN · EQUIPOS",
+      "hint": "F / X: encender elevador y ambos equipos"
+    }
+  ]
+}

@@ -70,6 +70,13 @@ func neutralize() -> bool:
 	return _transition(State.NEUTRALIZED, aggressor_reason)
 
 
+func disengage_at_home() -> bool:
+	if current_state != State.AGGRESSOR:
+		return false
+	protected_target_id = &""
+	return _transition(State.NEUTRAL, AggressorReason.NONE)
+
+
 func reset_conflict(state: State = State.NEUTRAL) -> void:
 	var previous := current_state
 	current_state = state

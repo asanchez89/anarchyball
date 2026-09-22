@@ -7,14 +7,16 @@
 [resource]
 script = ExtResource("2_enemy")
 content_id = &"enemy_egoist_disputer"
-display_name = "EgoistBall · EXIT DISPUTE"
+display_name = "EgoistBall · SUMINISTROS"
 tags = Array[StringName]([&"ball", &"egoist", &"route_dispute"])
 actor_scene_path = "res://src/debug/combat_target.tscn"
 maximum_resolve = 30.0
 surrender_resolve_ratio = 0.65
-behavior_id = &"attack_player"
+behavior_id = &"static"
 aggressor_reason = 1
-threat_text = "MY EXIT FIRST · REROUTE THE CONTROL OR LEAVE"
+threat_text = "Recupera el botiquín alto; puedes quedártelo"
+dialogue_lines = Array[String](["Ese botiquín quedó en el almacén alto. Si lo alcanzas, puedes quedártelo: despejar el acceso también me sirve.", "Los escalones siempre están disponibles. Restaurar el montacargas abre un acceso más directo. El botiquín restaura salud."])
+dialogue_auto_start = true
 attack_interval = 1.9
 activation_distance = 110.0
 patrol_distance = 32.0

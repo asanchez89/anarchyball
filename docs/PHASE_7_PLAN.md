@@ -6,7 +6,28 @@
 - **Plan visual propuesto:** [`PHASE_7_ART_INTEGRATION_PLAN.md`](PHASE_7_ART_INTEGRATION_PLAN.md)
 - **Reglas afectadas:** `GR-WORLD-001` a `GR-WORLD-005`, `GR-LEVEL-001` a `GR-LEVEL-009`, `GR-ENCOUNTER-001/002`, `GR-TELEM-001/002` y las reglas canónicas de conflicto aplicables
 
-## Objetivo
+## Revisión activa — 2026-09-22
+
+Avance implementado: entrada independiente `NIVEL 1 · NUEVO TALLER`, ambientación
+industrial Warped y primer encuentro acumulativo BlackAnarchy junto a las tres
+balls previas. No incluye todavía parte 3 ni jefe. Véase estado reproducible en
+`LEVEL_01_COALITION.md`; el progreso histórico se conserva por separado.
+
+La producción siguiente se rige por [LEVEL_01_COALITION.md](LEVEL_01_COALITION.md):
+parte 1 Mutualist/Ancom/Egoist; parte 2 BlackAnarchy; parte 3 LeftLibertarian;
+jefe estatista local con los cinco apoyos. Agorist es clase, no NPC. Se preservan
+los prototipos existentes y sus IDs; routing, guardado y onboarding se migrarán
+con pruebas, no por renombrado de archivos. Identidad del jefe pendiente de aprobación.
+
+Secuencia pendiente: validar taller → coordinación/relevos BlackAnarchy →
+uso/acceso reversible LeftLibertarian → enseñar apoyos e integrar jefe →
+playtest de recorrido completo y reanudación. Los checklists P7.0–P7.3 conservan
+su evidencia histórica; P7.4–P7.7 y las siete misiones siguientes son material
+fuente, **no el orden de backlog vigente**. Gate humano: probar las tres partes,
+checkpoint antes del jefe y sus resoluciones con teclado/gamepad; reunir tres
+`first_clear` y tres `clean_replay` del nivel compuesto.
+
+## Objetivo histórico (sustituido por la revisión activa)
 
 Construir el primer mundo real de campaña como siete misiones independientes, conectadas por un flujo mínimo y producidas de una en una. World 0 debe enseñar movimiento, target validity, defensa de terceros, surrender y las primeras reglas ideológicas; después debe recombinarlas durante la incursión del Leviatán.
 
@@ -20,7 +41,7 @@ El primer slice será `w0_01_first_aggression` porque reutiliza contratos ya apr
 
 `occupancy_workshop_draft` permanece intacto como fixture técnico. `w0_03_occupancy_workshop` será otro nivel, con geometría, pacing, perfil y evidencia de campaña propios.
 
-## Paquete de misiones
+## Paquete histórico de misiones (no acumulativo con el nivel compuesto)
 
 | Orden | ID | Función principal | Tipo | Primera vuelta |
 |---:|---|---|---|---:|
@@ -39,11 +60,11 @@ Objetivo provisional: 64-79 minutos dentro de misiones y 75-95 minutos con trans
 Phase 7 incluye:
 
 - Contractor como única clase requerida;
-- siete misiones de World 0 y sus fichas editoriales;
+- el primer nivel compuesto y sus fichas por parte; el resto de World 0 requiere replanificación;
 - flujo mínimo de inicio, desbloqueo, transición y reanudación de campaña;
 - reglas, actores y encounters necesarios para esas misiones;
-- placeholders coherentes, telemetría y curación humana;
-- una incursión local del Leviatán como cierre de World 0.
+- assets Warped prioritarios, arte nuevo solo cuando falte, telemetría y curación humana;
+- presión policial recurrente y jefe estatista local como cierre del nivel 1; no el boss final Leviathan;
 
 Phase 7 no incluye:
 
@@ -171,7 +192,7 @@ Gate: el escape funciona como examen jugable de World 0 y no como una cinemátic
 
 ### P7.8 - Curación integral y cierre
 
-- [ ] recorrer las siete misiones en orden desde una partida limpia;
+- [ ] recorrer el nivel compuesto (tres partes y jefe) desde una partida limpia;
 - [ ] verificar desbloqueo, reanudación, checkpoints y transición entre escenas;
 - [ ] comprobar Contractor, teclado y gamepad en todas las rutas obligatorias;
 - [ ] reunir evidencia de primera vuelta y repetición limpia por candidato promovido;
@@ -181,7 +202,7 @@ Gate: el escape funciona como examen jugable de World 0 y no como una cinemátic
 
 ## Gate final de Phase 7
 
-- [ ] las siete misiones tienen IDs, perfiles, LevelSpecs y escenas curadas independientes;
+- [ ] las tres partes y el jefe tienen referencias estables, perfiles, escenas curadas y transición/checkpoint probados;
 - [ ] World 0 enseña las reglas una a una y las recombina en el escape;
 - [ ] ninguna misión requerida depende de una clase posterior;
 - [ ] ningún actor es atacable por ideología o nombre;

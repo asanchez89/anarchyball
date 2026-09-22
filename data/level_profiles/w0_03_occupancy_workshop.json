@@ -4,21 +4,42 @@
   "lifecycle": "generated_draft",
   "classification": "standard_mission",
   "reference_viewport_width": 1280,
-  "beats": ["introduce", "demonstrate", "challenge", "combine", "climax"],
+  "beats": [
+    "introduce",
+    "demonstrate",
+    "challenge",
+    "combine",
+    "climax"
+  ],
   "evidence_targets": {
     "minimum_first_clear_samples": 3,
     "minimum_clean_replay_samples": 3
   },
   "targets": {
-    "first_clear_seconds": [600, 720],
-    "clean_replay_seconds": [360, 540],
-    "completionist_seconds": [720, 960],
-    "effective_route_screens": [12, 18],
-    "checkpoint_interval_seconds": [180, 360]
+    "first_clear_seconds": [
+      480,
+      720
+    ],
+    "clean_replay_seconds": [
+      240,
+      360
+    ],
+    "completionist_seconds": [
+      600,
+      960
+    ],
+    "effective_route_screens": [
+      12,
+      18
+    ],
+    "checkpoint_interval_seconds": [
+      150,
+      240
+    ]
   },
   "decision": {
     "action": "playtest_before_promotion",
-    "reason": "La duración debe surgir de aprender uso actual, comparar exclusión, elegir rutas de maquinaria y resolver la disputa; no de copiar ni alargar el prototipo técnico.",
+    "reason": "Cinco áreas funcionales y dos cierres principales. Medir recorrido efectivo con ascensos y retornos; el ancho no acredita duración. Reclasificar si no sostiene juego activo; véase docs/WORKSHOP_REDESIGN.md.",
     "campaign_boundary": "occupancy_workshop_draft permanece como fixture. Este candidato usa geometría, pacing, perfil, telemetría y evidencia independientes."
   }
 }

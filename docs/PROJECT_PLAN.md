@@ -1,9 +1,13 @@
 # Anarchyball: The Game
+
+Ampliación aprobada del taller: `LEVEL_01_ECONOMY.md` y GR-ECON-002 definen dos
+armas, munición, llaves, mercancías apilables y bitcoin ficticio para comercio local.
 ## Documento de planificación de producto, diseño y arquitectura para implementación con Codex
 
 **Estado:** Documento base de preproducción - revisión 0.4
-**Última revisión:** 2026-09-12
+**Última revisión:** 2026-09-21
 **Objetivo:** Convertir la idea de *Anarchyball* en un side-scroller shooter/RPG 2D, data-driven y multiplataforma, diseñado desde el inicio para que Codex pueda implementar, probar y asistir en la generación de niveles.  
+**Desarrollo narrativo detallado:** [`STORY_BIBLE.md`](STORY_BIBLE.md), subordinado a este plan y a las reglas canónicas de gameplay.
 **Plataformas objetivo:** Steam (Windows primero), Android e iOS.  
 **Motor elegido:** Godot 4.x estable + GDScript tipado.  
 **Principio rector:** primero debe funcionar como videojuego; la divulgación ideológica debe emerger de las mecánicas, los conflictos y las consecuencias del mundo, no de largas exposiciones. AnarchyBall no dispone de una ruta jugable basada en iniciar agresión: el sistema de combate debe hacer viable completar el juego respetando de forma estructural la no iniciación de la fuerza.
@@ -115,11 +119,12 @@ El recorrido introduce de forma progresiva:
 
 - AnarchyBall;
 - EgoistBall;
-- AgoristBall;
 - MutualistBall;
 - LeftLibertarianBall;
 - BlackAnarchyBall;
-- AncomBall como boss/rival final del mundo.
+- AncomBall como contraparte y aliada, no jefe obligatorio del nivel 1.
+
+Agorist se reserva como clase de AnarchyBall (Phase 8), no como NPC del reparto.
 
 La función del mundo es mostrar que la palabra "anarquía" contiene disputas reales:
 
@@ -141,7 +146,7 @@ En el taller tutorial, esa diferencia también se expresa mediante verbos propio
 
 AncomBalls y contrapartes Egoist priorizan conservar su autonomía: si llegan a comprometer una agresión, prefieren retirarse o rendirse con presión defensiva moderada en vez de resistir hasta agotar todo su Resolve. La política se configura por arquetipo y no por comprobaciones del nombre ideológico.
 
-El enfrentamiento con The AncomBall puede ser un duelo voluntario o una disputa reglada. En la fase final, las agencias del Leviatán reciben refuerzos y convierten la ocupación fragmentaria en una ofensiva abierta que declara ilegales las asociaciones de todos los anarquistas por igual. El boss fight se interrumpe y las facciones colaboran para escapar.
+El primer nivel reúne tres partes: taller Mutualist/Ancom/Egoist, comunidad BlackAnarchy y corredor LeftLibertarian. Culmina frente a un comandante de ideología estatista con apoyo jugable de las cinco balls. KraterocracyBall es el candidato pendiente de aprobación; no es un Leviatán menor. La presión policial recurre en todos los tramos. Un posible duelo Ancom queda como material futuro opcional, no sustituye este clímax.
 
 Esto establece la primera coalición.
 
@@ -782,11 +787,22 @@ Tensión secundaria:
 - si una patrulla decide atacar, su acción observable —no su identidad Ancom— habilita la defensa.
 - después de escalar, una patrulla prefiere retirada o surrender temprano frente a presión defensiva moderada.
 
-Boss: **The AncomBall**.
+La ayuda mutua se introduce como apoyo antes del jefe del nivel 1. Un duelo voluntario con The AncomBall es material futuro, no un boss obligatorio ni una interrupción que sustituya el enfrentamiento estatista.
 
-El encounter se interrumpe cuando la ocupación del Leviatán escala a ofensiva abierta. Las mecánicas aprendidas en el mundo se combinan para escapar.
+## 12.8 Paquete de World 0 — revisión 2026-09-22
 
-## 12.8 Paquete provisional de misiones de World 0
+Estructura vigente: un **primer nivel de tres partes y jefe**, detallado en
+[LEVEL_01_COALITION.md](LEVEL_01_COALITION.md). Parte 1 conserva Mutualist, Ancom y
+Egoist; parte 2 incorpora BlackAnarchy y coordinación distribuida; parte 3 incorpora
+LeftLibertarian y acceso compatible con uso. Jefe estatista local con apoyos de las
+cinco balls; identidad propuesta pendiente de aprobación. Agorist permanece clase.
+
+Objetivo inicial del nivel compuesto: 21–31 minutos (8–12 + 5–7 + 5–7 + 3–5),
+por medir, con checkpoints por tramo y antes del jefe. No extender cada parte hasta
+el presupuesto de una misión estándar. No se altera todavía catálogo ni progreso.
+La extensión restante de World 0 queda por replanificar.
+
+### Paquete anterior — referencias y prototipos, no orden vigente
 
 Los segmentos conceptuales anteriores se agrupan en misiones jugables; no es necesario convertir cada argumento en un nivel independiente.
 
@@ -800,7 +816,7 @@ Los segmentos conceptuales anteriores se agrupan en misiones jugables; no es nec
 | `w0_06_common_pool` | mutual aid, recurso común y The AncomBall | clímax | 12-15 min |
 | `w0_07_leviathan_escape` | incursión y escape recombinando reglas anteriores | misión estándar | 8-10 min |
 
-Objetivo provisional del mundo: **64-79 minutos de misiones** y **75-95 minutos** al incluir transiciones breves, intermisiones y hub. La lectura del Archive no forma parte del objetivo. Estos rangos se revisan con playtests; nunca justifican extender artificialmente un segmento.
+Presupuesto histórico, suspendido hasta replanificar World 0: **64-79 minutos de misiones** y **75-95 minutos** al incluir transiciones breves, intermisiones y hub. La lectura del Archive no forma parte del objetivo. Estos rangos se revisan con playtests; nunca justifican extender artificialmente un segmento.
 
 `w0_01_first_aggression` es deliberadamente fronteriza: su recorrido debe sentirse como misión corta en repetición, aunque el onboarding y el primer encounter puedan llevar la primera vuelta hasta ocho minutos.
 
@@ -1003,6 +1019,11 @@ Total provisional: **50-64 minutos de misiones**. El boss final puede apartarse 
 Total provisional: **7-10 minutos**. No hay combate obligatorio ni checklist de lore; el epílogo permite moverse, conversar y cerrar el arco.
 
 ## 13.7 Presupuesto total de campaña
+
+**Presupuesto histórico:** los totales de la tabla siguiente no son un objetivo
+vigente tras reagrupar el nivel 1 (§12.8). No se sumará este nuevo nivel sobre las
+siete misiones antiguas. Recalcular conteo y duración cuando se defina el resto de
+World 0; los paquetes de mundos posteriores no cambian en esta revisión.
 
 | Paquete | Misiones/viñetas | Primera vuelta |
 |---|---:|---:|
@@ -1341,8 +1362,9 @@ Orden de prioridad sugerido:
 3. `docs/GAMEPLAY_RULES.md`
 4. `docs/ARCHITECTURE.md`
 5. `docs/DEVELOPMENT_PHASES.md`
-6. ADRs aceptados
-7. código existente y tests
+6. `docs/STORY_BIBLE.md` para tareas que afecten campaña, personajes, diálogos, cutscenes o contenido ideológico
+7. ADRs aceptados
+8. código existente y tests
 
 ## 20.2 Reglas para cada tarea de Codex
 
@@ -1696,7 +1718,7 @@ Mitigación: documentación, tests, schemas y arquitectura que permitan entender
 
 ## Riesgo: scope ideológico infinito
 
-Mitigación: solo entra una ideología si produce una mecánica distinta y sirve al arco narrativo. El sobre de 44 misiones/viñetas es un máximo provisional: una incorporación nueva reemplaza o fusiona contenido antes de aumentar el total, salvo evidencia fuerte de playtest.
+Mitigación: solo entra una ideología si produce una mecánica distinta y sirve al arco narrativo. El sobre anterior de 44 misiones/viñetas queda pendiente de recálculo: una incorporación nueva reemplaza o fusiona contenido antes de aumentar el total, salvo evidencia fuerte de playtest.
 
 ---
 

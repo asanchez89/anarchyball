@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="RunEconomyDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/run_economy_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/props/world_0/workshop_items.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/props/world_0/communal_toothbrush_v1.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/props/world_0/egoist_milk_v1.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/art/props/world_0/social_contract_v1.png" id="5"]
+
+[sub_resource type="AtlasTexture" id="PrimaryGun"]
+atlas = ExtResource("2")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="SecondaryGun"]
+atlas = ExtResource("2")
+region = Rect2(96, 0, 32, 32)
+
+[resource]
+script = ExtResource("1")
+items = {"light_ammo": {"label": "Munición ligera"}, "heavy_ammo": {"label": "Munición pesada"}, "trade_parts": {"label": "Piezas recuperadas", "sell_sats": 2}, "communal_toothbrush": {"label": "Cepillos comunales", "description": "Uso común; cerdas por cuenta propia.", "sell_sats": 2}, "egoist_milk": {"label": "Leche egoísta", "description": "La única y su leche.", "sell_sats": 2}, "social_contract": {"label": "Contratos sociales", "description": "Firmado por ti. Aparentemente.", "sell_sats": 2}, "service_parts": {"label": "Componentes de servicio", "protected": true}, "production_key": {"label": "Llave de producción", "protected": true}, "healing": {"label": "Curación"}}
+item_art = {"communal_toothbrush": ExtResource("3"), "egoist_milk": ExtResource("4"), "social_contract": ExtResource("5")}
+loot_icon_size = 84.0
+loot_pixel_size = 3.0
+drop_lifetime_seconds = 90.0
+drop_warning_seconds = 10.0
+starting_items = {"light_ammo": 120, "heavy_ammo": 16}
+actor_drop_rewards = {"enemy_occupancy_enforcer": {"items": {"social_contract": 10}}, "enemy_ancom_collective": {"items": {"communal_toothbrush": 10}, "cede_on_resolution": true}, "enemy_egoist_raider": {"items": {"egoist_milk": 10}, "cede_on_resolution": true}}
+weapons = Array[Dictionary]([{"id": "pulse_carbine", "ammo": "light_ammo", "damage": 5.0, "cooldown": 0.16, "art_scale": 2.0, "projectile_scale": 2.0}, {"id": "impact_launcher", "ammo": "heavy_ammo", "damage": 14.0, "cooldown": 0.48, "art_scale": 2.0, "projectile_scale": 3.0}])
+weapon_art = Array[Texture2D]([SubResource("PrimaryGun"), SubResource("SecondaryGun")])
+pickup_rewards = {"pickup_arrival_refill": {"items": {"light_ammo": 60}}, "pickup_service_parts": {"items": {"service_parts": 10}}, "pickup_lift_ammo": {"items": {"heavy_ammo": 12, "trade_parts": 20}}, "pickup_production_key": {"items": {"production_key": 1}}, "pickup_arrival_ammo": {"items": {"light_ammo": 60}}, "pickup_depot_ammo": {"items": {"light_ammo": 100, "heavy_ammo": 12}}, "pickup_storage_ammo": {"items": {"light_ammo": 100, "heavy_ammo": 12}}, "pickup_dispatch_ammo": {"items": {"service_parts": 10, "light_ammo": 120, "heavy_ammo": 16}}, "pickup_crew_ammo": {"items": {"service_parts": 10, "light_ammo": 100, "heavy_ammo": 12}}}
+encounter_rewards = {"encounter_arrival_scout": {"items": {"social_contract": 20}, "sats": 40}, "encounter_arrival_pair": {"items": {"social_contract": 20}}, "encounter_arrival_squad": {"items": {"social_contract": 30}}}
+machine_costs = {"machine_production_feeder": {"item": "service_parts", "amount": 10}, "machine_dispatch_feeder": {"item": "service_parts", "amount": 10}, "crew_power": {"item": "service_parts", "amount": 10}}
+key_gates = {"gate_production_key": "production_key"}
+offers = {"light_pack": {"item": "light_ammo", "amount": 40, "price_sats": 10}, "heavy_pack": {"item": "heavy_ammo", "amount": 8, "price_sats": 16}, "heal": {"item": "healing", "amount": 25, "price_sats": 12}}
+shop_position = Vector2(3560, 630)
+emergency_ammo = 20
+pickup_atlas = ExtResource("2")
+pickup_regions = {"pickup_arrival_refill": Rect2(64, 256, 32, 32), "pickup_production_key": Rect2(96, 192, 32, 32), "pickup_service_parts": Rect2(32, 224, 32, 32), "pickup_lift_ammo": Rect2(96, 256, 32, 32), "pickup_arrival_ammo": Rect2(64, 256, 32, 32), "pickup_depot_ammo": Rect2(64, 256, 32, 32), "pickup_storage_ammo": Rect2(64, 256, 32, 32), "pickup_dispatch_ammo": Rect2(64, 256, 32, 32), "pickup_crew_ammo": Rect2(64, 256, 32, 32)}

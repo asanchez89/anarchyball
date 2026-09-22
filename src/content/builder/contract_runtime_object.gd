@@ -92,7 +92,7 @@ func accept_contract() -> bool:
 		return false
 	_transition_to(State.ACTIVE)
 	if acceptance_gate != null:
-		acceptance_gate.restore_open(true)
+		acceptance_gate.open_for_resolution()
 	return true
 
 
@@ -122,7 +122,7 @@ func resolve_breach(resolution: StringName) -> bool:
 		return false
 	_transition_to(State.RESOLVED)
 	if resolution_gate != null:
-		resolution_gate.restore_open(true)
+		resolution_gate.open_for_resolution()
 	if encounter_observer != null:
 		encounter_observer.try_resolve(resolution)
 	if reward != null:

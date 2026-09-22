@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ContentCatalog" load_steps=34 format=3]
+[gd_resource type="Resource" script_class="ContentCatalog" load_steps=40 format=3]
 
 [ext_resource type="Script" path="res://src/content/content_catalog.gd" id="1_catalog"]
 [ext_resource type="Resource" path="res://data/content/classes/class_contractor.tres" id="2_class"]
@@ -34,10 +34,19 @@
 [ext_resource type="Resource" path="res://data/content/enemies/npc_mutualist_mechanic.tres" id="32_mechanic"]
 [ext_resource type="Resource" path="res://data/content/encounters/encounter_mutualist_reroute.tres" id="33_mutualist_reroute"]
 
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_dispatch_escape.tres" id="34_dispatch"]
+
+[ext_resource type="Resource" path="res://data/content/enemies/npc_black_anarchy_facilitator.tres" id="35_black"]
+
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_ancom_collective.tres" id="36_collective"]
+[ext_resource type="Resource" path="res://data/content/enemies/enemy_egoist_raider.tres" id="37_raider"]
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_ancom_collective.tres" id="38_collective"]
+[ext_resource type="Resource" path="res://data/content/encounters/encounter_egoist_raiders.tres" id="39_raiders"]
+
 [resource]
 script = ExtResource("1_catalog")
 class_loadouts = Array[ExtResource("2_class")]([ExtResource("2_class")])
-enemy_archetypes = Array[ExtResource("3_guard")]([ExtResource("3_guard"), ExtResource("4_confiscator"), ExtResource("7_merchant"), ExtResource("8_boss"), ExtResource("9_turret"), ExtResource("12_occupancy_enforcer"), ExtResource("14_robber"), ExtResource("16_egoist"), ExtResource("19_mutualist"), ExtResource("21_raider"), ExtResource("22_lookout"), ExtResource("24_guide"), ExtResource("27_claimant"), ExtResource("28_ancom"), ExtResource("29_egoist_disputer"), ExtResource("32_mechanic")])
-encounter_definitions = Array[ExtResource("5_encounter")]([ExtResource("5_encounter"), ExtResource("10_boss_encounter"), ExtResource("13_occupancy_encounter"), ExtResource("15_first_aggression"), ExtResource("17_contract_encounter"), ExtResource("20_title_claim"), ExtResource("23_roadblock"), ExtResource("25_scout"), ExtResource("26_assault"), ExtResource("30_ancom_encounter"), ExtResource("31_egoist_encounter"), ExtResource("33_mutualist_reroute")])
+enemy_archetypes = Array[ExtResource("3_guard")]([ExtResource("3_guard"), ExtResource("4_confiscator"), ExtResource("7_merchant"), ExtResource("8_boss"), ExtResource("9_turret"), ExtResource("12_occupancy_enforcer"), ExtResource("14_robber"), ExtResource("16_egoist"), ExtResource("19_mutualist"), ExtResource("21_raider"), ExtResource("22_lookout"), ExtResource("24_guide"), ExtResource("27_claimant"), ExtResource("28_ancom"), ExtResource("29_egoist_disputer"), ExtResource("32_mechanic"), ExtResource("35_black"), ExtResource("36_collective"), ExtResource("37_raider")])
+encounter_definitions = Array[ExtResource("5_encounter")]([ExtResource("5_encounter"), ExtResource("10_boss_encounter"), ExtResource("13_occupancy_encounter"), ExtResource("15_first_aggression"), ExtResource("17_contract_encounter"), ExtResource("20_title_claim"), ExtResource("23_roadblock"), ExtResource("25_scout"), ExtResource("26_assault"), ExtResource("30_ancom_encounter"), ExtResource("31_egoist_encounter"), ExtResource("33_mutualist_reroute"), ExtResource("34_dispatch"), ExtResource("38_collective"), ExtResource("39_raiders")])
 ideology_rules = Array[ExtResource("6_rule")]([ExtResource("6_rule"), ExtResource("11_occupancy_rule")])
 contract_definitions = Array[ExtResource("18_contract")]([ExtResource("18_contract")])

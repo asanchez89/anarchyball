@@ -1,5 +1,7 @@
 extends Node2D
 
+@export_file("*.json") var scenery_layout_path: String = ""
+
 const SOURCE_HEIGHT: float = 240.0
 const ART_SCALE: float = World0ArtMetrics.TERRAIN_SCALE
 const SOURCE_TILE_SIZE: float = 32.0
@@ -22,8 +24,59 @@ func configure(spec: LevelSpec) -> void:
 	_build_layer("FarTrees", load("res://assets/art/world_0/frontier_forest/far_trees.png") as Texture2D, world_width, Color("ffffff"), World0ArtMetrics.FAR_TREE_PARALLAX, -2)
 	_build_layer("NearTrees", load("res://assets/art/world_0/frontier_forest/near_trees.png") as Texture2D, world_width, Color("ffffff"), World0ArtMetrics.NEAR_TREE_PARALLAX, -1)
 	_build_terrain(spec)
-	_build_midground_props(world_width)
-	_build_forest_silhouettes(world_width)
+	if scenery_layout_path.is_empty():
+		_build_midground_props(world_width)
+		_build_forest_silhouettes(world_width)
+	else:
+		_build_authored_scenery(spec)
+
+
+func _build_authored_scenery(spec: LevelSpec) -> void:
+	var layout := JSON.parse_string(FileAccess.get_file_as_string(scenery_layout_path)) as Dictionary
+	var props := Node2D.new()
+	props.name = "WorkshopStations"
+	props.z_index = 3
+	add_child(props)
+	var platforms := spec.data.get("platforms", []) as Array
+	var controlled: Array = []
+	for machine: Dictionary in spec.data.get("rule_objects", []):
+		controlled.append_array(machine.get("target_platform_ids", []))
+	for encounter: Dictionary in spec.data.get("encounters", []):
+		controlled.append_array(encounter.get("resolution_platform_ids", []))
+	var stationary := platforms.filter(func(value: Dictionary) -> bool: return is_zero_approx(float(value.get("motion_distance_y", 0.0))) and value.id not in controlled)
+	for value: Variant in layout.get("props", []) as Array:
+		var data := value as Dictionary
+		var sprite := Sprite2D.new()
+		var texture := load(String(data.get("texture"))) as Texture2D
+		var art_scale := float(data.get("scale", 2.0))
+		sprite.name = String(data.get("id"))
+		sprite.texture = texture
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		sprite.scale = Vector2.ONE * art_scale
+		var visible_rect := texture.get_image().get_used_rect()
+		var visible_bottom := float(visible_rect.end.y) - texture.get_height() * 0.5
+		var support := WorldPropPlacement.scenery_support(stationary, spec.data.get("gates", []), Vector2(float(data.x), float(data.y)), visible_rect.size.x * art_scale, World0ArtMetrics.COLLISION_SURFACE_DEPTH)
+		if not support.is_finite():
+			sprite.free()
+			push_warning("No permanent support for scenery prop: " + String(data.id))
+			continue
+		sprite.position = support - Vector2((visible_rect.get_center().x - texture.get_width() * 0.5) * art_scale, visible_bottom * art_scale)
+		# Absolute layer: also above moving platforms outside Presentation.
+		sprite.z_as_relative = false
+		sprite.z_index = -1
+		sprite.modulate = Color("c4b0d4")
+		props.add_child(sprite)
+	for value: Variant in layout.get("signs", []) as Array:
+		var data := value as Dictionary
+		var label := Label.new()
+		label.text = String(data.get("text"))
+		label.position = Vector2(float(data.get("x")), float(data.get("y")))
+		label.add_theme_font_override("font", load("res://assets/fonts/press_start_2p/PressStart2P-Regular.ttf") as Font)
+		label.add_theme_font_size_override("font_size", 16)
+		label.add_theme_color_override("font_outline_color", Color("120a26"))
+		label.add_theme_constant_override("outline_size", 6)
+		label.z_index = 3
+		props.add_child(label)
 
 
 func _build_layer(
@@ -64,6 +117,13 @@ func _build_terrain(spec: LevelSpec) -> void:
 	for platform_value: Variant in platforms:
 		var data := platform_value as Dictionary
 		if not is_zero_approx(float(data.get("motion_distance_y", 0.0))):
+			# Stationary guide columns make the lift read as a hoist, not a floating floor.
+			var lift_x := float(data.get("x"))
+			var lift_width := float(data.get("width"))
+			var lift_top := float(data.get("y")) + minf(0.0, float(data.get("motion_distance_y")))
+			var lift_bottom := _ground_surface_below(platforms, lift_x, lift_width, float(data.get("y")))
+			_add_platform_supports(terrain, tileset, lift_x, lift_top, WORLD_TILE_SIZE, lift_bottom, String(data.get("id")) + "GuideLeft")
+			_add_platform_supports(terrain, tileset, lift_x + lift_width - WORLD_TILE_SIZE, lift_top, WORLD_TILE_SIZE, lift_bottom, String(data.get("id")) + "GuideRight")
 			continue
 		var x := float(data.get("x", 0.0))
 		var y := float(data.get("y", 0.0))

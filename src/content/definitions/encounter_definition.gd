@@ -14,10 +14,12 @@ extends ContentDefinition
 @export var neutralization_resolution: StringName = &""
 @export var rule_interaction_resolution: StringName = &""
 @export var resource_collection_resolution: StringName = &""
+@export var interaction_during_aggression: bool = false
 @export var class_shortcut_tags: Array[StringName] = []
 @export var lens_option_ids: Array[StringName] = []
 @export var reward_ids: Array[StringName] = []
 @export var telemetry_tags: Array[StringName] = []
+@export var ceasefire_challenge: CeasefireChallengeDefinition
 
 
 func is_structurally_valid() -> bool:
@@ -30,4 +32,5 @@ func is_structurally_valid() -> bool:
 		and (rule_interaction_resolution.is_empty() or rule_interaction_resolution in allowed_resolutions)
 		and (resource_collection_resolution.is_empty() or resource_collection_resolution in allowed_resolutions)
 		and (not is_boss or not aggression_trigger_ids.is_empty())
+		and (ceasefire_challenge == null or (ceasefire_challenge.is_valid() and &"survive_ceasefire" in allowed_resolutions and &"force_surrender" in allowed_resolutions and rule_interaction_resolution.is_empty() and resource_collection_resolution.is_empty()))
 	)

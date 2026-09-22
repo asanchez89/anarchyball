@@ -13,8 +13,9 @@ Antes de implementar, leer en este orden:
 3. `docs/GAMEPLAY_RULES.md` para gameplay momento a momento;
 4. `docs/ARCHITECTURE.md` para dependencias y contratos técnicos;
 5. `docs/DEVELOPMENT_PHASES.md` para alcance de la fase actual;
-6. ADR aceptados en `docs/ADR/`;
-7. código y tests existentes.
+6. `docs/STORY_BIBLE.md` cuando la tarea afecte campaña, personajes, diálogos, cutscenes o contenido ideológico;
+7. ADR aceptados en `docs/ADR/`;
+8. código y tests existentes.
 
 Si `GAMEPLAY_RULES.md` contradice una descripción general de gameplay de `PROJECT_PLAN.md`, prevalece `GAMEPLAY_RULES.md`. No cambiar una regla `GR-*` de forma implícita: proponer primero el cambio documental.
 

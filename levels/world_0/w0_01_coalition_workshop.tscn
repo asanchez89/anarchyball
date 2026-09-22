@@ -1,0 +1,18 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/content/builder/level_builder.gd" id="1"]
+[ext_resource type="Resource" path="res://data/content/default_catalog.tres" id="2"]
+[ext_resource type="PackedScene" path="res://levels/world_0/presentation/coalition_workshop_presentation.tscn" id="3"]
+[ext_resource type="Resource" path="res://data/content/crew_workshop_coordination.tres" id="4"]
+[ext_resource type="Script" path="res://src/content/definitions/crew_coordination_definition.gd" id="5"]
+[ext_resource type="Resource" path="res://data/content/workshop_economy.tres" id="6"]
+
+[node name="CoalitionWorkshop" type="Node2D"]
+script = ExtResource("1")
+level_spec_path = "res://data/levels/w0_01_coalition_workshop.json"
+content_catalog = ExtResource("2")
+economy_profile = ExtResource("6")
+presentation_scene = ExtResource("3")
+crew_coordination_setups = Array[ExtResource("5")]([ExtResource("4")])
+art_surface_depth = 32.0
+start_in_menu = true

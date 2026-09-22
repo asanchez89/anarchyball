@@ -46,7 +46,7 @@ conflict_state_path = NodePath("../ConflictState")
 resolve_path = NodePath("../Resolve")
 duel_context_path = NodePath("../DuelContext")
 
-[node name="Sfx" type="Node" parent="."]
+[node name="Sfx" type="Node2D" parent="."]
 unique_name_in_owner = true
 script = ExtResource("8_sfx")
 profile = ExtResource("9_audio")

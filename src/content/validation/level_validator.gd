@@ -25,12 +25,12 @@ const POINT_FIELDS: PackedStringArray = ["x", "y"]
 const BOUNDS_FIELDS: PackedStringArray = ["width", "height"]
 const PLATFORM_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required", "route_tags", "art_style", "motion_distance_y", "motion_speed"]
 const PLATFORM_ART_STYLES: PackedStringArray = ["road", "column_supported"]
-const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "enemy_count", "rule_object_ids", "resource_ids", "resolution_gate_id", "required_for_completion"]
+const ENCOUNTER_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "enemy_count", "enemy_positions", "rule_object_ids", "resource_ids", "resolution_gate_id", "required_for_completion", "resolution_platform_ids"]
 const RESOURCE_FIELDS: PackedStringArray = ["id", "kind", "x", "y", "ownership", "effect_id", "effect_amount"]
 const SECTION_FIELDS: PackedStringArray = ["id", "from_x", "to_x"]
 const CHECKPOINT_FIELDS: PackedStringArray = ["id", "x", "y", "respawn_x", "respawn_y"]
-const GATE_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required_tag", "label"]
-const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag", "targets_enabled_before_interaction"]
+const GATE_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required_tag", "key_resource_id", "label"]
+const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag", "targets_enabled_before_interaction", "requires", "label", "hint", "visual_kind", "call_only"]
 const CONTRACT_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "acceptance_gate_id", "resolution_gate_id", "encounter_id", "performance_x", "resolution_x", "resolution_y", "counterparty_escape_x"]
 const ACTOR_FIELDS: PackedStringArray = ["id", "archetype_id", "x", "y"]
 const SLICE_FIELDS: PackedStringArray = ["title", "objective", "intro", "completion", "briefing_cards"]
@@ -82,6 +82,7 @@ static func validate(spec: LevelSpec, registry: ContentRegistry) -> LevelValidat
 	_validate_checkpoints(spec.data.get("checkpoints", []), result)
 	_validate_gates(spec, registry, result)
 	_validate_rule_objects(spec, registry, result)
+	_validate_mechanism_links(spec, result)
 	_validate_contracts(spec, registry, result)
 	_validate_actors(spec, registry, result)
 	_validate_unique_local_ids(spec, result)
@@ -94,6 +95,64 @@ static func _validate_identity(value: Variant, path: String, result: LevelValida
 	var content_id := StringName(String(value))
 	if not ContentId.is_valid(content_id):
 		result.add_error(&"invalid_id", path, "'%s' debe ser snake_case estable" % value)
+
+
+static func _validate_mechanism_links(spec: LevelSpec, result: LevelValidationResult) -> void:
+	var machines: Dictionary = {}
+	var platforms: Dictionary = {}
+	for value: Variant in spec.data.get("platforms", []) as Array:
+		if value is Dictionary:
+			platforms[String(value.get("id", ""))] = value
+	for value: Variant in spec.data.get("rule_objects", []) as Array:
+		if value is Dictionary:
+			machines[String(value.get("id", ""))] = value
+	for id: String in machines:
+		var data := machines[id] as Dictionary
+		var path := "rule_objects.%s" % id
+		if not data.get("requires", []) is Array:
+			result.add_error(&"invalid_type", path + ".requires", "se esperaba array")
+			continue
+		for field: String in ["label", "hint", "visual_kind"]:
+			if data.has(field) and not data[field] is String:
+				result.add_error(&"invalid_type", path + "." + field, "se esperaba texto")
+		if data.get("visual_kind", "machine") not in ["machine", "signal"]:
+			result.add_error(&"invalid_value", path + ".visual_kind", "visual desconocido")
+		if not data.get("call_only", false) is bool:
+			result.add_error(&"invalid_type", path + ".call_only", "se esperaba booleano")
+		for dependency: Variant in data.get("requires", []) as Array:
+			if not machines.has(String(dependency)):
+				result.add_error(&"unknown_local_reference", path + ".requires", "control no declarado")
+		if _dependency_cycle(id, machines, []):
+			result.add_error(&"cyclic_mechanism", path + ".requires", "dependencia circular")
+		if bool(data.get("call_only", false)):
+			for target: Variant in data.get("target_platform_ids", []) as Array:
+				if platforms.has(String(target)) and is_zero_approx(float(platforms[String(target)].get("motion_distance_y", 0.0))):
+					result.add_error(&"invalid_call_target", path, "llamada requiere ascensor móvil")
+	for value: Variant in spec.data.get("encounters", []) as Array:
+		if not value is Dictionary:
+			continue
+		var data := value as Dictionary
+		if not data.get("resolution_platform_ids", []) is Array:
+			result.add_error(&"invalid_type", "encounters.resolution_platform_ids", "se esperaba array")
+			continue
+		for target: Variant in data.get("resolution_platform_ids", []) as Array:
+			if not platforms.has(String(target)):
+				result.add_error(&"unknown_local_reference", "encounters.resolution_platform_ids", "plataforma no declarada")
+
+
+static func _dependency_cycle(id: String, machines: Dictionary, visiting: Array[String]) -> bool:
+	if id in visiting:
+		return true
+	if not machines.has(id):
+		return false
+	var path: Array[String] = visiting.duplicate()
+	path.append(id)
+	var dependencies: Variant = (machines[id] as Dictionary).get("requires", [])
+	if dependencies is Array:
+		for dependency: Variant in dependencies:
+			if _dependency_cycle(String(dependency), machines, path):
+				return true
+	return false
 
 
 static func _validate_closed_shapes(spec: LevelSpec, result: LevelValidationResult) -> void:
@@ -305,6 +364,16 @@ static func _validate_encounters(spec: LevelSpec, registry: ContentRegistry, res
 		var definition := registry.get_definition(ContentRegistry.Kind.ENCOUNTER_DEFINITION, StringName(String(definition_id))) as EncounterDefinition
 		if definition == null:
 			continue
+		if encounter_data.has("enemy_positions"):
+			var points: Variant = encounter_data.enemy_positions
+			_validate_array_shapes(points, path + ".enemy_positions", POINT_FIELDS, result)
+			if points is Array:
+				if points.size() != int(encounter_data.get("enemy_count", definition.enemy_archetype_ids.size())):
+					result.add_error(&"invalid_enemy_positions", path + ".enemy_positions", "se requiere un punto por integrante")
+				for point_index: int in points.size():
+					if points[point_index] is Dictionary:
+						_validate_vector(points[point_index], path + ".enemy_positions[%d]" % point_index, result)
+						_validate_point_in_bounds(points[point_index], spec.data.bounds, path + ".enemy_positions[%d]" % point_index, result)
 		if not definition.is_structurally_valid():
 			result.add_error(&"invalid_encounter", path + ".definition_id", "encounter sin objetivo, éxito o resolución")
 		if not definition.protected_archetype_id.is_empty() and not registry.has(ContentRegistry.Kind.ENEMY_ARCHETYPE, definition.protected_archetype_id):
@@ -424,6 +493,15 @@ static func _validate_gates(spec: LevelSpec, registry: ContentRegistry, result: 
 		_validate_vector(gate, path, result)
 		var required_tag := StringName(String(gate.get("required_tag", "")))
 		_validate_identity(required_tag, path + ".required_tag", result)
+		if required_tag == &"mission_key":
+			var key_id := String(gate.get("key_resource_id", ""))
+			var found := false
+			for resource: Dictionary in spec.data.get("resources", []):
+				if String(resource.id) == key_id and String(resource.get("kind", "")) == "key":
+					found = true
+			if not found:
+				result.add_error(&"missing_key", path, "llave ausente del nivel")
+			continue
 		if required_tag == &"encounter_resolution":
 			var gate_id := StringName(String(gate.get("id", "")))
 			if not encounter_gate_ids.has(gate_id):

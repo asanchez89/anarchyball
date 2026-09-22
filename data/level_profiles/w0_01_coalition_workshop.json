@@ -1,0 +1,45 @@
+{
+  "schema_version": 0,
+  "level_id": "w0_01_coalition_workshop",
+  "lifecycle": "generated_draft",
+  "classification": "standard_mission",
+  "reference_viewport_width": 1280,
+  "beats": [
+    "introduce",
+    "demonstrate",
+    "challenge",
+    "combine",
+    "climax"
+  ],
+  "evidence_targets": {
+    "minimum_first_clear_samples": 3,
+    "minimum_clean_replay_samples": 3
+  },
+  "targets": {
+    "first_clear_seconds": [
+      600,
+      900
+    ],
+    "clean_replay_seconds": [
+      300,
+      480
+    ],
+    "completionist_seconds": [
+      720,
+      1080
+    ],
+    "effective_route_screens": [
+      14,
+      22
+    ],
+    "checkpoint_interval_seconds": [
+      150,
+      240
+    ]
+  },
+  "decision": {
+    "action": "playtest_before_promotion",
+    "reason": "Avance incompleto: taller y primer encuentro de coordinación. Objetivos provisionales del avance, no del nivel compuesto final; medir comprensión de alimentación, interrupción y relevo. Parte 3 y jefe pendientes.",
+    "campaign_boundary": "Entrada de desarrollo independiente. No avanza ni migra la campaña histórica. Promoción bloqueada hasta completar nivel, onboarding y playtests."
+  }
+}

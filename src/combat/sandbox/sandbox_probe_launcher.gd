@@ -12,6 +12,7 @@ var _last_aim_direction: Vector2 = Vector2.RIGHT
 var cooldown_multiplier: float = 1.0
 var effect_amount_multiplier: float = 1.0
 var input_enabled: bool = true
+var last_weapon_index: int = 0
 
 
 func _physics_process(delta: float) -> void:
@@ -29,21 +30,36 @@ func _physics_process(delta: float) -> void:
 			_last_aim_direction = LaunchDirectionResolver.resolve(pointer_aim, facing)
 		else:
 			_last_aim_direction = LaunchDirectionResolver.resolve(_last_aim_direction, facing)
-	if InputActions.is_attack_primary_pressed() and is_zero_approx(_cooldown_remaining):
-		_fire_probe()
+	if is_zero_approx(_cooldown_remaining):
+		if player != null and player.inventory != null and Input.is_action_pressed(InputActions.ATTACK_SECONDARY):
+			_fire_probe(1)
+		elif InputActions.is_attack_primary_pressed():
+			_fire_probe(0)
 
 
 func aim_direction() -> Vector2:
 	return _last_aim_direction
 
 
-func _fire_probe() -> void:
+func _fire_probe(weapon_index: int = 0) -> void:
 	if probe_scene == null:
 		return
+	var player := get_parent() as PlayerController
+	var weapon: Dictionary = {}
+	if player != null and player.inventory != null:
+		if weapon_index < 0 or weapon_index >= player.inventory.profile.weapons.size():
+			return
+		weapon = player.inventory.profile.weapons[weapon_index]
+		if player.inventory.count(String(weapon.ammo)) <= 0:
+			_cooldown_remaining = 0.2
+			return
 	var probe := probe_scene.instantiate() as AimProbe
 	if probe == null:
 		return
-	get_tree().current_scene.add_child(probe)
+	if not weapon.is_empty():
+		player.inventory.spend(String(weapon.ammo), 1)
+		probe.effect_amount = float(weapon.damage)
+	get_parent().get_parent().add_child(probe)
 	probe.global_position = global_position + _last_aim_direction * muzzle_distance
 	var source_identity := get_parent().get_node_or_null("Identity") as CombatIdentityComponent
 	var context := EffectContext.offensive(
@@ -53,5 +69,8 @@ func _fire_probe() -> void:
 	)
 	probe.effect_amount *= effect_amount_multiplier
 	probe.configure(_last_aim_direction, source_identity, context)
-	_cooldown_remaining = fire_cooldown * cooldown_multiplier
+	if not weapon.is_empty():
+		probe.missile_sprite.scale = Vector2.ONE * float(weapon.get("projectile_scale", 2.0))
+	last_weapon_index = weapon_index
+	_cooldown_remaining = float(weapon.get("cooldown", fire_cooldown)) * cooldown_multiplier
 	probe_fired.emit()

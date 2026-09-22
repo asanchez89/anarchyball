@@ -21,6 +21,8 @@ var facing_direction: float = 1.0
 var _movement_assist := MovementAssistState.new()
 var _previous_health: float
 var _gameplay_input_suppressed: bool = false
+var inventory: RunInventory
+var damage_feedback_cue: StringName = &"hurt"
 
 
 func _ready() -> void:
@@ -72,11 +74,14 @@ func _physics_process(delta: float) -> void:
 func _on_health_changed(current: float, _maximum: float) -> void:
 	if current < _previous_health:
 		visual.play_hurt()
-		sfx.play_cue(&"hurt")
+		sfx.play_cue(damage_feedback_cue)
 	_previous_health = current
 
 
 func _on_probe_fired() -> void:
+	if inventory != null and probe_launcher.last_weapon_index < inventory.profile.weapon_art.size():
+		var index := probe_launcher.last_weapon_index
+		visual.set_weapon_art(inventory.profile.weapon_art[index], float(inventory.profile.weapons[index].get("art_scale", 1.0)))
 	var aim := probe_launcher.aim_direction()
 	if not is_zero_approx(aim.x):
 		facing_direction = signf(aim.x)
@@ -108,7 +113,7 @@ func is_gameplay_input_suppressed() -> bool:
 func _update_input_release_guard() -> void:
 	if not _gameplay_input_suppressed:
 		return
-	if Input.is_action_pressed(InputActions.JUMP) or Input.is_action_pressed(InputActions.ATTACK_PRIMARY):
+	if Input.is_action_pressed(InputActions.JUMP) or Input.is_action_pressed(InputActions.ATTACK_PRIMARY) or Input.is_action_pressed(InputActions.ATTACK_SECONDARY):
 		return
 	_gameplay_input_suppressed = false
 	probe_launcher.input_enabled = true

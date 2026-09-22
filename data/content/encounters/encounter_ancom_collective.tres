@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=4 format=3]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/definitions/ceasefire_challenge_definition.gd" id="2"]
+[sub_resource type="Resource" id="Challenge"]
+script = ExtResource("2")
+mode = 0
+title = "ANCOM · PRESIÓN COLECTIVA"
+duration = 35.0
+any_surrender_resolves = true
+collective_commitment = true
+tactical_relay = true
+retreat_resolve_ratio = 0.85
+retreat_speed = 1200.0
+jump_speed = 1920.0
+jump_gravity = 14400.0
+jump_horizontal_speed = 720.0
+jump_cooldown = 0.08
+[resource]
+script = ExtResource("1")
+content_id = &"encounter_ancom_collective"
+display_name = "ANCOM · PRESIÓN COLECTIVA"
+objective = &"survive_or_defend_after_aggression"
+enemy_archetype_ids = Array[StringName]([&"enemy_ancom_collective"])
+aggression_trigger_ids = Array[StringName]([&"attack_committed"])
+success_condition_ids = Array[StringName]([&"ceasefire_reached", &"defensive_surrender"])
+allowed_resolutions = Array[StringName]([&"survive_ceasefire", &"force_surrender"])
+neutralization_resolution = &"force_surrender"
+ceasefire_challenge = SubResource("Challenge")

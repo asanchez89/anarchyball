@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+content_id = &"encounter_dispatch_escape"
+display_name = "Liberar el despacho"
+objective = &"release_dispatch"
+enemy_archetype_ids = Array[StringName]([&"enemy_occupancy_enforcer"])
+aggression_trigger_ids = Array[StringName]([&"detain_order_executed"])
+success_condition_ids = Array[StringName]([&"upper_control_operated", &"patrol_neutralized"])
+allowed_resolutions = Array[StringName]([&"neutralize_enforcer", &"operate_alternate_machine"])
+neutralization_resolution = &"neutralize_enforcer"
+rule_interaction_resolution = &"operate_alternate_machine"
+interaction_during_aggression = true

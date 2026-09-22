@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BallVisualDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/ball_visual_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/actors/balls/world_0/runtime/black_anarchy_animation_v2.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/vfx/world_0/anarchy_front_cannon.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+visual_id = &"black_anarchy_ball"
+animation_atlas = ExtResource("2")
+action_equipment = ExtResource("3")
+cell_size = Vector2i(313, 313)
+animation_columns = 4
+animation_rows = {"idle": 0, "move": 1, "jump": 1, "action": 2, "threatening": 2, "hurt": 3, "surrendering": 3, "neutralized": 3}
+fit_visible_frame_height = 86.0
+frame_body_bounds = Array[Rect2]([Rect2(62, 104, 204, 204), Rect2(51, 104, 209, 204), Rect2(40, 105, 209, 203), Rect2(36, 104, 205, 203), Rect2(55, 91, 207, 199), Rect2(36, 103, 219, 191), Rect2(40, 106, 218, 188), Rect2(39, 86, 210, 206), Rect2(61, 78, 210, 202), Rect2(51, 79, 210, 202), Rect2(44, 78, 212, 205), Rect2(36, 79, 205, 202), Rect2(58, 56, 210, 203), Rect2(49, 55, 214, 204), Rect2(43, 54, 215, 205), Rect2(35, 54, 209, 205)])
+runtime_body_size = Vector2(76, 76)
+source_facing_direction = -1

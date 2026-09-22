@@ -38,7 +38,7 @@ script = ExtResource("5_launcher")
 probe_scene = ExtResource("6_probe")
 muzzle_distance = 55.0
 
-[node name="Sfx" type="Node" parent="."]
+[node name="Sfx" type="Node2D" parent="."]
 script = ExtResource("11_sfx")
 profile = ExtResource("12_audio")
 spatial = false

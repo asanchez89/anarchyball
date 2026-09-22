@@ -26,6 +26,7 @@ var _panel: Control
 var _speaker_label: Label
 var _text_label: Label
 var _hint_label: Label
+var _nearby_player: PlayerController
 
 
 func configure(name: String, dialogue_lines: Array[String], starts_automatically: bool) -> void:
@@ -35,6 +36,7 @@ func configure(name: String, dialogue_lines: Array[String], starts_automatically
 
 
 func _ready() -> void:
+	add_to_group("npc_dialogue_bubbles")
 	z_index = 20
 	_build_sensor()
 	_build_bubble()
@@ -42,8 +44,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _panel != null and _player_nearby:
+		_panel.visible = not _finished and _is_nearest_speaker()
 	_update_typewriter(delta)
-	if not _player_nearby or _finished:
+	if not _player_nearby or _finished or not _is_nearest_speaker():
 		return
 	if InputActions.is_interact_just_pressed():
 		advance()
@@ -214,6 +218,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body is PlayerController:
 		return
 	_player_nearby = true
+	_nearby_player = body as PlayerController
 	player_proximity_changed.emit(body as PlayerController, true)
 	if auto_start:
 		start()
@@ -225,8 +230,23 @@ func _on_body_exited(body: Node2D) -> void:
 	if not body is PlayerController:
 		return
 	_player_nearby = false
+	_nearby_player = null
 	player_proximity_changed.emit(body as PlayerController, false)
 	if _active:
 		_active = false
 		_typing = false
 	_refresh()
+
+
+func _is_nearest_speaker() -> bool:
+	if _nearby_player == null:
+		return true
+	var distance := global_position.distance_squared_to(_nearby_player.global_position)
+	for node: Node in get_tree().get_nodes_in_group("npc_dialogue_bubbles"):
+		var other := node as NpcDialogueBubble
+		if other == self or other._nearby_player != _nearby_player or other._finished:
+			continue
+		var other_distance := other.global_position.distance_squared_to(_nearby_player.global_position)
+		if other_distance < distance or (is_equal_approx(other_distance, distance) and other.get_instance_id() < get_instance_id()):
+			return false
+	return true

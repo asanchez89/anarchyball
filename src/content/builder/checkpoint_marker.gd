@@ -7,6 +7,7 @@ var checkpoint_id: StringName = &"checkpoint"
 var respawn_position: Vector2 = Vector2.ZERO
 var _active: bool = false
 var _sprite: Sprite2D
+var emergency_refill: Callable
 
 
 func _ready() -> void:
@@ -34,7 +35,11 @@ func _draw() -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if _active or not body is PlayerController:
+	if not body is PlayerController:
+		return
+	if emergency_refill.is_valid():
+		emergency_refill.call()
+	if _active:
 		return
 	_active = true
 	_update_art()

@@ -37,6 +37,7 @@ enum Behavior {
 @export_range(0.0, 0.95, 0.05) var surrender_resolve_ratio: float = 0.0
 @export var defeat_response: EnemyArchetype.DefeatResponse = EnemyArchetype.DefeatResponse.SURRENDER
 @export var sustained_attack: bool = false
+@export_range(0.0, 1000.0, 1.0) var projectile_damage: float = 10.0
 
 @onready var identity: CombatIdentityComponent = %Identity
 @onready var conflict_state: ConflictStateComponent = %ConflictState
@@ -66,9 +67,18 @@ var _patrol_origin_x: float = 0.0
 var _patrol_direction: float = 1.0
 var _status_icon: ConflictStatusIcon
 var _is_patrolling: bool = false
+var externally_managed: bool = false
+var external_patrol_enabled: bool = true
+var archetype_id: StringName = &""
+var _restoring_audio: bool = false
+var tactical_airborne: bool = false
+var tactical_moving: bool = false
 
 
 func apply_archetype(archetype: EnemyArchetype) -> void:
+	# Projectile target layer is independent of dialogue/proximity sensors.
+	set_collision_layer_value(4, archetype.blocks_projectiles)
+	archetype_id = archetype.content_id
 	stable_id = archetype.content_id
 	display_name = archetype.display_name
 	initial_state = archetype.initial_conflict_state
@@ -81,6 +91,7 @@ func apply_archetype(archetype: EnemyArchetype) -> void:
 	phase_two_ratio = archetype.phase_two_ratio
 	attack_interval = archetype.attack_interval
 	sustained_attack = archetype.sustained_attack
+	projectile_damage = archetype.projectile_damage
 	activation_distance = archetype.activation_distance
 	patrol_distance = archetype.patrol_distance
 	patrol_speed = archetype.patrol_speed
@@ -159,22 +170,52 @@ func _process(delta: float) -> void:
 
 
 func _update_patrol(delta: float) -> void:
-	if behavior == Behavior.STATIC or patrol_distance <= 0.0 or patrol_speed <= 0.0:
+	if tactical_airborne:
+		return
+	if (externally_managed and not external_patrol_enabled) or patrol_distance <= 0.0 or patrol_speed <= 0.0:
 		_set_patrolling(false)
 		return
-	if _telegraph_started or _aggression_committed or conflict_state.current_state in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
+	if _attack_visual_remaining > 0.0 or conflict_state.current_state in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
 		_set_patrolling(false)
 		return
-	_set_patrolling(true)
-	var next_x := position.x + _patrol_direction * patrol_speed * delta
+	var direction := _patrol_direction
+	var next_x := position.x + direction * patrol_speed * minf(delta, 0.1)
 	var left_edge := _patrol_origin_x - patrol_distance
 	var right_edge := _patrol_origin_x + patrol_distance
 	if next_x <= left_edge or next_x >= right_edge:
 		_patrol_direction *= -1.0
 		next_x = clampf(next_x, left_edge, right_edge)
-	position.x = next_x
-	if _ball_visual != null:
-		_ball_visual.set_facing(_patrol_direction)
+	var moved := try_grounded_step(global_position.x + next_x - position.x)
+	_set_patrolling(moved)
+	if not moved:
+		_patrol_direction = -direction
+	if moved and _ball_visual != null:
+		_ball_visual.set_facing(direction)
+
+
+func try_grounded_step(target_x: float) -> bool:
+	var distance := target_x - global_position.x
+	if is_zero_approx(distance):
+		return false
+	var direction := signf(distance)
+	var space := get_world_2d().direct_space_state
+	var candidate := global_position
+	# Small swept steps prevent crossing gaps even during a long frame.
+	for step: int in ceili(absf(distance) / 8.0):
+		var next_x := candidate.x + direction * minf(8.0, absf(target_x - candidate.x))
+		var wall := PhysicsRayQueryParameters2D.create(candidate, Vector2(next_x + direction * 24.0, candidate.y), 1)
+		if not space.intersect_ray(wall).is_empty():
+			return false
+		var foot_y := candidate.y + WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
+		var floor_hit: Dictionary = {}
+		for offset: float in [direction * 24.0, 0.0]:
+			var query := PhysicsRayQueryParameters2D.create(Vector2(next_x + offset, foot_y - 18.0), Vector2(next_x + offset, foot_y + 22.0), 1)
+			floor_hit = space.intersect_ray(query)
+			if floor_hit.is_empty() or (floor_hit.normal as Vector2).y > -0.5:
+				return false
+		candidate = Vector2(next_x, (floor_hit.position as Vector2).y - WorldPropPlacement.BALL_ORIGIN_TO_FLOOR)
+	global_position = candidate
+	return true
 
 
 func _set_patrolling(value: bool) -> void:
@@ -213,10 +254,16 @@ func _draw() -> void:
 
 
 func _update_behavior(delta: float) -> void:
+	if externally_managed:
+		return
 	if behavior == Behavior.STATIC:
 		return
 	var player := get_node_or_null(player_path) as PlayerController
 	if player == null or global_position.distance_to(player.global_position) > activation_distance:
+		if not _aggression_committed:
+			_behavior_elapsed = 0.0
+			_telegraph_started = false
+			conflict_state.cancel_threat()
 		return
 	if _aggression_committed:
 		if is_boss and conflict_state.current_state == ConflictStateComponent.State.AGGRESSOR:
@@ -297,7 +344,8 @@ func _launch_bolt_direction(direction: Vector2) -> void:
 	if _ball_visual != null and not is_zero_approx(launch_direction.x):
 		_ball_visual.set_facing(signf(launch_direction.x))
 	var bolt := hostile_bolt_scene.instantiate() as HostileBolt
-	get_tree().current_scene.add_child(bolt)
+	bolt.damage_amount = projectile_damage
+	get_parent().add_child(bolt)
 	bolt.global_position = global_position + launch_direction * 34.0
 	bolt.configure(launch_direction, identity)
 	_begin_attack_visual()
@@ -367,16 +415,25 @@ func _on_state_changed(
 ) -> void:
 	if _new_state != ConflictStateComponent.State.AGGRESSOR:
 		_attack_visual_remaining = 0.0
-	match _new_state:
-		ConflictStateComponent.State.THREATENING:
-			sfx.play_cue(&"threat")
-		ConflictStateComponent.State.AGGRESSOR:
-			sfx.play_cue(&"aggression")
-		ConflictStateComponent.State.SURRENDERING:
-			sfx.play_cue(&"surrender")
+	if not _restoring_audio and _previous_state != _new_state:
+		var cue := state_audio_cue(_previous_state, _new_state)
+		if not cue.is_empty():
+			sfx.play_cue(cue)
 	if _new_state == ConflictStateComponent.State.NEUTRALIZED:
 		neutralized.emit(stable_id)
 	_update_presentation()
+
+
+func state_audio_cue(previous: ConflictStateComponent.State, current: ConflictStateComponent.State) -> StringName:
+	match current:
+		ConflictStateComponent.State.DISPUTED: return &"dispute"
+		ConflictStateComponent.State.THREATENING: return &"threat"
+		ConflictStateComponent.State.AGGRESSOR: return &"aggression"
+		ConflictStateComponent.State.SURRENDERING: return &"surrender"
+		ConflictStateComponent.State.NEUTRAL: return &"alert_clear"
+		ConflictStateComponent.State.NEUTRALIZED:
+			return &"" if previous == ConflictStateComponent.State.SURRENDERING else &"neutralized"
+	return &""
 
 
 func _on_resolve_changed(_current: float, _maximum: float) -> void:
@@ -423,10 +480,12 @@ func _update_ball_visual_state() -> void:
 
 
 func presentation_state_id() -> StringName:
+	if tactical_airborne:
+		return &"jump"
+	if (_is_patrolling or tactical_moving) and _attack_visual_remaining <= 0.0 and conflict_state.current_state not in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
+		return &"move"
 	if conflict_state.current_state == ConflictStateComponent.State.AGGRESSOR:
 		return &"action" if _attack_visual_remaining > 0.0 else &"threatening"
-	if _is_patrolling and conflict_state.current_state in [ConflictStateComponent.State.NEUTRAL, ConflictStateComponent.State.DISPUTED]:
-		return &"move"
 	match conflict_state.current_state:
 		ConflictStateComponent.State.THREATENING:
 			return &"threatening"
@@ -458,6 +517,9 @@ func _state_symbol() -> String:
 
 func capture_runtime_state() -> Dictionary:
 	return {
+		"behavior": behavior,
+		"behavior_elapsed": _behavior_elapsed,
+		"surrender_remaining": _surrender_remaining,
 		"conflict_state": conflict_state.current_state,
 		"aggressor_reason": conflict_state.aggressor_reason,
 		"resolve": resolve.current_resolve,
@@ -466,12 +528,16 @@ func capture_runtime_state() -> Dictionary:
 		"boss_phase": _boss_phase,
 		"third_party_impact_remaining": _third_party_impact_remaining,
 		"position_x": position.x,
+		"position_y": position.y,
 		"patrol_origin_x": _patrol_origin_x,
 		"patrol_direction": _patrol_direction,
 	}
 
 
 func restore_runtime_state(snapshot: Dictionary) -> void:
+	_restoring_audio = true
+	behavior = int(snapshot.get("behavior", behavior)) as Behavior
+	_behavior_elapsed = float(snapshot.get("behavior_elapsed", 0.0))
 	var state: ConflictStateComponent.State = int(snapshot.get("conflict_state", initial_state))
 	var reason: ConflictStateComponent.AggressorReason = int(snapshot.get("aggressor_reason", ConflictStateComponent.AggressorReason.NONE))
 	conflict_state.reset_conflict(ConflictStateComponent.State.NEUTRAL)
@@ -493,12 +559,14 @@ func restore_runtime_state(snapshot: Dictionary) -> void:
 	_boss_phase = int(snapshot.get("boss_phase", 1))
 	_third_party_impact_remaining = float(snapshot.get("third_party_impact_remaining", -1.0))
 	position.x = float(snapshot.get("position_x", position.x))
+	position.y = float(snapshot.get("position_y", position.y))
 	_patrol_origin_x = float(snapshot.get("patrol_origin_x", _patrol_origin_x))
 	_patrol_direction = float(snapshot.get("patrol_direction", 1.0))
-	_surrender_remaining = 0.0
+	_surrender_remaining = float(snapshot.get("surrender_remaining", 0.8 if state == ConflictStateComponent.State.SURRENDERING else 0.0))
 	_attack_cooldown = 0.0
 	_attack_visual_remaining = 0.0
 	_update_presentation()
+	_restoring_audio = false
 
 
 func _state_color() -> Color:

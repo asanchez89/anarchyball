@@ -260,7 +260,7 @@ Gate: AnarchyBall, un NPC y un agresor pueden mostrar todos los estados requerid
 
 Estado observado: existe un spike de presentación para `w0_01` que repite capas Twilight a 3x y aplica música/tema al shell. `levels/prototypes/art_lab.tscn` añade dos concept anchors generados y dos prototipos deterministas sobre grid exacto para comparar 24x32 y 32x32, facing, aim y los seis estados visuales. Sigue siendo provisional hasta comprobarlo visualmente en Godot y elegir una escala.
 
-El set conceptual completo de World 0 está registrado en `world0_ball_roster.json` y puede revisarse sobre el entorno curado mediante `levels/prototypes/world0_roster_lab.tscn`. Incluye nueve identidades: AnarchyBall, MerchantBall, RobberBall, EgoistBall, AgoristBall, MutualistBall, LeftLibertarianBall, BlackAnarchyBall y The AncomBall. Continúan siendo anclajes conceptuales hasta reconstruirse en el atlas exacto.
+El set conceptual completo de World 0 está registrado en `world0_ball_roster.json` y puede revisarse sobre el entorno curado mediante `levels/prototypes/world0_roster_lab.tscn`. El registro histórico incluye nueve identidades: AnarchyBall, MerchantBall, RobberBall, EgoistBall, AgoristBall, MutualistBall, LeftLibertarianBall, BlackAnarchyBall y The AncomBall. Revisión 2026-09-22: AgoristBall queda como referencia conceptual de clase, no NPC a producir; no se borra el asset ni se altera aquí el roster runtime. Priorizar las cinco balls aliadas de `LEVEL_01_COALITION.md`; el arte del jefe espera aprobación de identidad. Continúan siendo anclajes conceptuales hasta reconstruirse en el atlas exacto.
 
 ### A2 - Presentación reemplazable
 

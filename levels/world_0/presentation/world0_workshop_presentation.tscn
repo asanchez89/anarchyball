@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/industrial_workshop_presentation.gd" id="1"]
+
+[node name="WorkshopPresentation" type="Node2D"]
+script = ExtResource("1")
+scenery_layout_path = "res://assets/art/world_0/workshop_layout.json"

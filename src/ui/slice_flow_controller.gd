@@ -67,6 +67,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if get_tree().get_first_node_in_group("shop_overlay") != null or get_tree().get_first_node_in_group("player_menu_overlay") != null:
+		return
 	if not InputActions.is_pause_just_pressed() or _is_completion:
 		return
 	if _overlay.visible:
@@ -90,6 +92,7 @@ func append_completion_summary(summary: String) -> void:
 
 func _build_ui() -> void:
 	_overlay = ColorRect.new()
+	_overlay.theme = preload("res://assets/ui/game_theme.tres")
 	_overlay.name = "MenuOverlay"
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.color = Color("101527e8")

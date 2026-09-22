@@ -1,21 +1,29 @@
-[gd_resource type="Resource" script_class="GameplayAudioProfile" load_steps=16 format=3]
+[gd_resource type="Resource" script_class="GameplayAudioProfile" load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://src/audio/gameplay_audio_profile.gd" id="1_profile"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/jump.wav" id="2_jump"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/player_fire.wav" id="3_fire"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/impact_allowed.wav" id="4_allowed"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/impact_blocked.wav" id="5_blocked"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/threat_retro.wav" id="6_threat"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/detection_alert_retro.wav" id="6_threat"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/aggression_retro.wav" id="7_aggression"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/surrender_retro.wav" id="8_surrender"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/pickup_retro.wav" id="9_pickup"]
-[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/gate_open.wav" id="10_gate"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/gate_open_retro.wav" id="10_gate"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/machine_activate_retro.wav" id="11_rule"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/contract_state.wav" id="12_contract"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/encounter_resolved.wav" id="13_resolved"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/checkpoint_retro.wav" id="14_checkpoint"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/boss_phase.wav" id="15_boss"]
 [ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/level_complete.wav" id="16_complete"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/dispute_retro.wav" id="17_dispute"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/alert_clear_retro.wav" id="18_clear"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/neutralized_retro.wav" id="19_neutralized"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/tactical_dash.wav" id="20_dash"]
+
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/theft_retro.wav" id="21_theft"]
+
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/world_0/generated/contact_hit_retro.wav" id="22_contact"]
 
 [resource]
 script = ExtResource("1_profile")
@@ -27,6 +35,12 @@ impact_blocked = ExtResource("5_blocked")
 threat = ExtResource("6_threat")
 aggression = ExtResource("7_aggression")
 surrender = ExtResource("8_surrender")
+dispute = ExtResource("17_dispute")
+alert_clear = ExtResource("18_clear")
+neutralized = ExtResource("19_neutralized")
+tactical_dash = ExtResource("20_dash")
+theft = ExtResource("21_theft")
+contact_hit = ExtResource("22_contact")
 pickup = ExtResource("9_pickup")
 gate_open = ExtResource("10_gate")
 rule_interaction = ExtResource("11_rule")

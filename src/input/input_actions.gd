@@ -16,6 +16,7 @@ const ABILITY_2: StringName = &"ability_2"
 const INTERACT: StringName = &"interact"
 const DODGE_OR_DASH: StringName = &"dodge_or_dash"
 const PAUSE: StringName = &"pause"
+const PLAYER_MENU: StringName = &"player_menu"
 
 const REQUIRED_ACTIONS: Array[StringName] = [
 	MOVE_LEFT,
@@ -33,6 +34,7 @@ const REQUIRED_ACTIONS: Array[StringName] = [
 	INTERACT,
 	DODGE_OR_DASH,
 	PAUSE,
+	PLAYER_MENU,
 ]
 
 

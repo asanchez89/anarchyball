@@ -1,5 +1,9 @@
 # Fases de desarrollo de Anarchyball
 
+Ampliación aprobada del nivel 1: `LEVEL_01_ECONOMY.md` autoriza inventario local,
+dos armas finitas, loot determinista, llaves y tienda mínima durante P7. No amplía
+el alcance a loot aleatorio, crafting, backend o simulación económica persistente.
+
 **Estado:** roadmap operativo v1.3; MVP aprobado
 **Fecha base:** 2026-08-21  
 **Última revisión:** 2026-09-12
@@ -237,7 +241,7 @@ Un segundo nivel retenido explícitamente como `technical_prototype` no se promo
 
 ### Phase 7 - World 0: The Anarchist Frontier
 
-Construir sus segmentos con el patrón enseñar, demostrar, desafiar, combinar y culminar. Incluir Egoist, Mutualist, Left-Libertarian, Black Anarchist, Ancom y la incursión del Leviatán sin romper los contratos del MVP. Usar el paquete provisional de siete misiones de `PROJECT_PLAN.md` §12.8: 64-79 minutos de misiones y 75-95 minutos al incluir transiciones, intermisiones y hub. Revisar el rango después de cada lote de playtests, sin rellenar segmentos para cumplirlo.
+Revisión 2026-09-22: producir el primer nivel compuesto de `LEVEL_01_COALITION.md`: taller Mutualist/Ancom/Egoist, comunidad BlackAnarchy, corredor LeftLibertarian y jefe estatista local con cinco apoyos. KraterocracyBall es candidato pendiente de aprobación. Presión policial en las tres partes; Agorist sigue siendo clase de Phase 8. El anterior paquete de siete misiones y su duración dejan de dirigir producción. Conservar prototipos/IDs, migrar progreso explícitamente y replanificar el resto de World 0. Rango inicial del nivel: 21–31 minutos, sujeto a playtest sin relleno.
 
 El plan operativo vive en [`PHASE_7_PLAN.md`](PHASE_7_PLAN.md). La producción comienza por P7.0 y `w0_01_first_aggression`; las demás misiones no entran simultáneamente al backlog detallado.
 
@@ -268,7 +272,7 @@ Gate de campaña:
 
 - Leviathan ocupa 50-64 minutos de misiones y su boss final 12-15 minutos de primera vuelta;
 - Panarchy ocupa 7-10 minutos y conserva control del jugador durante el cierre;
-- la campaña completa cae inicialmente entre 403 y 514 minutos de misiones, aproximadamente 8-11 horas con Agora e intermisiones;
+- recalcular el presupuesto total de campaña tras reorganizar World 0; el rango anterior 403–514 minutos no es gate vigente;
 - cada aliado requerido en el boss final fue presentado y tiene una contribución mecánica observable;
 - ninguna fase final exige recordar una regla que no se haya reintroducido de forma breve y segura.
 
@@ -330,7 +334,7 @@ Una pantalla equivalente mide recorrido efectivo normalizado contra el viewport 
 
 Los specs `mvp_vertical_slice` y `occupancy_workshop_draft` son evidencia del pipeline y los contratos actuales, no de la escala final de campaña. `occupancy_workshop_draft` queda retenido como `technical_prototype`: no se expande ni se reclasifica como misión de campaña. Su sucesor `w0_03_occupancy_workshop` será un LevelSpec separado, diseñado contra el presupuesto de una misión estándar y sin alargar contenido mediante más vida enemiga o exposición.
 
-El sobre provisional completo es de 44 misiones/viñetas y 403-514 minutos de primera vuelta dentro de niveles. Los desafíos opcionales viven primero dentro del presupuesto completionist de cada misión y no aumentan este conteo por defecto. Solo se convierte en backlog el mundo activo; el resto conserva estatus de planificación hasta superar el gate del mundo anterior.
+El sobre anterior de 44 misiones/viñetas y 403-514 minutos es histórico y requiere recálculo tras reagrupar el nivel 1; no sumar ambos paquetes. Los desafíos opcionales viven primero dentro del presupuesto completionist de cada misión y no aumentan este conteo por defecto. Solo se convierte en backlog el mundo activo; el resto conserva estatus de planificación hasta superar el gate del mundo anterior.
 
 ## 9. Próximo hito recomendado
 
@@ -342,6 +346,6 @@ El hito activo es **Phase 7 - World 0: The Anarchist Frontier**:
 2. comprobar en P7.3 restauración de maquinaria abandonada, exclusión por uso actual, disputa sin agresión automática y ambas resoluciones;
 3. reunir tres recorridos `first_clear` y tres `clean_replay` por candidato y ajustar pacing con esa evidencia;
 4. conservar `occupancy_workshop_draft` como fixture técnico y comparar comprensión, no geometría, contra P7.3;
-5. abrir P7.4 solo después de revisar el gate humano del slice actual.
+5. después del gate humano del taller, producir parte 2 BlackAnarchy, parte 3 LeftLibertarian y el jefe según `LEVEL_01_COALITION.md`; no seguir el orden histórico de IDs P7.4/P7.5.
 
 Las clases restantes, The Agora y el RPG siguen fuera de alcance hasta Phase 8. La comprobación del build en máquina limpia y la observación del CI remoto continúan como tareas operativas previas a un release público.

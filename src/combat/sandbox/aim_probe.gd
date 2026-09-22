@@ -38,9 +38,13 @@ func configure(
 
 
 func _on_area_entered(area: Area2D) -> void:
+	if is_queued_for_deletion():
+		return
 	var receiver := area.get_node_or_null("EffectReceiver") as EffectReceiverComponent
 	if receiver != null and source_identity != null and effect_context != null:
-		receiver.receive_effect(source_identity, effect_context, effect_amount)
+		var permission := receiver.receive_effect(source_identity, effect_context, effect_amount)
+		if permission.decision == TargetPermission.Decision.BLOCK_SURRENDERED:
+			return
 		queue_free()
 		return
 	if area.has_method("register_probe_hit"):
