@@ -32,6 +32,12 @@ class ShopOverlay extends CanvasLayer:
 class TradeTerminal extends RuleStateObject:
 	var open_menu: Callable
 
+	func interaction_caption() -> String:
+		return "SHOP"
+
+	func interaction_available() -> bool:
+		return true
+
 	func _texture_for_machine() -> Texture2D:
 		return preload("res://assets/art/props/world_0/bitcoin_atm_terminal.png")
 
@@ -47,6 +53,16 @@ class TradeTerminal extends RuleStateObject:
 		badge.add_theme_color_override("font_color", Color("ffca45"))
 		badge.position = Vector2(-15, -95)
 		add_child(badge)
+		_interaction_beacon.configure(_machine_sprite, "SHOP", Color("ffca45"))
+		_label.position = Vector2(-135, -210)
+		_label.size = Vector2(270, 60)
+		_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_update_label()
+
+	func _update_label() -> void:
+		if _label != null:
+			_label.text = "F / X · Comprar / Vender"
+			_label.visible = _player_nearby
 
 	func interact() -> bool:
 		open_menu.call()

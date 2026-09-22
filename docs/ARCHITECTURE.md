@@ -91,6 +91,20 @@ Las cuatro capas ambientales de World 0 usan `Parallax2D`: el cielo permanece ca
 
 ## 4. Motor de contenido
 
+`InteractionBeacon` compone brillo pulsante y señal pixelada de tienda/checkpoint,
+sin desplazar arte ni colisiones. El ATM conserva escala entera ×3; el checkpoint
+conserva su huella y cuantiza detalles a la cuadrícula del terreno. Las señales
+SHOP/CHECKPOINT permanecen visibles; el prompt comercial aparece en proximidad.
+Aplica GR-LEVEL-002 sin cambiar interacción, pagos ni GR-RETRY-001.
+
+Todo `RuleStateObject` compone automáticamente el mismo letrero: ACTIVATE para
+activar, DOWN para llamadas de retorno del ascensor, ACTIVE tras operar y LOCKED
+para estados no operables. Terminales de coordinación usan SWITCH y comercio
+conserva SHOP mediante sobrescrituras de presentación por capacidad, no por ID.
+El halo solo aparece si la acción está disponible; requisitos y restore actualizan
+su estado sin alterar permisos. Los detalles se muestran al acercarse. Props
+decorativos no reciben el componente. Nuevas máquinas heredan esta regla.
+
 El pipeline de nivel será:
 
 ```text
@@ -231,7 +245,7 @@ de pared/apoyo, margen de borde y pasos barridos cortos impiden cruzar huecos.
 El controlador externo decide cuándo ceder movimiento a la patrulla (Egoist
 persigue dentro de su zona). Rendición/neutralización detienen el movimiento.
 
-Relevo y retorno usan `BallTacticalMotor`, un CharacterBody2D local que mantiene
+Retirada y retorno usan `BallTacticalMotor`, un CharacterBody2D local que mantiene
 la colisión ofensiva en el Area2D del actor. Consulta apoyos activos, incluidos ascensores,
 busca saltos balísticos alcanzables y rechaza arcos contra paredes/puertas;
 la trayectoria se ejecuta con colisión física, nunca teletransporte. El origen
@@ -240,6 +254,11 @@ si el encuentro se resuelve. Parámetros en CeasefireChallengeDefinition.
 CeasefireChallenge conserva roles, destinos, repliegues usados, retorno, avisos
 individuales y velocidades de salto en checkpoint. El retorno Egoist solo llama
 `disengage_at_home` tras llegar físicamente; no concede rendición, loot ni cura.
+`tactical_retreat` elige el camarada más alejado del jugador que ofrezca un
+destino alcanzable en su apoyo activo. Se separa por `personal_space`, rechaza
+actores/destinos reservados y exige `retreat_safety_gain`; no manda reemplazo.
+Snapshots antiguos descartan el rol `relief`, pero completan cualquier salto
+físico en curso. No se modifica el tiempo de tregua ni la zona de activación.
 Reglas: GR-CONFLICT-001, GR-ENCOUNTER-001, GR-RETRY-001 y extensión táctica del
 taller en GAMEPLAY_RULES. TargetValidity sigue siendo la única autoridad ofensiva.
 

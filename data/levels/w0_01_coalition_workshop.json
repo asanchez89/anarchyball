@@ -21,7 +21,7 @@
       },
       {
         "title": "AncomBall",
-        "body": "El primer colectivo tiene 3 integrantes. Tras la alerta común inician un ataque coordinado. Las heridas se retiran antes de rendirse y otra con más Resolve ocupa su puesto; pueden saltar entre apoyos. Una rendición sigue retirando a todo el grupo. También puedes esquivar durante 35 segundos. Salir pausa la barra; sobrevivir sin causar daño da sats extra.",
+        "body": "El primer colectivo tiene 3 integrantes. Atacan por turnos; las heridas se retiran junto a un camarada lejano, sin reemplazo. Una rendición retira al grupo. También puedes resistir 35 segundos dentro del área central del combate: quedarte en los bordes pausa la tregua sin borrar tu progreso. El aviso indica hacia dónde avanzar. Sobrevivir sin causar daño da sats extra.",
         "image_path": "res://assets/art/actors/balls/world_0/runtime/ancom_ball_keyposes.png",
         "image_columns": 8,
         "image_frame": 0
@@ -65,8 +65,13 @@
   ],
   "platforms": [
     {"id": "depot_patrol_deck", "x": 6550, "y": 550, "width": 220, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "dispatch_patrol_deck", "x": 12560, "y": 550, "width": 280, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "dispatch_patrol_deck", "x": 12530, "y": 570, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
     {"id": "crew_patrol_deck", "x": 19450, "y": 530, "width": 200, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_collective_lower", "x": 18690, "y": 345, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_collective_upper", "x": 18920, "y": 265, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_backtrack_low", "x": 17960, "y": 570, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_backtrack_mid", "x": 17810, "y": 490, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {"id": "crew_backtrack_high", "x": 17660, "y": 415, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
     {
       "id": "ground_arrival",
       "x": 0,
@@ -577,8 +582,8 @@
     },
     {
       "id": "dispatch_truce_perch",
-      "x": 13080,
-      "y": 475,
+      "x": 12770,
+      "y": 490,
       "width": 192,
       "height": 24,
       "required": false,
@@ -900,7 +905,7 @@
       "x": 12450,
       "y": 630,
       "enemy_count": 6,
-      "enemy_positions": [{"x": 12480, "y": 630}, {"x": 12630, "y": 550}, {"x": 12760, "y": 550}, {"x": 12930, "y": 630}, {"x": 13100, "y": 575}, {"x": 13200, "y": 475}],
+      "enemy_positions": [{"x": 12480, "y": 650}, {"x": 12580, "y": 570}, {"x": 12690, "y": 570}, {"x": 12710, "y": 650}, {"x": 12810, "y": 490}, {"x": 12910, "y": 490}],
       "resolution_platform_ids": [
         "dispatch_service_walkway"
       ],
@@ -948,7 +953,7 @@
       "x": 18670,
       "y": 405,
       "enemy_count": 7,
-      "enemy_positions": [{"x": 18690, "y": 425}, {"x": 18890, "y": 350}, {"x": 19090, "y": 350}, {"x": 19260, "y": 440}, {"x": 19370, "y": 440}, {"x": 19550, "y": 530}, {"x": 19490, "y": 630}],
+      "enemy_positions": [{"x": 18660, "y": 425}, {"x": 18730, "y": 345}, {"x": 18840, "y": 345}, {"x": 18960, "y": 265}, {"x": 19070, "y": 265}, {"x": 19000, "y": 400}, {"x": 19140, "y": 350}],
       "required_for_completion": true,
       "resolution_platform_ids": [
         "crew_truce_walkway"
@@ -994,7 +999,7 @@
     {
       "id": "pickup_service_parts",
       "kind": "spares",
-      "x": 3640,
+      "x": 3550,
       "y": 615,
       "ownership": "permitted_salvage"
     },
@@ -1029,7 +1034,7 @@
     {
       "id": "pickup_dispatch_ammo",
       "kind": "supply",
-      "x": 12500,
+      "x": 12320,
       "y": 615,
       "ownership": "unowned_collectible"
     },
@@ -1137,7 +1142,7 @@
   "checkpoints": [
     {
       "id": "checkpoint_supply_post",
-      "x": 3510,
+      "x": 3460,
       "y": 650,
       "respawn_x": 3490,
       "respawn_y": 620

@@ -191,3 +191,11 @@ Las interacciones Mutualist, Ancom, Egoist y BlackAnarchy conservan su secuencia
 posterior. El bloque original desde x=850 se desplazó 1800 px junto con decoración,
 señales y terminales de coordinación; longitud actual del avance: 19900 px.
 Validación automatizada: 183 pruebas. Balance y duración pendientes de playtest.
+# Retorno desde el equipo B
+
+La caída desde `crew_gallery` a `crew_lower` dispone de tres peldaños permanentes
+de retorno (`crew_backtrack_low/mid/high`), con soportes industriales, anchura
+120 px y ascensos de 80/80/75 px. Permiten volver a la galería y alimentación
+sin pagar, encender equipos ni completar combate. La pasarela coordinada sigue
+siendo un atajo horizontal, no la única salida del desnivel. GR-LEVEL-003/010 y
+GR-CORE-008; validar físicamente los cuatro saltos con alimentación apagada.

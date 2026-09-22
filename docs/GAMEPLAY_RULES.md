@@ -1278,10 +1278,20 @@ Previously seen pre-boss dialogue should support skip/fast-forward on retry.
 # 19. Resources and economy
 
 Workshop tactical extension (user requested): the first Ancom collective has
-three members. A wounded member can retreat and a healthier member can take
-its position before reaching surrender. One surrender still resolves the entire
+three members. A wounded member retreats toward the farthest reachable active
+comrade away from the player, to a supported and unoccupied nearby position.
+No replacement moves into the vacated post (revised by user request). A retreat
+must increase distance from the player; unreachable or crowded destinations
+are rejected. One surrender still resolves the entire
 collective, as does survival to the shared ceasefire. No healing or
 invulnerability is granted by a tactical retreat.
+
+User-approved anti-edge extension: the Ancom survival clock advances only inside
+the central 70% of the authored roster's horizontal footprint (15% inset per
+side, excluding detection padding). Bounds remain fixed during movement and
+retreat. Outside, the clock pauses without resetting; attacks, defensive target
+validity and collective surrender remain active. HUD communicates pause and
+direction back into the arena. Other challenge profiles keep their prior timing.
 
 Contact raiders have bounded pursuit around their original posts. They return
 by traversing valid terrain, not teleporting. After physically returning and

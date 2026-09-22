@@ -76,6 +76,8 @@ func _tile_region(parent: Node2D, texture: Texture2D, source: Rect2, destination
 			atlas.atlas = texture
 			atlas.region = Rect2(source.position, visible_size / ART_SCALE)
 			var sprite := Sprite2D.new()
+			# Supports must never obscure a traversable tread drawn earlier.
+			sprite.z_index = -1 if source == BRACE else 0
 			sprite.name = prefix + "%d_%d" % [column, row]
 			sprite.texture = atlas
 			sprite.centered = false

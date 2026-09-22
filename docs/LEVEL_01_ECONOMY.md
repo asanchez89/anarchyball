@@ -15,7 +15,7 @@ Diseño aprobado. Implementación incremental: no todo el rediseño es jugable a
 - Alto el fuego: empieza tras agresión observable, avanza dentro de la zona y
   no se reinicia por defensa. Rendición o supervivencia resuelve; bonus sin causar
   daño separado del bonus sin recibir daño.
-- Ancom: tres presentes inicialmente, relevo de heridas, ataques por turnos y retirada colectiva
+- Ancom: tres presentes inicialmente, retirada de heridas sin relevo, ataques por turnos y retirada colectiva
   al rendirse una integrante o terminar contador. Egoist: dos saqueadores ágiles,
   robo limitado recuperable, jamás llaves ni componentes de misión.
 - Mutualist: servicio con coste anunciado en componentes, sin tregua ni agresión
@@ -98,18 +98,18 @@ nuevo. La tienda sigue siendo el lugar para vender/comprar.
   escalonan por turnos. No propaga agresión a otro encuentro ni a NPC neutrales.
   La primera agresión inicia 35 s compartidos. Una rendición retira al grupo;
   resistir el contador también abre la puerta y la pasarela del encuentro.
-- Relevo: resistencia de 60 Resolve (antes 30). Al quedar en 85% o menos,
-  la herida cambia de puesto con
-  una compañera con más Resolve, usando suelo y saltos alcanzables. No dispara
+- Retirada: resistencia de 90 Resolve. Al quedar en 90% o menos,
+  la herida busca espacio junto al camarada alcanzable más alejado del jugador,
+  sin que otro ocupe su puesto, usando suelo y saltos alcanzables. No dispara
   durante el traslado, no se cura ni gana invulnerabilidad. Rendición a 35% de
   Resolve: **una sola rendición sigue resolviendo el colectivo**. Repliegue
   táctico no significa rendición. Cada integrante herida se repliega una vez.
-  A igual resistencia se prioriza la compañera cercana. El salto comienza en
+  Se rechazan destinos ocupados o que no aumenten la distancia. El salto comienza en
   el punto alcanzable más próximo, sin caminar hasta debajo del destino final.
-  El desplazamiento de ambas es deliberadamente rápido: 1200 px/s,
+  El desplazamiento de la herida es deliberadamente rápido: 1200 px/s,
   salto a 1920 px/s y gravedad 14400 px/s², conservando alcance/altura del arco
   pero recorriéndolo tres veces más rápido. Pausa entre saltos: 0.08 s. Whoosh
-  espacial de 0.32 s una vez al iniciar el intercambio. No acelera a las Egoist.
+  espacial de 0.32 s una vez al iniciar la retirada. No acelera a las Egoist.
 - Egoist: 2, 3 y 4 saqueadores, persecución terrestre a 190 px/s, respetando
   suelo, paredes y separación. El intento próximo de confiscación habilita defensa.
   Contacto: 4 de daño, hasta 8 municiones ligeras y 2 piezas por vez; cooldown
@@ -221,7 +221,43 @@ Capturas revisadas: halo activo, aviso brillante/atenuado y escena tras caducar
 en reports/workshop_review/pickup_*.png. Pendiente playtest humano para ajustar
 duración e intensidad; no se cambiaron controles.
 
+### Ajuste del colectivo de Despacho
+
+Seis integrantes distribuidos en tres alturas dentro de 430 px horizontales,
+con dos pasarelas cercanas y soportes industriales. Están activas antes
+del combate; ascensos de 80 px y separación horizontal de 30 px mantienen
+el salto base dentro del margen conservador de validación. La bajada derecha
+conecta con el primer escalón de salida.
+La pasarela de salida sigue condicionada a resolverlo. El alcance
+Ancom pasa a 850 px para incluir la retaguardia desde la entrada del recinto.
+Resolve del arquetipo colectivo: 90 (antes 60); retirada al 90%, conservando su
+activación tras dos impactos ligeros. Una rendición retira al grupo y el alto
+el fuego permanece en 35 s. Sin aumento de daño ni de frecuencia de disparo.
+GR-LEVEL-002/003/010, GR-CORE-005 y GR-CONFLICT-001 permanecen intactas.
+Probar desde Nuevo taller: los checkpoints conservan posiciones antiguas.
+
+El colectivo final conserva siete integrantes en 480 px, añade dos pasarelas
+de 210 px con ascensos de 80 px y hueco de 20 px; se apoyan visualmente sobre
+la estructura existente y están disponibles antes del combate. El techo
+conserva el descenso hacia salida. No requiere encender máquinas adicionales.
+Pruebas físicas del jugador cubren subida y descenso, y los siete turnos
+de disparo se comprueban desde el borde izquierdo del recinto.
+
 ### Escala y contacto de los coleccionables
+
+La tregua Ancom solo avanza dentro del 70% central de la huella horizontal
+inicial del grupo, sin los 350 px de detección exterior. Los bordes pausan sin
+reiniciar. HUD indica pausa y dirección; el área no sigue patrullas/retiradas.
+Disparos y rendición siguen funcionando en los bordes. No cambia Egoist.
+
+Revisión táctica posterior: sustituir el intercambio de puestos por retirada
+única hacia el camarada activo más distante del jugador con refugio alcanzable.
+El destino queda junto al camarada, no encima; requiere ganar al menos 80 px de
+distancia, apoyo activo, ruta física y separación de actores/destinos reservados.
+Sin refugio válido no se mueve. Nadie avanza a sustituirla. Se conservan velocidad,
+sonido, vulnerabilidad, Resolve, temporizador y rendición colectiva. Al cargar un
+snapshot antiguo se descartan órdenes de reemplazo, sin teletransportar un salto
+que ya estuviera en curso. El balance previo de relevo queda como histórico.
 
 Los tres loots humorísticos usan ahora 28 píxeles lógicos en el eje mayor,
 mostrados a 3 px de mundo por píxel lógico (84 px), coherente con los pickups

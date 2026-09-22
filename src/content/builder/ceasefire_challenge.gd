@@ -82,6 +82,21 @@ func player_in_zone() -> bool:
 	return player.global_position.x >= zone.x and player.global_position.x <= zone.y and player.health.current_health > 0.0
 
 
+func ceasefire_bounds() -> Vector2:
+	if is_zero_approx(definition.ceasefire_core_fraction):
+		return zone
+	# Fixed authored footprint: retreats and patrols never drag the timer zone.
+	var roster_left := zone.x + definition.zone_padding
+	var roster_right := zone.y - definition.zone_padding
+	var inset := maxf(0.0, roster_right - roster_left) * definition.ceasefire_core_fraction
+	return Vector2(roster_left + inset, roster_right - inset)
+
+
+func can_advance_ceasefire() -> bool:
+	var bounds := ceasefire_bounds()
+	return player_in_zone() and player.global_position.x >= bounds.x and player.global_position.x <= bounds.y
+
+
 func _physics_process(delta: float) -> void:
 	advance(delta)
 	_update_hud()
@@ -103,14 +118,14 @@ func advance(delta: float) -> void:
 	if definition.mode == CeasefireChallengeDefinition.AttackMode.CONTACT_RAID:
 		_advance_raiders(delta)
 		return
-	if definition.tactical_relay and started:
-		_advance_relay(delta)
+	if definition.tactical_retreat and started:
+		_advance_retreat(delta)
 	if not player_in_zone():
 		_warning = 0.0
 		for actor: CombatTarget in observer._actors:
 			actor.conflict_state.cancel_threat()
 		return
-	if started:
+	if started and can_advance_ceasefire():
 		remaining = maxf(0.0, remaining - delta)
 		if is_zero_approx(remaining):
 			finish(&"survive_ceasefire")
@@ -168,29 +183,16 @@ func _is_relocating(actor: CombatTarget) -> bool:
 	return actor.tactical_airborne or String(_roles.get(actor.stable_id, "")) in ["retreat", "relief"]
 
 
-func _advance_relay(delta: float) -> void:
+func _advance_retreat(delta: float) -> void:
 	for wounded: CombatTarget in observer._actors:
 		if _relieved.has(wounded.stable_id) or _is_relocating(wounded) or wounded.conflict_state.current_state != ConflictStateComponent.State.AGGRESSOR:
 			continue
 		if wounded.resolve.current_resolve > wounded.resolve.maximum_resolve * definition.retreat_resolve_ratio:
 			continue
-		var replacement: CombatTarget = null
-		for candidate: CombatTarget in observer._actors:
-			if candidate == wounded or _roles.has(candidate.stable_id) or candidate.conflict_state.current_state != ConflictStateComponent.State.AGGRESSOR:
-				continue
-			if candidate.resolve.current_resolve <= wounded.resolve.current_resolve:
-				continue
-			if replacement != null and candidate.resolve.current_resolve <= replacement.resolve.current_resolve:
-				if candidate.resolve.current_resolve < replacement.resolve.current_resolve or candidate.global_position.distance_squared_to(wounded.global_position) >= replacement.global_position.distance_squared_to(wounded.global_position):
-					continue
-			if (_motors[wounded.stable_id] as BallTacticalMotor).route_to(candidate.global_position, zone).is_empty() or (_motors[candidate.stable_id] as BallTacticalMotor).route_to(wounded.global_position, zone).is_empty():
-				continue
-			replacement = candidate
-		if replacement != null:
-			_goals[wounded.stable_id] = replacement.global_position
-			_goals[replacement.stable_id] = wounded.global_position
+		var refuge := _retreat_destination(wounded)
+		if refuge.is_finite():
+			_goals[wounded.stable_id] = refuge
 			_roles[wounded.stable_id] = "retreat"
-			_roles[replacement.stable_id] = "relief"
 			_relieved[wounded.stable_id] = true
 			wounded.sfx.play_cue(&"tactical_dash")
 	for actor: CombatTarget in observer._actors:
@@ -207,6 +209,44 @@ func _advance_relay(delta: float) -> void:
 			actor._set_patrolling(false)
 		elif _roles[actor.stable_id] != "reserve":
 			(_motors[actor.stable_id] as BallTacticalMotor).travel(goal, definition.retreat_speed, zone, delta)
+
+
+func _retreat_destination(wounded: CombatTarget) -> Vector2:
+	var motor := _motors[wounded.stable_id] as BallTacticalMotor
+	var surfaces := motor._surfaces(zone)
+	var best := Vector2(INF, INF)
+	var best_comrade_distance := -INF
+	var wounded_distance := wounded.global_position.distance_to(player.global_position)
+	for comrade: CombatTarget in observer._actors:
+		if comrade == wounded or _is_relocating(comrade) or comrade.conflict_state.current_state != ConflictStateComponent.State.AGGRESSOR:
+			continue
+		var distance := comrade.global_position.distance_to(player.global_position)
+		if distance <= best_comrade_distance:
+			continue
+		var away := signf(comrade.global_position.x - player.global_position.x)
+		if is_zero_approx(away):
+			continue
+		for surface: Dictionary in surfaces:
+			if absf(float(surface.y) - comrade.global_position.y) > definition.home_tolerance or comrade.global_position.x < float(surface.left) - BallTacticalMotor.FEET or comrade.global_position.x > float(surface.right) + BallTacticalMotor.FEET:
+				continue
+			for side: float in [away, -away]:
+				var point := Vector2(clampf(comrade.global_position.x + side * definition.personal_space, float(surface.left), float(surface.right)), float(surface.y))
+				if point.distance_to(player.global_position) < wounded_distance + definition.retreat_safety_gain:
+					continue
+				var occupied := false
+				for other: CombatTarget in observer._actors:
+					if other == wounded:
+						continue
+					var other_goal: Vector2 = _goals.get(other.stable_id, other.global_position)
+					if point.distance_to(other.global_position) < definition.personal_space * 0.8 or point.distance_to(other_goal) < definition.personal_space * 0.8:
+						occupied = true
+						break
+				if occupied or motor.route_to(point, zone).is_empty():
+					continue
+				best = point
+				best_comrade_distance = distance
+				break
+	return best
 
 
 func _advance_raiders(delta: float) -> void:
@@ -323,10 +363,13 @@ func _update_hud() -> void:
 	_bar.value = definition.duration - remaining
 	var instruction := "Una rendición retira al grupo." if definition.any_surrender_resolves else "Esquiva el robo o haz que se rindan todos."
 	_label.text = "%s\n%s\n%s" % [definition.title, "ALTO EL FUEGO EN %.1f s" % remaining if started else "ADVERTENCIA · aún no puedes atacar", instruction]
+	if started and not can_advance_ceasefire() and definition.ceasefire_core_fraction > 0.0:
+		var direction := "DERECHA" if player.global_position.x < ceasefire_bounds().x else "IZQUIERDA"
+		_label.text += "\nTREGUA PAUSADA · entra al combate hacia la " + direction
 	if not stolen.is_empty():
 		_label.text += "\nAl resolver, recoge el paquete con lo robado."
 	if _roles.values().has("retreat"):
-		_label.text += "\nRELEVO: una herida se repliega; otra cubre su puesto."
+		_label.text += "\nRETIRADA: la herida busca refugio junto al grupo."
 
 
 func capture_runtime_state() -> Dictionary:
@@ -349,6 +392,12 @@ func restore_runtime_state(state: Dictionary) -> void:
 	_contacts = (state.get("contacts", {}) as Dictionary).duplicate(true)
 	_roles = (state.get("roles", {}) as Dictionary).duplicate()
 	_goals = (state.get("goals", {}) as Dictionary).duplicate()
+	# Old checkpoints may contain a replacement heading to the wounded post.
+	# Keep physical airborne motion, but never resume that obsolete order.
+	for id: Variant in _roles.keys():
+		if _roles[id] == "relief":
+			_roles.erase(id)
+			_goals.erase(id)
 	_relieved = (state.get("relieved", {}) as Dictionary).duplicate()
 	_returning = (state.get("returning", {}) as Dictionary).duplicate()
 	_raid_warnings = (state.get("raid_warnings", {}) as Dictionary).duplicate()

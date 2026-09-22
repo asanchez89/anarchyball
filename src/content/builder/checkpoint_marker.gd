@@ -26,12 +26,17 @@ func _ready() -> void:
 		-float(_sprite.texture.get_height()) * World0ArtMetrics.CHECKPOINT_SCALE * 0.5
 	)
 	add_child(_sprite)
+	# Preserve footprint, but sample details on the same 3-world-pixel grid as terrain.
+	var pixels := ShaderMaterial.new()
+	pixels.shader = preload("res://assets/art/props/pickup_pixel_grid.gdshader")
+	pixels.set_shader_parameter("logical_size", (_sprite.texture.get_size() / World0ArtMetrics.TERRAIN_SCALE).round())
+	_sprite.material = pixels
+	var beacon := InteractionBeacon.new()
+	beacon.name = "InteractionBeacon"
+	add_child(beacon)
+	beacon.configure(_sprite, "CHECKPOINT", Color("65ffe0"))
 	_update_art()
 	queue_redraw()
-
-
-func _draw() -> void:
-	draw_string(ThemeDB.fallback_font, Vector2(-48.0, 66.0), "CHECKPOINT", HORIZONTAL_ALIGNMENT_CENTER, 96.0, 12, Color.WHITE)
 
 
 func _on_body_entered(body: Node2D) -> void:

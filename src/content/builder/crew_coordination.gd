@@ -15,6 +15,12 @@ class Terminal extends RuleStateObject:
 	var coordinator: CrewCoordination
 	var index: int
 
+	func interaction_caption() -> String:
+		return "SWITCH"
+
+	func interaction_available() -> bool:
+		return true
+
 	func interact() -> bool:
 		coordinator.assign_local(index, not coordinator.local_assignments[index])
 		return true

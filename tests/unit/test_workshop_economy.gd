@@ -16,6 +16,55 @@ func _level() -> LevelBuilder:
 	return level
 
 
+func test_service_station_spacing_and_shared_beacons() -> void:
+	var level := _level()
+	var economy := level.get_node("Generated/Economy") as WorkshopEconomy
+	var checkpoint := level.get_node("Generated/Checkpoints/checkpoint_supply_post") as CheckpointMarker
+	assert_float(economy.shop.position.x - checkpoint.position.x).is_greater_equal(180.0)
+	var shop_beacon := economy.shop.get_node("InteractionBeacon") as InteractionBeacon
+	var checkpoint_beacon := checkpoint.get_node("InteractionBeacon") as InteractionBeacon
+	assert_str(shop_beacon.caption).is_equal("SHOP")
+	assert_str(checkpoint_beacon.caption).is_equal("CHECKPOINT")
+	assert_bool(economy.shop._label.visible).is_false()
+	var before := checkpoint._sprite.position
+	checkpoint_beacon._process(0.5)
+	assert_vector(checkpoint._sprite.position).is_equal(before)
+	assert_object(checkpoint._sprite.material).is_not_null()
+	economy.shop._on_body_entered(level._player)
+	assert_bool(economy.shop._label.visible).is_true()
+	economy.shop._on_body_exited(level._player)
+	assert_bool(economy.shop._label.visible).is_false()
+
+
+func test_functional_machine_signs_follow_capability_and_state() -> void:
+	var level := _level()
+	var power := level.get_node("Generated/RuleObjects/machine_production_feeder") as RuleStateObject
+	var call := level.get_node("Generated/RuleObjects/call_production_lift") as RuleStateObject
+	var panel := level.get_node("Generated/RuleObjects/control_production_transfer") as RuleStateObject
+	assert_str(power._interaction_beacon.caption).is_equal("ACTIVATE")
+	assert_bool(power._interaction_beacon.actionable).is_true()
+	call._update_interaction_beacon()
+	panel._update_interaction_beacon()
+	assert_str(call._interaction_beacon.caption).is_equal("DOWN")
+	assert_bool(call._interaction_beacon.actionable).is_false()
+	assert_bool(panel._interaction_beacon.actionable).is_false()
+	power.transition_to(RuleStateObject.State.OCCUPIED)
+	assert_str(power._interaction_beacon.caption).is_equal("ACTIVE")
+	assert_bool(power._interaction_beacon._halo.visible).is_false()
+	call._update_interaction_beacon()
+	panel._update_interaction_beacon()
+	assert_bool(call._interaction_beacon.actionable).is_true()
+	assert_bool(panel._interaction_beacon.actionable).is_true()
+	assert_bool(call.interact()).is_true()
+	assert_str(call._interaction_beacon.caption).is_equal("DOWN")
+	power.restore_runtime_state({"state": "abandoned"})
+	assert_str(power._interaction_beacon.caption).is_equal("ACTIVATE")
+	assert_bool(power._interaction_beacon.actionable).is_true()
+	for machine: Node in level.find_children("*", "RuleStateObject", true, false):
+		assert_object(machine.get_node_or_null("InteractionBeacon")).is_not_null()
+		assert_bool((machine as RuleStateObject)._label.visible).is_false()
+
+
 func test_stack_rewards_are_once_only_and_protected_items_cannot_be_sold() -> void:
 	var inventory := _inventory()
 	assert_bool(inventory.grant_once("loot", {"trade_parts": 20, "production_key": 1}, 40)).is_true()

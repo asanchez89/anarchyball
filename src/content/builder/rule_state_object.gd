@@ -42,6 +42,7 @@ var activation_payment: Callable
 var _player_nearby: bool = false
 var _label: Label
 var _machine_sprite: Sprite2D
+var _interaction_beacon: InteractionBeacon
 
 
 func _ready() -> void:
@@ -71,6 +72,12 @@ func _ready() -> void:
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.add_theme_font_size_override("font_size", 13)
 	add_child(_label)
+	_interaction_beacon = InteractionBeacon.new()
+	_interaction_beacon.name = "InteractionBeacon"
+	add_child(_interaction_beacon)
+	_interaction_beacon.configure(_machine_sprite, interaction_caption(), Color("65ffe0"))
+	_label.position.y = _interaction_beacon._bounds.position.y - 116.0
+	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_apply_state()
 
 
@@ -83,6 +90,7 @@ func _texture_for_machine() -> Texture2D:
 
 
 func _process(_delta: float) -> void:
+	_update_interaction_beacon()
 	if _player_nearby and InputActions.is_interact_just_pressed():
 		interact()
 	if not action_hint.is_empty() and _player_nearby:
@@ -153,6 +161,7 @@ func _apply_state() -> void:
 	_apply_targets()
 	_update_label()
 	_update_machine_art()
+	_update_interaction_beacon()
 	queue_redraw()
 
 
@@ -182,6 +191,7 @@ func _apply_targets() -> void:
 func _update_label() -> void:
 	if _label == null:
 		return
+	_label.visible = _player_nearby
 	if not action_hint.is_empty():
 		_label.text = "%s\n%s" % [machine_label, guidance_text()]
 		_label.modulate.a = 1.0 if _player_nearby else 0.8
@@ -193,6 +203,23 @@ func _update_label() -> void:
 		String(state_id()).to_upper(),
 		guidance_text(),
 	]
+
+
+func interaction_caption() -> String:
+	if call_only:
+		return "DOWN"
+	if current_state == State.OCCUPIED:
+		return "ACTIVE"
+	return "ACTIVATE" if current_state in [State.AVAILABLE, State.ABANDONED] else "LOCKED"
+
+
+func interaction_available() -> bool:
+	return prerequisites_met() and (call_only or current_state in [State.AVAILABLE, State.ABANDONED])
+
+
+func _update_interaction_beacon() -> void:
+	if _interaction_beacon != null:
+		_interaction_beacon.set_status(interaction_caption(), interaction_available())
 
 
 func guidance_text() -> String:

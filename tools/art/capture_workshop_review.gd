@@ -228,6 +228,8 @@ func _capture() -> void:
 		centers = [750, 1750, 2950, 3550]
 	if "--collective-layout" in OS.get_cmdline_user_args():
 		centers = [6840, 12850, 19200]
+	if "--crew-return" in OS.get_cmdline_user_args():
+		centers = [17800]
 	for center: int in centers:
 		camera.position = Vector2(center, 360)
 		camera.reset_smoothing()

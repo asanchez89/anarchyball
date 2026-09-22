@@ -34,6 +34,118 @@ func _challenge(level: LevelBuilder, id: String) -> CeasefireChallenge:
 	return (level.get_node("Generated/EncounterObservers/" + id) as EncounterRuntimeObserver).challenge
 
 
+func test_dispatch_collective_all_fire_from_left_edge_and_share_close_supported_tiers() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "encounter_dispatch_ancom")
+	level._player.global_position = Vector2(challenge.zone.x + 1.0, 628.0)
+	var heights: Dictionary = {}
+	var left := INF
+	var right := -INF
+	for actor: CombatTarget in challenge.observer._actors:
+		left = minf(left, actor.global_position.x)
+		right = maxf(right, actor.global_position.x)
+		var height := roundi(actor.global_position.y)
+		heights[height] = int(heights.get(height, 0)) + 1
+		assert_float(actor.global_position.distance_to(level._player.global_position)).is_less(challenge.definition.activation_range)
+		assert_float(actor.resolve.maximum_resolve).is_equal(90.0)
+	assert_float(right - left).is_less_equal(450.0)
+	assert_int(heights.size()).is_equal(3)
+	for count: int in heights.values():
+		assert_int(count).is_equal(2)
+	challenge.advance(challenge.definition.warning_seconds + 0.01)
+	for turn: int in 5:
+		challenge.advance(challenge.definition.turn_interval)
+	var shooters: Dictionary = {}
+	for node: Node in challenge.observer._actors[0].get_parent().get_children():
+		if node is HostileBolt:
+			shooters[node.source_identity] = true
+	assert_int(shooters.size()).is_equal(6)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+	var deck := level.get_node("Generated/Platforms/dispatch_patrol_deck") as DebugPlatform
+	var perch := level.get_node("Generated/Platforms/dispatch_truce_perch") as DebugPlatform
+	assert_bool(deck.is_rule_enabled()).is_true()
+	assert_bool(perch.is_rule_enabled()).is_true()
+	var platforms: Dictionary = {}
+	for entry: Dictionary in level.loaded_spec.data.platforms:
+		platforms[entry.id] = entry
+	var profile := load("res://data/player/default_movement_profile.tres") as PlayerMovementProfile
+	for pair: Array in [["ground_dispatch_entry", "dispatch_patrol_deck"], ["dispatch_patrol_deck", "dispatch_truce_perch"], ["dispatch_truce_perch", "dispatch_step_one"]]:
+		assert_bool(LevelValidator._can_jump(platforms[pair[0]], platforms[pair[1]], profile)).is_true()
+
+
+func test_final_collective_is_compact_and_every_member_fires_from_entry() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "crew_ancom")
+	level._player.global_position = Vector2(challenge.zone.x + 1, 508)
+	for actor: CombatTarget in challenge.observer._actors:
+		assert_float(actor.global_position.distance_to(level._player.global_position)).is_less(challenge.definition.activation_range)
+	challenge.advance(challenge.definition.warning_seconds + 0.01)
+	for turn: int in 6:
+		challenge.advance(challenge.definition.turn_interval)
+	var shooters: Dictionary = {}
+	for node: Node in challenge.observer._actors[0].get_parent().get_children():
+		if node is HostileBolt:
+			shooters[node.source_identity] = true
+	assert_int(shooters.size()).is_equal(7)
+	for id: String in ["crew_collective_lower", "crew_collective_upper"]:
+		assert_bool((level.get_node("Generated/Platforms/" + id) as DebugPlatform).is_rule_enabled()).is_true()
+
+
+func test_player_base_jump_physically_lands_on_dispatch_steps() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	var player := level._player
+	var profile := player.movement_profile
+	for leg: Array in [["ground_dispatch_entry", 12500.0, "dispatch_patrol_deck", 12600.0], ["dispatch_patrol_deck", 12700.0, "dispatch_truce_perch", 12820.0], ["dispatch_truce_perch", 12920.0, "dispatch_step_one", 13090.0], ["crew_return_c", 18660.0, "crew_collective_lower", 18760.0], ["crew_collective_lower", 18860.0, "crew_collective_upper", 18970.0], ["crew_collective_upper", 19100.0, "crew_cache_roof", 19160.0]]:
+		var source := level.get_node("Generated/Platforms/" + String(leg[0])) as DebugPlatform
+		var target := level.get_node("Generated/Platforms/" + String(leg[2])) as DebugPlatform
+		var start_y := source.position.y - source.size.y * 0.5 + source.collision_surface_depth - WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
+		var end_y := target.position.y - target.size.y * 0.5 + target.collision_surface_depth - WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
+		player.reset_at(Vector2(float(leg[1]), start_y))
+		player.velocity.y = -profile.jump_velocity
+		var landed := false
+		for frame: int in 100:
+			var dx := float(leg[3]) - player.position.x
+			player.velocity.x = clampf(dx * 10.0, -profile.run_speed, profile.run_speed)
+			player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, profile, 1.0 / 60.0)
+			player.move_and_slide()
+			await get_tree().physics_frame
+			if player.is_on_floor() and absf(player.position.y - end_y) < 3.0 and absf(dx) < 25.0:
+				landed = true
+				break
+		assert_bool(landed).is_true()
+
+
+func test_crew_lower_has_physical_return_without_power_or_coordination() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	var player := level._player
+	var profile := player.movement_profile
+	var power := level.get_node("Generated/RuleObjects/crew_power") as RuleStateObject
+	assert_bool(power.current_state == RuleStateObject.State.OCCUPIED).is_false()
+	var bridge := level.get_node("Generated/Platforms/crew_cache_route") as DebugPlatform
+	assert_bool(bridge.is_rule_enabled()).is_false()
+	for leg: Array in [["crew_lower", 17920.0, "crew_backtrack_low", 18000.0], ["crew_backtrack_low", 17975.0, "crew_backtrack_mid", 17890.0], ["crew_backtrack_mid", 17825.0, "crew_backtrack_high", 17740.0], ["crew_backtrack_high", 17675.0, "crew_gallery", 17580.0]]:
+		var source := level.get_node("Generated/Platforms/" + String(leg[0])) as DebugPlatform
+		var target := level.get_node("Generated/Platforms/" + String(leg[2])) as DebugPlatform
+		assert_bool(target.is_rule_enabled()).is_true()
+		var start_y := source.position.y - source.size.y * 0.5 + source.collision_surface_depth - WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
+		var end_y := target.position.y - target.size.y * 0.5 + target.collision_surface_depth - WorldPropPlacement.BALL_ORIGIN_TO_FLOOR
+		player.reset_at(Vector2(float(leg[1]), start_y))
+		player.velocity.y = -profile.jump_velocity
+		var landed := false
+		for frame: int in 100:
+			var dx := float(leg[3]) - player.position.x
+			player.velocity.x = clampf(dx * 10.0, -profile.run_speed, profile.run_speed)
+			player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, profile, 1.0 / 60.0)
+			player.move_and_slide()
+			await get_tree().physics_frame
+			if player.is_on_floor() and absf(player.position.y - end_y) < 3.0 and absf(dx) < 25.0:
+				landed = true
+				break
+		assert_bool(landed).is_true()
+
+
 func test_collective_starts_only_after_attack_and_one_surrender_releases_group() -> void:
 	var level := _build()
 	var challenge := _challenge(level, "encounter_depot_patrol")
@@ -73,12 +185,48 @@ func test_timer_pauses_outside_zone_and_clean_survival_pays_once() -> void:
 	challenge.advance(100)
 	assert_float(challenge.remaining).is_equal(remaining)
 	assert_bool(challenge.observer.is_resolved()).is_false()
-	level._player.position.x = challenge.zone.x + 20.0
+	level._player.position.x = (challenge.ceasefire_bounds().x + challenge.ceasefire_bounds().y) * 0.5
 	challenge.advance(remaining)
 	assert_bool(challenge.observer.is_resolved()).is_true()
 	assert_int(level._player.inventory.satoshis).is_equal(60)
 	challenge.finish(&"survive_ceasefire")
 	assert_int(level._player.inventory.satoshis).is_equal(60)
+
+
+func test_collective_clock_requires_core_and_preserves_progress_on_both_edges() -> void:
+	var level := _build()
+	for id: String in ["encounter_depot_patrol", "encounter_dispatch_ancom", "crew_ancom"]:
+		var challenge := _challenge(level, id)
+		var bounds := challenge.ceasefire_bounds()
+		level._player.position = challenge.observer._actors[0].position - Vector2(100, 0)
+		challenge.advance(1.3)
+		assert_bool(challenge.started).is_true()
+		var initial := challenge.remaining
+		challenge.advance(40.0)
+		assert_float(challenge.remaining).is_equal(initial)
+		assert_bool(challenge.observer.is_resolved()).is_false()
+		challenge._update_hud()
+		assert_bool(challenge._label.text.contains("TREGUA PAUSADA")).is_true()
+		assert_bool(challenge._label.text.contains("DERECHA")).is_true()
+		level._player.position.x = (bounds.x + bounds.y) * 0.5
+		challenge.advance(3.0)
+		assert_float(challenge.remaining).is_equal(initial - 3.0)
+		level._player.position.x = bounds.y + 1.0
+		challenge.advance(40.0)
+		assert_float(challenge.remaining).is_equal(initial - 3.0)
+		challenge._update_hud()
+		assert_bool(challenge._label.text.contains("IZQUIERDA")).is_true()
+		var snapshot := challenge.capture_runtime_state()
+		challenge.remaining = 1.0
+		challenge.restore_runtime_state(snapshot)
+		assert_float(challenge.remaining).is_equal(initial - 3.0)
+		challenge.observer._actors[0].position.x += 50.0
+		assert_vector(challenge.ceasefire_bounds()).is_equal(bounds)
+		level._player.position.x = (bounds.x + bounds.y) * 0.5
+		challenge.advance(1.0)
+		assert_float(challenge.remaining).is_equal(initial - 4.0)
+	var raiders := _challenge(level, "encounter_storage_cache")
+	assert_vector(raiders.ceasefire_bounds()).is_equal(raiders.zone)
 
 
 func test_collectives_use_multiple_supported_heights_and_bounded_patrols() -> void:
@@ -321,7 +469,7 @@ func test_defending_does_not_restart_timer_and_pause_stops_processing() -> void:
 	get_tree().paused = false
 
 
-func test_wounded_collective_relay_moves_physically_without_healing_and_one_surrender_still_wins() -> void:
+func test_wounded_collective_retreats_to_far_comrade_without_replacement_or_healing() -> void:
 	var level := _build()
 	await get_tree().physics_frame
 	await get_tree().physics_frame
@@ -336,24 +484,29 @@ func test_wounded_collective_relay_moves_physically_without_healing_and_one_surr
 	wounded.receiver.receive_effect(level._player.get_node("Identity"), EffectContext.offensive(), 10.0)
 	challenge.advance(0.016)
 	assert_str(challenge._roles.get(wounded.stable_id, "")).is_equal("retreat")
-	assert_bool(challenge._roles.values().has("relief")).is_true()
-	var replacement_id: StringName = challenge._roles.find_key("relief")
-	var replacement := (challenge._motors[replacement_id] as BallTacticalMotor).actor
-	var replacement_goal: Vector2 = challenge._goals[replacement_id]
+	assert_bool(challenge._roles.values().has("relief")).is_false()
+	var ally_positions: Dictionary = {}
+	for ally: CombatTarget in challenge.observer._actors:
+		if ally != wounded:
+			ally_positions[ally.stable_id] = ally.global_position
+	var far_comrade := challenge.observer._actors[2]
+	assert_float((challenge._goals[wounded.stable_id] as Vector2).distance_to(far_comrade.global_position)).is_less_equal(challenge.definition.personal_space + 1.0)
 	assert_bool(challenge.observer.is_resolved()).is_false()
 	var resolve_before := wounded.resolve.current_resolve
 	var jumped := false
-	for frame: int in 60:
-		challenge._advance_relay(1.0 / 60.0)
+	for frame: int in 150:
+		challenge._advance_retreat(1.0 / 60.0)
 		jumped = jumped or wounded.tactical_airborne
 		await get_tree().physics_frame
 	assert_bool(jumped).is_true()
 	assert_float(wounded.global_position.distance_to(origin)).is_greater(80.0)
 	assert_float(wounded.global_position.distance_to(challenge._goals[wounded.stable_id])).is_less(12.0)
-	assert_float(replacement.global_position.distance_to(replacement_goal)).is_less(12.0)
+	for ally: CombatTarget in challenge.observer._actors:
+		if ally != wounded:
+			assert_float(ally.global_position.distance_to(ally_positions[ally.stable_id])).is_less(3.0)
 	assert_int(sound.dash_count).is_equal(1)
 	challenge.restore_runtime_state(challenge.capture_runtime_state())
-	challenge._advance_relay(1.0 / 60.0)
+	challenge._advance_retreat(1.0 / 60.0)
 	assert_int(sound.dash_count).is_equal(1)
 	assert_float(wounded.resolve.current_resolve).is_equal(resolve_before)
 	assert_bool(challenge.observer.is_resolved()).is_false()
@@ -361,6 +514,47 @@ func test_wounded_collective_relay_moves_physically_without_healing_and_one_surr
 	challenge.advance(0.016)
 	assert_bool(challenge.observer.is_resolved()).is_true()
 	assert_int(level._player.inventory.satoshis).is_equal(20)
+
+
+func test_all_collective_arenas_provide_supported_retreat_destinations() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for id: String in ["encounter_depot_patrol", "encounter_dispatch_ancom", "crew_ancom"]:
+		var challenge := _challenge(level, id)
+		var wounded := challenge.observer._actors[0]
+		level._player.global_position = wounded.global_position - Vector2(100, 0)
+		challenge.advance(1.3)
+		var destination := challenge._retreat_destination(wounded)
+		assert_bool(destination.is_finite()).is_true()
+		assert_float(destination.distance_to(level._player.global_position)).is_greater(180.0)
+		assert_bool((challenge._motors[wounded.stable_id] as BallTacticalMotor).route_to(destination, challenge.zone).is_empty()).is_false()
+
+
+func test_retreat_chooses_safety_relative_to_player_and_rejects_crowding() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var challenge := _challenge(level, "encounter_depot_patrol")
+	var rear := challenge.observer._actors[2]
+	level._player.global_position = rear.global_position + Vector2(100, 0)
+	challenge.advance(1.3)
+	var destination := challenge._retreat_destination(rear)
+	assert_bool(destination.is_finite()).is_true()
+	assert_float(destination.x).is_less(challenge.observer._actors[1].global_position.x)
+	assert_float(destination.distance_to(level._player.global_position)).is_greater(rear.global_position.distance_to(level._player.global_position))
+	challenge.definition = challenge.definition.duplicate() as CeasefireChallengeDefinition
+	challenge.definition.retreat_safety_gain = 100000.0
+	assert_bool(challenge._retreat_destination(rear).is_finite()).is_false()
+	challenge.definition.retreat_safety_gain = 80.0
+	challenge.definition.personal_space = 10000.0
+	assert_bool(challenge._retreat_destination(rear).is_finite()).is_false()
+	var state := challenge.capture_runtime_state()
+	state.roles[rear.stable_id] = "relief"
+	state.goals[rear.stable_id] = Vector2(6500, 630)
+	challenge.restore_runtime_state(state)
+	assert_bool(challenge._roles.has(rear.stable_id)).is_false()
+	assert_bool(challenge._goals.has(rear.stable_id)).is_false()
 
 
 func test_raider_returns_on_foot_pauses_clock_and_warns_again_without_healing() -> void:
@@ -409,22 +603,22 @@ func test_wounded_ball_escapes_early_and_survives_followup_hits() -> void:
 	var actor := challenge.observer._actors[0]
 	level._player.global_position = actor.global_position - Vector2(100, 0)
 	challenge.advance(1.3)
-	assert_float(actor.resolve.maximum_resolve).is_equal(60.0)
+	assert_float(actor.resolve.maximum_resolve).is_equal(90.0)
 	var origin := actor.global_position
 	var context := EffectContext.offensive()
 	# Two light hits trigger retreat; two further hits cannot end the group.
 	for hit: int in 2:
 		actor.receiver.receive_effect(level._player.get_node("Identity"), context, 5.0)
-	challenge._advance_relay(1.0 / 60.0)
+	challenge._advance_retreat(1.0 / 60.0)
 	assert_str(challenge._roles.get(actor.stable_id, "")).is_equal("retreat")
-	assert_str(String(challenge._roles.find_key("relief"))).is_equal(String(challenge.observer._actors[1].stable_id))
+	assert_bool(challenge._roles.values().has("relief")).is_false()
 	for frame: int in 12:
-		challenge._advance_relay(1.0 / 60.0)
+		challenge._advance_retreat(1.0 / 60.0)
 		await get_tree().physics_frame
 	assert_float(actor.global_position.distance_to(origin)).is_greater(100.0)
 	for hit: int in 2:
 		actor.receiver.receive_effect(level._player.get_node("Identity"), context, 5.0)
-	assert_float(actor.resolve.current_resolve).is_equal(40.0)
+	assert_float(actor.resolve.current_resolve).is_equal(70.0)
 	assert_int(actor.conflict_state.current_state).is_equal(ConflictStateComponent.State.AGGRESSOR)
 	assert_bool(challenge.observer.is_resolved()).is_false()
 
@@ -441,7 +635,7 @@ func test_tactical_checkpoint_restores_relay_and_airborne_state() -> void:
 	challenge.advance(0.016)
 	var motor := challenge._motors[actor.stable_id] as BallTacticalMotor
 	for frame: int in 180:
-		challenge._advance_relay(1.0 / 60.0)
+		challenge._advance_retreat(1.0 / 60.0)
 		await get_tree().physics_frame
 		if motor.airborne:
 			break
@@ -454,7 +648,7 @@ func test_tactical_checkpoint_restores_relay_and_airborne_state() -> void:
 	assert_str(challenge._roles[actor.stable_id]).is_equal("retreat")
 	assert_bool(motor.airborne).is_true()
 	assert_vector(motor.velocity).is_equal(before.motion[actor.stable_id].velocity)
-	assert_float(actor.resolve.current_resolve).is_equal(50.0)
+	assert_float(actor.resolve.current_resolve).is_equal(80.0)
 	assert_int(level._player.inventory.satoshis).is_equal(0)
 
 

@@ -10,9 +10,11 @@ enum AttackMode { ROTATING_FIRE, CONTACT_RAID }
 @export var turn_interval: float = 1.4
 @export var activation_range: float = 650.0
 @export var zone_padding: float = 350.0
+@export_range(0.0, 0.4, 0.01) var ceasefire_core_fraction: float = 0.0
 @export var any_surrender_resolves: bool = true
 @export var collective_commitment: bool = false
-@export var tactical_relay: bool = false
+@export var tactical_retreat: bool = false
+@export var retreat_safety_gain: float = 80.0
 @export var retreat_resolve_ratio: float = 0.7
 @export var retreat_speed: float = 150.0
 @export var pursuit_radius: float = 420.0
@@ -37,7 +39,9 @@ enum AttackMode { ROTATING_FIRE, CONTACT_RAID }
 
 
 func is_valid() -> bool:
-	for value: float in [retreat_speed, pursuit_radius, return_speed, home_tolerance, jump_speed, jump_gravity, jump_horizontal_speed, jump_cooldown]:
+	if not is_finite(ceasefire_core_fraction) or ceasefire_core_fraction < 0.0 or ceasefire_core_fraction > 0.4:
+		return false
+	for value: float in [retreat_safety_gain, retreat_speed, pursuit_radius, return_speed, home_tolerance, jump_speed, jump_gravity, jump_horizontal_speed, jump_cooldown]:
 		if not is_finite(value) or value <= 0.0:
 			return false
 	if not is_finite(retreat_resolve_ratio) or retreat_resolve_ratio <= 0.0 or retreat_resolve_ratio >= 1.0:
