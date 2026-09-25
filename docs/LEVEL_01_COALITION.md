@@ -1,5 +1,9 @@
 # Nivel 1 — Asociaciones bajo asedio
 
+**Revisión vigente 2026-09-23:** `LEVEL_01_PARTS_2_3.md` reemplaza los desafíos
+principales y duraciones de partes 2/3 de este documento. Sus secciones de
+coordinación/corredor quedan como antecedentes. El jefe no está en la entrega actual.
+
 Revisión: 2026-09-22. Implementación incremental, no nivel completo.
 El taller constituye la parte 1. Existe un primer encuentro acumulativo de la
 parte 2; su expansión, la parte 3 y el jefe siguen pendientes.

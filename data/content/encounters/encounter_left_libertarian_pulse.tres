@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=4 format=3]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/definitions/ceasefire_challenge_definition.gd" id="2"]
+[sub_resource type="Resource" id="Challenge"]
+script = ExtResource("2")
+mode = 3
+title = "LEFTLIBERTARIAN · MARCAS DE ACCESO"
+compact_actor_hud = true
+duration = 42.0
+warning_seconds = 1.4
+activation_range = 850.0
+ceasefire_core_fraction = 0.15
+any_surrender_resolves = false
+pulse_warning = 1.5
+pulse_radius = 65.0
+pulse_damage = 3.0
+pulse_push = 100.0
+pulse_interval = 3.0
+clean_dodge_bonus = 1.0
+clean_dodge_cap = 8.0
+[resource]
+script = ExtResource("1")
+content_id = &"encounter_left_libertarian_pulse"
+display_name = "LEFTLIBERTARIAN · MARCAS DE ACCESO"
+objective = &"survive_or_defend_after_aggression"
+enemy_archetype_ids = Array[StringName]([&"enemy_left_libertarian_marker"])
+aggression_trigger_ids = Array[StringName]([&"attack_committed"])
+success_condition_ids = Array[StringName]([&"ceasefire_reached", &"defensive_surrender"])
+allowed_resolutions = Array[StringName]([&"survive_ceasefire", &"force_surrender"])
+neutralization_resolution = &"force_surrender"
+ceasefire_challenge = SubResource("Challenge")

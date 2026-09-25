@@ -832,6 +832,15 @@ When one world contains more than one ideological current, every current keeps a
 
 # 12. World 0 gameplay specification
 
+Approved revision 2026-09-23: `LEVEL_01_PARTS_2_3.md` supersedes the older
+BlackAnarchy coordination and LeftLibertarian corridor main challenges for this
+level. Their hostile encounters use bounded autonomous flanking/individual
+ceasefire and telegraphed spatial pulses/clean-dodge ceasefire bonuses respectively.
+Mutualist owns paid mechanical route services. The mixed final encounter has
+one shared clock and explicit subgroup surrender, capped simultaneous attacks,
+and staged aggression; neither affiliation nor inactive membership grants damage
+eligibility. Old friendly story briefs remain secondary, not completion gates.
+
 World 0 is both tutorial and ideological foundation. Mechanics must be introduced one at a time and later recombined. The segments below are teaching beats, not a one-to-one mandate for level files; production packaging is governed by `PROJECT_PLAN.md` §12.8.
 
 Leviathan security agencies already maintain a fragmented occupation when World 0 begins. Early raids provide recurring action pressure, while the final incursion is an escalation with reinforcements rather than their first appearance. Institutional affiliation never replaces an inspectable aggression source: an occupation unit may begin an encounter as `AGGRESSOR` only when the scene establishes that it is already carrying out detention, confiscation, attack or another immediate coercive act.
@@ -1309,6 +1318,10 @@ shop sells ammunition/healing and buys declared trade goods. This is not a real
 wallet, random loot economy or persistent economic simulation. Mandatory keys and
 service components cannot be sold or stolen. Checkpoints restore inventory and
 world rewards together; replaying a resolved encounter never duplicates payment.
+Each raider owns the items it actually stole. On surrender or neutralization,
+that raider releases a separate collectible; collecting another raider's bag
+must not return these items. A ceasefire releases any bags still held by its
+participants. Existing encounter-wide checkpoint bags remain recoverable.
 See `LEVEL_01_ECONOMY.md`. Existing ownership and target eligibility rules remain
 authoritative, including after surrender.
 
@@ -1437,6 +1450,16 @@ Potential later options:
 
 ## GR-LEVEL-001 - Teach, test, combine, climax
 
+Revisión aprobada del nivel 1: `LEVEL_01_VERTICAL_REDESIGN.md`. Como regla general,
+la verticalidad cambia avance, combate o recompensa; mecanismos sin beneficio
+se eliminan. Cada parte de este nivel incluye ascenso y descenso principales,
+retorno base y desvíos señalizados sin recursos obligatorios ocultos.
+Ancom mantiene rendición colectiva, pero su retirada puede recibir cobertura
+de hasta dos compañeros cercanos, sin curación ni invulnerabilidad. Esto reemplaza
+la restricción anterior de retirada sin apoyo. BlackAnarchy añade ruptura de
+cerco y LeftLibertarian corredores seguros amplios. El arma principal prueba
+cuatro tiros y recarga automática; no altera elegibilidad ofensiva.
+
 New major mechanics follow:
 
 ```text
@@ -1456,6 +1479,12 @@ Todas las balls jugables y de World 0 deben comunicar sus estados mediante anima
 La acción de disparo conserva el cuerpo orientado hacia su objetivo y muestra el arma en un socket lateral compartido. Una pose de golpe, giro corporal o daño no puede reutilizarse como disparo ni como desplazamiento; esas siluetas pertenecen únicamente a su estado correspondiente.
 
 Antes de crear un proyectil, el atacante actualiza su orientación horizontal según la dirección del disparo. El proyectil nace en el lateral del arma, nunca desde el centro ni desde la espalda de la ball.
+
+Los proyectiles de ambos bandos atraviesan pasarelas delgadas de arriba hacia
+abajo. Desde abajo y por los laterales siguen bloqueados; paredes, bloques
+sólidos y compuertas bloquean en todas direcciones. Esta regla de proyectiles
+no cambia la colisión de personajes ni TargetValidity. Se aplica también al
+trayecto del cañón al punto de aparición para no bloquear disparos al nacer.
 
 Las barreras obligatorias deben mostrar arte integrado del nivel y retirar su colisión al resolverse el encuentro asociado. Un mensaje de “paso abierto” sin paso físico constituye un fallo bloqueante del nivel.
 

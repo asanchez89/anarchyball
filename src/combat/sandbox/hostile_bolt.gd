@@ -17,7 +17,11 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	global_position += direction * speed * delta
+	var destination := global_position + direction * speed * delta
+	if not ProjectileTerrain.obstruction(get_world_2d(), global_position, destination).is_empty():
+		queue_free()
+		return
+	global_position = destination
 	_animation_elapsed += delta
 	missile_sprite.frame = int(_animation_elapsed * 12.0) % missile_sprite.hframes
 	lifetime -= delta
@@ -32,6 +36,8 @@ func configure(new_direction: Vector2, source: CombatIdentityComponent) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
+	if is_queued_for_deletion():
+		return
 	var receiver := body.get_node_or_null("EffectReceiver") as EffectReceiverComponent
 	if receiver == null or source_identity == null:
 		return

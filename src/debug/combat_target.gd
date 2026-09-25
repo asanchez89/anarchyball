@@ -27,6 +27,7 @@ enum Behavior {
 @export_range(1.0, 1000.0, 1.0) var maximum_resolve: float = 30.0
 @export var hostile_bolt_scene: PackedScene
 @export var player_path: NodePath
+var compact_status: bool = false
 @export var is_boss: bool = false
 @export_range(0.1, 0.9, 0.05) var phase_two_ratio: float = 0.5
 @export_range(0.2, 5.0, 0.1) var attack_interval: float = 1.2
@@ -347,7 +348,11 @@ func _launch_bolt_direction(direction: Vector2) -> void:
 	bolt.damage_amount = projectile_damage
 	get_parent().add_child(bolt)
 	bolt.global_position = global_position + launch_direction * 34.0
+	var obstruction := ProjectileTerrain.obstruction(get_world_2d(), global_position, bolt.global_position)
+	if not obstruction.is_empty():
+		bolt.global_position = (obstruction.position as Vector2) - launch_direction
 	bolt.configure(launch_direction, identity)
+	sfx.play_cue(&"fire")
 	_begin_attack_visual()
 
 
@@ -470,6 +475,8 @@ func _update_presentation() -> void:
 	_update_ball_visual_state()
 	if _status_icon != null:
 		_status_icon.set_state(conflict_state.current_state)
+	if compact_status:
+		status_label.text = "%.0f/%.0f" % [resolve.current_resolve, resolve.maximum_resolve] if conflict_state.current_state == ConflictStateComponent.State.AGGRESSOR else ""
 	queue_redraw()
 
 

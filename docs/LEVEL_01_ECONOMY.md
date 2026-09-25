@@ -19,8 +19,9 @@ Diseño aprobado. Implementación incremental: no todo el rediseño es jugable a
   al rendirse una integrante o terminar contador. Egoist: dos saqueadores ágiles,
   robo limitado recuperable, jamás llaves ni componentes de misión.
 - Mutualist: servicio con coste anunciado en componentes, sin tregua ni agresión
-  por rechazar el trato. BlackAnarchy: rotación de parejas y ventanas de paso.
-  LeftLibertarian: restablecer el corredor acelera el alto el fuego.
+  por rechazar el trato. BlackAnarchy: flanqueo autónomo y rendición individual.
+  LeftLibertarian: marcas anunciadas y evasión limpia aceleran el alto el fuego.
+  Ver `LEVEL_01_PARTS_2_3.md`: tiendas nuevas por parte y arena conjunta final.
 - Policía: neutralización/evasión según objetivo, sin tregua automática.
 - No confiscar por rendición: devolución, cesión, recompensa o abandono explícito;
   pago único por encuentro.
@@ -116,8 +117,11 @@ nuevo. La tienda sigue siendo el lugar para vender/comprar.
   de 2 s por actor. Máximo sustraído por encuentro: 24 ligeras y 6 piezas.
   Llaves y componentes protegidos nunca se tocan. No roba sats ni munición pesada.
   Resolver exige todas las rendiciones o 26 s de resistencia. Los objetos robados
-  salen en un paquete físico con aura y arco de caída: no se devuelven hasta
-  recogerlo. Este paquete no caduca; checkpoint conserva contenido y recogida.
+  salen en paquetes físicos con aura y arco de caída: no se devuelven hasta
+  recogerlos. Estas bolsas no caducan; checkpoint conserva contenido y recogida.
+  Cada saqueador que robe lleva su propia cuenta y suelta su propia bolsa al
+  rendirse o quedar neutralizado. La tregua libera las bolsas restantes. Un
+  checkpoint antiguo con un único paquete compartido sigue pudiendo recuperarlo.
   Los choques usan un golpe retro propio, también al agotar el cupo de robo.
 - Persecución Egoist: radio de 420 px desde el puesto inicial, además del límite
   del encuentro. Al perder alcance vuelve andando/saltando y cesa la agresión
@@ -129,8 +133,8 @@ nuevo. La tienda sigue siendo el lugar para vender/comprar.
   horizontal aérea máxima 320 px/s. Recalculan con la posición del apoyo móvil
   y pueden bajar por pasarelas unidireccionales al regresar. No atraviesan muros
   ni usan plataformas desactivadas. No cambia la tregua ni su permiso ofensivo.
-- Lo sustraído vuelve automáticamente al inventario al resolver: restitución,
-  no confiscación del equipo del NPC. Botiquines siguen curando pero no resuelven.
+- Lo sustraído vuelve al inventario al recoger cada bolsa de restitución;
+  no es confiscación del equipo del NPC. Botiquines siguen curando pero no resuelven.
 - Temporizadores solo avanzan dentro de la zona y con el jugador vivo; salir
   los pausa, no los reinicia. Disparar en defensa tampoco reinicia el reloj.
 - Premio base: 20 sats; por supervivencia, +20 sin causar daño y +20 sin recibirlo.

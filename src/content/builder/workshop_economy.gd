@@ -5,6 +5,7 @@ var profile: RunEconomyDefinition
 var player: PlayerController
 var builder: LevelBuilder
 var shop: RuleStateObject
+var shops: Array[RuleStateObject] = []
 var _menu: CanvasLayer
 var _summary: Label
 var _message: Label
@@ -96,20 +97,35 @@ func configure(level: LevelBuilder, definition: RunEconomyDefinition) -> void:
 	for id: String in profile.encounter_rewards:
 		var observer := level.get_node("Generated/EncounterObservers/" + id) as EncounterRuntimeObserver
 		observer.resolved.connect(_reward_encounter)
-	shop = TradeTerminal.new()
-	shop.name = "WorkshopShop"
-	(shop as TradeTerminal).open_menu = open_shop
-	shop.position = builder._grounded_placement(profile.shop_position.x, profile.shop_position.y)
-	shop.machine_label = "ATM BITCOIN · SUMINISTROS"
-	shop.action_hint = "F / X: vender loot, comprar munición o curación"
-	shop.current_state = RuleStateObject.State.AVAILABLE
-	level.get_node("Generated").add_child(shop)
+	for id: String in profile.service_gates:
+		var machine := level.get_node("Generated/RuleObjects/" + id) as RuleStateObject
+		var gate := level.get_node("Generated/Gates/" + String(profile.service_gates[id])) as AccessGate
+		machine.state_changed.connect(func(_rule: StringName, _object: StringName, _previous: StringName, current: StringName, _tag: StringName) -> void:
+			if current == &"occupied":
+				gate.open_for_resolution()
+		)
+	shop = _create_shop("WorkshopShop", profile.shop_position)
+	for id: String in profile.additional_shops:
+		_create_shop(id, profile.additional_shops[id])
 	loot = WorldLootDrops.new()
 	add_child(loot)
 	loot.configure(self)
 	player_menu = PlayerInventoryMenu.new()
 	add_child(player_menu)
 	player_menu.configure(self)
+
+
+func _create_shop(id: String, location: Vector2) -> RuleStateObject:
+	var terminal := TradeTerminal.new()
+	terminal.name = id
+	terminal.open_menu = open_shop
+	terminal.position = builder._grounded_placement(location.x, location.y)
+	terminal.machine_label = "ATM BITCOIN · SUMINISTROS"
+	terminal.action_hint = "F / X: vender loot, comprar munición o curación"
+	terminal.current_state = RuleStateObject.State.AVAILABLE
+	builder.get_node("Generated").add_child(terminal)
+	shops.append(terminal)
+	return terminal
 
 
 func reward_text(reward: Dictionary) -> String:
@@ -156,7 +172,9 @@ func open_service(id: String) -> void:
 	label.custom_minimum_size.x = 820
 	label.add_theme_font_size_override("font_size", 18)
 	var owned := player.inventory.count(String(cost.item))
-	label.text = "SERVICIO MUTUALIST\n\nPara habilitar esta máquina necesito:\n%d × %s · Tienes: %d\nPago único. No se descuenta nada hasta aceptar." % [int(cost.amount), String(profile.items[String(cost.item)].label), owned]
+	label.name = "ServiceDescription"
+	var machine := builder.get_node("Generated/RuleObjects/" + id) as RuleStateObject
+	label.text = "SERVICIO MUTUALIST\n%s\n\n%d × %s · Tienes: %d\nPago único. No se descuenta nada hasta aceptar." % [machine.machine_label, int(cost.amount), String(profile.items[String(cost.item)].label), owned]
 	list.add_child(label)
 	var accept := _button(list, "Pagar y activar" if owned >= int(cost.amount) else "Faltan %d componentes: explora el taller" % (int(cost.amount) - owned))
 	accept.disabled = owned < int(cost.amount)

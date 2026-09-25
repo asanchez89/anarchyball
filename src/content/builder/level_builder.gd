@@ -127,6 +127,8 @@ func build_from_file(path: String, catalog: ContentCatalog) -> LevelValidationRe
 	loaded_spec = load_result.spec
 	last_validation = LevelValidator.validate(loaded_spec, registry)
 	for gate: Dictionary in loaded_spec.data.get("gates", []):
+		if String(gate.get("required_tag", "")) == "mechanical_service" and (economy_profile == null or String(gate.id) not in economy_profile.service_gates.values()):
+			last_validation.add_error(&"missing_service_inventory", "gates", "compuerta mecánica sin servicio configurado")
 		if String(gate.get("required_tag", "")) == "mission_key" and (economy_profile == null or not economy_profile.key_gates.has(String(gate.id))):
 			last_validation.add_error(&"missing_key_inventory", "gates", "puerta con llave sin inventario configurado")
 	if economy_profile != null:
@@ -780,6 +782,7 @@ func _capture_checkpoint(checkpoint_id: StringName, position: Vector2) -> void:
 			var actor := node as CombatTarget
 			actor_states[String(actor.stable_id)] = actor.capture_runtime_state()
 	var rule_state: Dictionary = {}
+	rule_state["weapon_state"] = _player.probe_launcher.capture_weapon_state()
 	if _player.inventory != null:
 		rule_state["inventory"] = _player.inventory.capture()
 		rule_state["loot_drops"] = (get_node("Generated/Economy") as WorkshopEconomy).loot.capture()
@@ -825,6 +828,7 @@ func _restore_checkpoint_state() -> void:
 		elif node is HostileBolt:
 			node.queue_free()
 	_player.reset_at(_checkpoint.player_position)
+	_player.probe_launcher.restore_weapon_state(_checkpoint.world_rule_state.get("weapon_state", {}))
 	for node: Node in get_node("Generated").get_children():
 		if node is AimProbe:
 			node.queue_free()

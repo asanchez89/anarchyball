@@ -7,13 +7,137 @@ func _inventory() -> RunInventory:
 	return inventory
 
 
-func _level() -> LevelBuilder:
+func _level(extra_shops: Dictionary = {}) -> LevelBuilder:
 	var scene := load("res://levels/world_0/w0_01_coalition_workshop.tscn") as PackedScene
 	var level := auto_free(scene.instantiate()) as LevelBuilder
 	level.start_in_menu = false
+	if not extra_shops.is_empty():
+		level.economy_profile = level.economy_profile.duplicate(true) as RunEconomyDefinition
+		level.economy_profile.additional_shops = extra_shops
 	add_child(level)
 	assert_bool(level.last_validation.is_valid()).is_true()
 	return level
+
+
+func test_multiple_terminals_share_inventory_and_do_not_reset_purchases() -> void:
+	var level := _level({"shop_part_two": Vector2(16800, 650), "shop_part_three": Vector2(19400, 650)})
+	var economy := level.get_node("Generated/Economy") as WorkshopEconomy
+	assert_int(economy.shops.size()).is_equal(3)
+	var inventory := level._player.inventory
+	inventory.grant_once("test_funds", {}, 100)
+	for terminal: RuleStateObject in economy.shops:
+		assert_str(terminal._interaction_beacon.caption).is_equal("SHOP")
+		assert_bool(terminal.interact()).is_true()
+		assert_bool(level._player.inventory == inventory).is_true()
+		assert_bool(economy.buy("heavy_pack")).is_true()
+		economy.close_shop()
+	assert_int(inventory.satoshis).is_equal(52)
+	assert_int(inventory.count("heavy_ammo")).is_equal(40)
+	assert_bool(get_tree().paused).is_false()
+
+
+func test_additional_shop_validation_rejects_invalid_ids_positions_and_overlap() -> void:
+	var spec := LevelSpecLoader.load_file("res://data/levels/w0_01_coalition_workshop.json").spec
+	var profile := (load("res://data/content/workshop_economy.tres") as RunEconomyDefinition).duplicate(true) as RunEconomyDefinition
+	for invalid: Dictionary in [{"bad/path": Vector2(100, 100)}, {"shop_two": Vector2(INF, 100)}, {"shop_two": "not_a_position"}, {"shop_two": profile.shop_position}]:
+		profile.additional_shops = invalid
+		assert_array(Array(profile.validation_errors(spec))).is_not_empty()
+	profile.additional_shops = {"shop_two": Vector2(16800, 650), "shop_three": Vector2(19400, 650)}
+	assert_array(Array(profile.validation_errors(spec))).is_empty()
+
+
+func test_paid_maintenance_gate_requires_confirmation_and_restores_with_inventory() -> void:
+	var level := _level()
+	var economy := level.get_node("Generated/Economy") as WorkshopEconomy
+	var machine := level.get_node("Generated/RuleObjects/p2_maintenance_control") as RuleStateObject
+	var gate := level.get_node("Generated/Gates/gate_p2_maintenance") as AccessGate
+	var walkway := level.get_node("Generated/Platforms/p2_maintenance_walkway") as DebugPlatform
+	assert_bool(walkway.is_rule_enabled()).is_false()
+	assert_str(gate._label.text).contains("terminal ACTIVATE")
+	assert_bool(gate.is_open()).is_false()
+	assert_bool(machine.interact()).is_false()
+	var description := economy._service_menu.find_child("ServiceDescription", true, false) as Label
+	assert_str(description.text).contains(machine.machine_label)
+	assert_bool(economy.confirm_service()).is_false()
+	economy.close_service()
+	(level.get_node("Generated/Resources/p2_maintenance_parts") as DebugPickup)._on_body_entered(level._player)
+	assert_bool(machine.interact()).is_false()
+	assert_bool(gate.is_open()).is_false()
+	assert_bool(economy.confirm_service()).is_true()
+	assert_bool(gate.is_open()).is_true()
+	assert_bool(walkway.is_rule_enabled()).is_true()
+	assert_int(level._player.inventory.count("service_parts")).is_equal(0)
+	level.activate_checkpoint(&"paid_gate_test", Vector2(22800, 630))
+	gate.restore_open(false)
+	walkway.set_rule_enabled(false)
+	level.retry_from_checkpoint()
+	assert_bool(gate.is_open()).is_true()
+	assert_bool(walkway.is_rule_enabled()).is_true()
+	assert_int(level._player.inventory.count("service_parts")).is_equal(0)
+	assert_bool(machine.interact()).is_false()
+	assert_bool((level.get_node("Generated/EncounterObservers/p2_collective") as EncounterRuntimeObserver).is_resolved()).is_false()
+
+
+func test_paid_walkway_connects_both_sides_and_collects_visible_ammo() -> void:
+	var level := _level()
+	var economy := level.get_node("Generated/Economy") as WorkshopEconomy
+	var machine := level.get_node("Generated/RuleObjects/p2_maintenance_control") as RuleStateObject
+	var player := level._player
+	player.set_physics_process(false)
+	for node: Node in level.find_children("*", "", true, false):
+		if node is CombatTarget:
+			node.set_process(false)
+		elif node is CeasefireChallenge:
+			node.set_physics_process(false)
+	(level.get_node("Generated/Resources/p2_maintenance_parts") as DebugPickup)._on_body_entered(player)
+	machine.interact()
+	assert_bool(economy.confirm_service()).is_true()
+	await get_tree().physics_frame
+	var before := player.inventory.count("light_ammo")
+	var profile := player.movement_profile
+	var legs: Array = [
+		[Vector2(22530, 583), Vector2(22660, 503), true],
+		[Vector2(22660, 503), Vector2(22530, 583), false],
+		[Vector2(22750, 503), Vector2(22870, 578), false],
+		[Vector2(22870, 578), Vector2(22740, 503), true],
+	]
+	for leg: Array in legs:
+		player.reset_at(leg[0])
+		player.velocity.y = -profile.jump_velocity if bool(leg[2]) else 0.0
+		var target: Vector2 = leg[1]
+		var landed := false
+		for frame: int in 110:
+			player.velocity.x = clampf((target.x - player.position.x) * 10.0, -profile.run_speed, profile.run_speed)
+			player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, profile, 1.0 / 60.0)
+			player.move_and_slide()
+			await get_tree().physics_frame
+			if player.is_on_floor() and player.position.distance_to(target) < 12.0:
+				landed = true
+				break
+		assert_bool(landed).override_failure_message("Paid walkway route %s -> %s stopped at %s" % [leg[0], target, player.position]).is_true()
+	assert_int(player.inventory.count("light_ammo")).is_equal(before + 40)
+	assert_bool((level.get_node("Generated/Gates/gate_p2_collective") as AccessGate).is_open()).is_false()
+	level.activate_checkpoint(&"walkway_reward_test", player.position)
+	level.retry_from_checkpoint()
+	(level.get_node("Generated/Resources/p2_maintenance_ammo") as DebugPickup)._on_body_entered(player)
+	assert_int(player.inventory.count("light_ammo")).is_equal(before + 40)
+
+
+func test_upper_detour_supply_is_physical_and_checkpoint_does_not_duplicate_reward() -> void:
+	var level := _level()
+	var inventory := level._player.inventory
+	var pickup := level.get_node("Generated/Resources/p3_ammo_return_supply") as DebugPickup
+	var before_ammo := inventory.count("heavy_ammo")
+	var before_parts := inventory.count("trade_parts")
+	pickup._on_body_entered(level._player)
+	assert_int(inventory.count("heavy_ammo")).is_equal(before_ammo + 12)
+	assert_int(inventory.count("trade_parts")).is_equal(before_parts + 10)
+	level.activate_checkpoint(&"detour_test", Vector2(30750, 170))
+	level.retry_from_checkpoint()
+	pickup._on_body_entered(level._player)
+	assert_int(inventory.count("heavy_ammo")).is_equal(before_ammo + 12)
+	assert_int(inventory.count("trade_parts")).is_equal(before_parts + 10)
+	assert_bool((level.get_node("Generated/Gates/gate_p3_flank_vertical") as AccessGate).is_open()).is_false()
 
 
 func test_service_station_spacing_and_shared_beacons() -> void:
@@ -141,9 +265,61 @@ func test_checkpoint_restores_inventory_purchases_keys_and_world_together() -> v
 	assert_bool(player.inventory.capture() == expected).is_true()
 
 
+func test_reload_checkpoint_and_json_roundtrip_preserve_partial_reload() -> void:
+	var level := _level()
+	var launcher := level._player.probe_launcher
+	launcher.set_physics_process(false)
+	for shot: int in 4:
+		launcher._fire_probe(0)
+	launcher.advance_weapon_timers(0.25)
+	level.activate_checkpoint(&"reload_test", level._player.position)
+	launcher.advance_weapon_timers(1.0)
+	level.retry_from_checkpoint()
+	assert_float(launcher.reload_remaining(0)).is_equal_approx(0.4, 0.0001)
+	var serialized := JSON.parse_string(JSON.stringify(launcher.capture_weapon_state())) as Dictionary
+	launcher.restore_weapon_state(serialized)
+	assert_int(launcher.magazine_remaining(0, 4)).is_equal(0)
+	assert_float(launcher.reload_remaining(0)).is_equal_approx(0.4, 0.0001)
+	launcher._fire_probe(0)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(116)
+	launcher.restore_weapon_state({})
+	assert_int(launcher.magazine_remaining(0, 4)).is_equal(4)
+	assert_float(launcher.reload_remaining(0)).is_equal(0.0)
+
+
+func test_primary_four_shots_reload_cannot_be_bypassed_by_secondary() -> void:
+	var level := _level()
+	var launcher := level._player.probe_launcher
+	launcher.set_physics_process(false)
+	for shot: int in 4:
+		launcher._fire_probe(0)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(116)
+	assert_int(launcher.magazine_remaining(0, 4)).is_equal(0)
+	assert_float(launcher.reload_remaining(0)).is_equal(0.65)
+	assert_str(level._hud.primary_magazine_text()).contains("[ ][ ][ ][ ]")
+	assert_str(level._hud.primary_magazine_text()).contains("RECARGA")
+	assert_object(level._player.sfx.profile.stream_for(&"reload")).is_not_null()
+	launcher._fire_probe(1)
+	launcher._fire_probe(0)
+	assert_int(level._player.inventory.count("heavy_ammo")).is_equal(15)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(116)
+	launcher.advance_weapon_timers(0.64)
+	launcher._fire_probe(0)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(116)
+	launcher.advance_weapon_timers(0.02)
+	launcher._fire_probe(0)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(115)
+	assert_int(launcher.magazine_remaining(0, 4)).is_equal(3)
+	assert_str(level._hud.primary_magazine_text()).contains("[■][■][■][ ]")
+
+
 func test_two_weapons_consume_distinct_ammo_and_apply_configured_damage() -> void:
 	var level := _level()
 	var launcher := level._player.probe_launcher
+	assert_float(float(level.economy_profile.weapons[0].damage)).is_equal(5.0)
+	assert_float(float(level.economy_profile.weapons[0].cooldown)).is_equal(0.20)
+	assert_float(float(level.economy_profile.weapons[1].damage)).is_equal(14.0)
+	assert_float(float(level.economy_profile.weapons[1].cooldown)).is_equal(0.48)
 	for index: int in 2:
 		launcher._fire_probe(index)
 		var found := false

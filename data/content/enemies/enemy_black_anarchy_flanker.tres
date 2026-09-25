@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyArchetype" load_steps=3 format=3]
+[ext_resource type="Script" path="res://src/content/definitions/enemy_archetype.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/art/actors/balls/world_0/runtime/black_anarchy_ball_visual.tres" id="2"]
+[resource]
+script = ExtResource("1")
+content_id = &"enemy_black_anarchy_flanker"
+display_name = "BlackAnarchy · FLANQUEO"
+actor_scene_path = "res://src/debug/combat_target.tscn"
+maximum_resolve = 75.0
+surrender_resolve_ratio = 0.3
+behavior_id = &"static"
+projectile_damage = 4.0
+patrol_distance = 50.0
+patrol_speed = 40.0
+threat_text = "FLANQUEO AUTÓNOMO · CADA RENDICIÓN ACORTA LA TREGUA"
+visual_definition = ExtResource("2")

@@ -1,10 +1,11 @@
 class_name CeasefireChallengeDefinition
 extends Resource
 
-enum AttackMode { ROTATING_FIRE, CONTACT_RAID }
+enum AttackMode { ROTATING_FIRE, CONTACT_RAID, AUTONOMOUS_FLANK, MARKED_PULSE, MIXED_STAGES }
 
 @export var mode: AttackMode = AttackMode.ROTATING_FIRE
 @export var title: String = "ALTO EL FUEGO"
+@export var compact_actor_hud: bool = false
 @export var duration: float = 35.0
 @export var warning_seconds: float = 1.2
 @export var turn_interval: float = 1.4
@@ -31,6 +32,32 @@ enum AttackMode { ROTATING_FIRE, CONTACT_RAID }
 @export var contact_cooldown: float = 2.0
 @export var theft_effect: PackedScene = preload("res://src/presentation/theft_burst.tscn")
 @export var personal_space: float = 70.0
+@export_range(0, 2, 1) var retreat_cover_count: int = 2
+@export var retreat_cover_radius: float = 700.0
+@export var retreat_cover_cooldown: float = 2.5
+@export var flank_distance: float = 160.0
+@export var encirclement_hold: float = 0.6
+@export var encirclement_cooldown: float = 5.0
+@export var encirclement_bonus: float = 2.0
+@export var encirclement_bonus_cap: float = 6.0
+@export_range(1, 2, 1) var simultaneous_attacks: int = 2
+@export var surrender_time_bonus: float = 3.0
+@export var surrender_bonus_cap: float = 9.0
+@export var pulse_warning: float = 1.5
+@export var pulse_radius: float = 65.0
+@export var pulse_safe_lane_width: float = 120.0
+@export var pulse_vfx: Texture2D = preload("res://assets/art/vfx/world_0/warped_pulse_spark.png")
+@export var pulse_vfx_frames: int = 5
+@export var pulse_vfx_scale: int = 2
+@export var pulse_burst_seconds: float = 0.3
+@export var pulse_damage: float = 3.0
+@export var pulse_push: float = 100.0
+@export var pulse_interval: float = 3.0
+@export var clean_dodge_bonus: float = 1.0
+@export var clean_dodge_cap: float = 8.0
+@export var group_profiles: Array[Resource] = []
+@export var group_sizes := PackedInt32Array()
+@export var stage_delays := PackedFloat32Array()
 @export var stolen_items: Dictionary = {"light_ammo": 8, "trade_parts": 2}
 @export var theft_limit: Dictionary = {"light_ammo": 24, "trade_parts": 6}
 @export var reward_sats: int = 20
@@ -39,6 +66,34 @@ enum AttackMode { ROTATING_FIRE, CONTACT_RAID }
 
 
 func is_valid() -> bool:
+	if pulse_vfx_frames <= 0 or pulse_vfx_scale <= 0 or not is_finite(pulse_burst_seconds) or pulse_burst_seconds <= 0.0:
+		return false
+	if pulse_vfx == null or pulse_vfx.get_width() % pulse_vfx_frames != 0:
+		return false
+	for value: float in [encirclement_hold, encirclement_cooldown]:
+		if not is_finite(value) or value <= 0.0:
+			return false
+	for value: float in [encirclement_bonus, encirclement_bonus_cap]:
+		if not is_finite(value) or value < 0.0:
+			return false
+	if retreat_cover_count < 0 or retreat_cover_count > 2 or not is_finite(retreat_cover_radius) or retreat_cover_radius <= 0.0 or not is_finite(retreat_cover_cooldown) or retreat_cover_cooldown < 0.0:
+		return false
+	if mode == AttackMode.MIXED_STAGES:
+		if group_profiles.is_empty() or group_profiles.size() != group_sizes.size() or group_sizes.size() != stage_delays.size():
+			return false
+		for i: int in group_profiles.size():
+			if not group_profiles[i] is CeasefireChallengeDefinition or group_profiles[i].mode == AttackMode.MIXED_STAGES or not group_profiles[i].is_valid() or group_sizes[i] <= 0 or not is_finite(stage_delays[i]) or stage_delays[i] < 0.0 or (i > 0 and stage_delays[i] < stage_delays[i - 1]):
+				return false
+	for value: float in [pulse_warning, pulse_radius, pulse_interval, pulse_safe_lane_width]:
+		if not is_finite(value) or value <= 0.0:
+			return false
+	for value: float in [pulse_damage, pulse_push, clean_dodge_bonus, clean_dodge_cap]:
+		if not is_finite(value) or value < 0.0:
+			return false
+	if simultaneous_attacks < 1 or simultaneous_attacks > 2 or not is_finite(flank_distance) or flank_distance <= 0.0:
+		return false
+	if not is_finite(surrender_time_bonus) or not is_finite(surrender_bonus_cap) or surrender_time_bonus < 0.0 or surrender_bonus_cap < 0.0:
+		return false
 	if not is_finite(ceasefire_core_fraction) or ceasefire_core_fraction < 0.0 or ceasefire_core_fraction > 0.4:
 		return false
 	for value: float in [retreat_safety_gain, retreat_speed, pursuit_radius, return_speed, home_tolerance, jump_speed, jump_gravity, jump_horizontal_speed, jump_cooldown]:

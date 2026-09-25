@@ -1,11 +1,27 @@
 # Arquitectura de Anarchyball
 
+Rediseño vertical aprobado: `LEVEL_01_VERTICAL_REDESIGN.md`. Cobertura colectiva,
+cerco y corredores serán capacidades configurables, nunca ramas por nombre
+ideológico. Reservas biográficas: metadata editorial, no pickups falsos runtime.
+
 Inventario del taller: `RunInventory` pertenece al jugador y consume un
 `RunEconomyDefinition` de la escena. `WorkshopEconomy` conecta recompensas y
 servicios por IDs, sin ramas ideológicas ni autoload. Los efectos de ambas armas
 siguen pasando por EffectReceiver/TargetValidity. Checkpoint guarda una instantánea
 versionada bajo `world_rule_state.inventory`; snapshots antiguos sin esa clave
 usan una reserva inicial de compatibilidad, sin duplicar pickups ya recogidos.
+
+Los encuentros con robo conservan el total sustraído para el límite global y
+guardan además `stolen_by_actor` por ID estable. `WorldLootDrops` crea una bolsa
+de restitución por participante que haya robado; la transición individual a
+rendición/neutralización la libera. Al resolver la tregua libera las restantes.
+Un checkpoint anterior sin ese desglose usa su bolsa agregada original.
+
+`RunEconomyDefinition.additional_shops` declara terminales adicionales mediante
+IDs estables y posiciones. Todos conectan al mismo `WorkshopEconomy` y al mismo
+`RunInventory`; abrir otra tienda no configura ni reinicia el inventario. La
+tienda original conserva `WorkshopShop` para compatibilidad. Las posiciones se
+validan como finitas, dentro del nivel y no duplicadas.
 
 **Estado:** base arquitectónica v0.1  
 **Motor:** Godot 4.x estable  
@@ -68,6 +84,12 @@ Encounter event
 ```
 
 Ninguna arma, proyectil, trampa, drone o aliado contratado decide por sí mismo si un actor es atacable. `SURRENDERING` invalida el objetivo inmediatamente.
+
+`ProjectileTerrain` comparte el barrido de terreno entre cañones y vuelo de
+ambos proyectiles. Un cuerpo puede declarar `allows_projectile_passage`;
+`DebugPlatform` lo permite solo descendiendo por su cara superior cuando es
+una pasarela delgada. El barrido excluye ese cuerpo y continúa buscando sólidos
+o puertas detrás. La colisión de actores y TargetValidity no cambian.
 
 `EnemyArchetype.blocks_projectiles` controla únicamente la capa física de objetivo
 de proyectiles. Operadores, mecánicos y reclamantes Mutualist la desactivan: los disparos los

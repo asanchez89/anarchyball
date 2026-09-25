@@ -1,0 +1,32 @@
+{
+  "level_id": "w0_01_coalition_workshop",
+  "editorial_only": true,
+  "reservations": [
+    {
+      "id": "archive_niche_p1_office",
+      "status": "prototype_placed",
+      "platform_id": "p1_archive_office_floor",
+      "temporary_reward_id": "archive_niche_p1_office_supply",
+      "author_id": null,
+      "hint": "Oficina sobre la nave; suministros visibles desde el ascenso.",
+      "future_use": "Archivo biográfico opcional; no implementado."
+    },
+    {
+      "id": "archive_niche_p2_records",
+      "status": "prototype_placed",
+      "platform_id": "p2_records_room",
+      "temporary_reward_id": "archive_niche_p2_records_supply",
+      "author_id": null,
+      "hint": "Cuarto de registros tras maquinaria con acceso lateral."
+    },
+    {
+      "id": "archive_niche_p3_reading_room",
+      "status": "prototype_placed",
+      "platform_id": "p3_factory_continuation",
+      "ceiling_platform_id": "p3_raiders_upper",
+      "temporary_reward_id": "archive_niche_p3_reading_room_supply",
+      "author_id": null,
+      "hint": "Nicho bajo la galería, retorno a la ruta principal."
+    }
+  ]
+}

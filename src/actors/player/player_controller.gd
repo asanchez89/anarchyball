@@ -29,6 +29,7 @@ func _ready() -> void:
 	assert(movement_profile != null and movement_profile.is_valid(), "PlayerMovementProfile inválido")
 	_previous_health = health.current_health
 	probe_launcher.probe_fired.connect(_on_probe_fired)
+	probe_launcher.reload_started.connect(_on_reload_started)
 	health.health_changed.connect(_on_health_changed)
 
 
@@ -76,6 +77,10 @@ func _on_health_changed(current: float, _maximum: float) -> void:
 		visual.play_hurt()
 		sfx.play_cue(damage_feedback_cue)
 	_previous_health = current
+
+
+func _on_reload_started(_weapon_index: int) -> void:
+	sfx.play_cue(&"reload")
 
 
 func _on_probe_fired() -> void:

@@ -234,13 +234,15 @@ func _briefing_texture(card: Dictionary) -> Texture2D:
 	if source == null:
 		return null
 	var columns := maxi(int(card.get("image_columns", 1)), 1)
-	if columns == 1:
+	var rows := maxi(int(card.get("image_rows", 1)), 1)
+	if columns == 1 and rows == 1:
 		return source
-	var frame := clampi(int(card.get("image_frame", 0)), 0, columns - 1)
+	var frame := clampi(int(card.get("image_frame", 0)), 0, columns * rows - 1)
 	var frame_width := float(source.get_width()) / float(columns)
+	var frame_height := float(source.get_height()) / float(rows)
 	var atlas := AtlasTexture.new()
 	atlas.atlas = source
-	atlas.region = Rect2(frame_width * frame, 0.0, frame_width, float(source.get_height()))
+	atlas.region = Rect2(frame_width * (frame % columns), frame_height * floori(float(frame) / columns), frame_width, frame_height)
 	return atlas
 
 

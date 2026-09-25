@@ -5,7 +5,7 @@
 script = ExtResource("2")
 mode = 0
 title = "ANCOM · PRESIÓN COLECTIVA"
-duration = 35.0
+duration = 15.0
 ceasefire_core_fraction = 0.15
 any_surrender_resolves = true
 collective_commitment = true

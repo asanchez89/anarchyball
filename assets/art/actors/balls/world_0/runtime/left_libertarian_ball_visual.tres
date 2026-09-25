@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BallVisualDefinition" load_steps=5 format=3]
+[ext_resource type="Script" path="res://src/presentation/ball_visual_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/art/actors/balls/world_0/runtime/left_libertarian_animation_v2.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/vfx/world_0/anarchy_front_cannon.png" id="3"]
+[sub_resource type="AtlasTexture" id="RegisteredSheet"]
+atlas = ExtResource("2")
+region = Rect2(0, 30, 1252, 1200)
+
+[resource]
+script = ExtResource("1")
+visual_id = &"left_libertarian_ball"
+animation_atlas = SubResource("RegisteredSheet")
+action_equipment = ExtResource("3")
+cell_size = Vector2i(313, 300)
+animation_columns = 4
+animation_rows = {"idle": 0, "move": 1, "jump": 1, "action": 2, "threatening": 2, "hurt": 3, "surrendering": 3, "neutralized": 3}
+fit_visible_frame_height = 86.0
+frame_body_bounds = Array[Rect2]([Rect2(45, 72, 225, 208), Rect2(36, 71, 230, 209), Rect2(34, 72, 232, 208), Rect2(35, 72, 230, 208), Rect2(42, 75, 230, 206), Rect2(24, 80, 240, 204), Rect2(32, 87, 234, 195), Rect2(33, 70, 228, 210), Rect2(42, 68, 229, 216), Rect2(36, 67, 232, 217), Rect2(32, 70, 231, 214), Rect2(31, 68, 234, 215), Rect2(44, 55, 227, 220), Rect2(34, 56, 233, 219), Rect2(31, 56, 234, 218), Rect2(31, 56, 234, 219)])
+runtime_body_size = Vector2(76, 76)
+source_facing_direction = -1

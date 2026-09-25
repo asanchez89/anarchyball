@@ -4,45 +4,57 @@
   "display_name": "Nivel 1 · Taller y coordinación (avance)",
   "slice": {
     "title": "ASOCIACIONES BAJO ASEDIO · AVANCE",
-    "objective": "Libera tres puestos policiales, recoge contratos sociales y véndelos en la tienda. Después paga el servicio Mutualist y explora el taller.",
-    "intro": "Versión en construcción: taller completo y primer desafío acumulativo BlackAnarchy. LeftLibertarian y el jefe aún no forman parte de este recorrido.",
-    "completion": "Fin del avance jugable: taller y coordinación. La tercera parte y el jefe siguen en producción; esto no completa el nivel definitivo.",
+    "objective": "Recorre las tres naves del taller y busca rutas, aliados y suministros.",
+    "intro": "El taller comunal resiste la ocupación. Cada grupo defiende su propia forma de libertad.",
+    "completion": "Taller recorrido. Zona segura previa al jefe: puedes reponer suministros en el ATM. El jefe no forma parte de esta entrega.",
     "briefing_cards": [
       {
         "title": "Reconocimiento: taller comunal",
-        "body": "Primaria: clic izquierdo / RT. Secundaria: clic derecho / LT. Supera tres puestos policiales: 1, 2 y 3 unidades. Recoge los contratos sociales abandonados. Después, F / X abre la tienda para venderlos por sats y comprar munición o salud. Más adelante encontrarás las otras balls y la llave del ascensor."
+        "body": "Armas: clic / RT y clic derecho / LT. Interactúa: F / X. Explora arriba y abajo."
       },
       {
         "title": "PoliceBall de ocupación",
-        "body": "Unidad hostil cuando ejecuta una detención o confiscación. Ataca con frecuencia y no se rinde: reduce su Resolve para neutralizarla y dejar de recibir fuego.",
+        "body": "Orden estatal: impone la ocupación por la fuerza.",
         "image_path": "res://assets/art/actors/balls/world_0/runtime/occupancy_enforcer_ball_keyposes.png",
         "image_columns": 8,
         "image_frame": 0
       },
       {
         "title": "AncomBall",
-        "body": "El primer colectivo tiene 3 integrantes. Atacan por turnos; las heridas se retiran junto a un camarada lejano, sin reemplazo. Una rendición retira al grupo. También puedes resistir 35 segundos dentro del área central del combate: quedarte en los bordes pausa la tregua sin borrar tu progreso. El aviso indica hacia dónde avanzar. Sobrevivir sin causar daño da sats extra.",
+        "body": "Apoyo mutuo: el colectivo protege a cada integrante.",
         "image_path": "res://assets/art/actors/balls/world_0/runtime/ancom_ball_keyposes.png",
         "image_columns": 8,
         "image_frame": 0
       },
       {
         "title": "EgoistBall",
-        "body": "Saqueadores ágiles que saltan y roban al contacto tras advertir. No toman llaves ni componentes de misión. Si te alejas de su puesto regresan caminando y saltando, sin curarse; al volver a cruzarte avisan de nuevo. Resiste 26 segundos bajo presión o ríndelos a todos. Alejarte pausa la tregua. Recuperas lo robado al resolver.",
+        "body": "Interés propio: cada ball persigue lo que desea.",
         "image_path": "res://assets/art/actors/balls/world_0/runtime/egoist_ball_keyposes.png",
         "image_columns": 8,
         "image_frame": 0
       },
       {
         "title": "MutualistBall",
-        "body": "La prensa ocupada no se puede tomar. La alimentación alternativa cuesta 10 componentes de servicio: el lote está antes de la máquina y no puede venderse. El pago es único. El primer ascensor lleva a munición y una llave; la llave abre la puerta de producción más adelante.",
+        "body": "Reciprocidad e intercambio: sus acuerdos mantienen vivo el taller.",
         "image_path": "res://assets/art/actors/balls/world_0/runtime/mutualist_ball_keyposes.png",
         "image_columns": 8,
         "image_frame": 0
       },
       {
-        "title": "BlackAnarchy · relevo local",
-        "body": "Una redada puede cortar la señal central de dos equipos. Delega desde cada terminal para que su equipo siga operando. La alimentación Mutualist sigue siendo necesaria."
+        "title": "BlackAnarchy · flanqueo autónomo",
+        "body": "Sin mando central: cada ball decide y actúa por sí misma.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/black_anarchy_animation_v2.png",
+        "image_columns": 4,
+        "image_frame": 0,
+        "image_rows": 4
+      },
+      {
+        "title": "LeftLibertarian · marcas de acceso",
+        "body": "Libertad y acceso justo: nadie debe acaparar el espacio común.",
+        "image_path": "res://assets/art/actors/balls/world_0/runtime/left_libertarian_animation_v2.png",
+        "image_columns": 4,
+        "image_frame": 0,
+        "image_rows": 4
       }
     ]
   },
@@ -51,11 +63,11 @@
     "y": 606
   },
   "exit": {
-    "x": 19680,
-    "y": 586
+    "x": 40000,
+    "y": 610
   },
   "bounds": {
-    "width": 19900,
+    "width": 40300,
     "height": 720
   },
   "movement_profile_path": "res://data/player/default_movement_profile.tres",
@@ -64,14 +76,212 @@
     "rule_occupancy_and_use"
   ],
   "platforms": [
-    {"id": "depot_patrol_deck", "x": 6550, "y": 550, "width": 220, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "dispatch_patrol_deck", "x": 12530, "y": 570, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_patrol_deck", "x": 19450, "y": 530, "width": 200, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_collective_lower", "x": 18690, "y": 345, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_collective_upper", "x": 18920, "y": 265, "width": 210, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_backtrack_low", "x": 17960, "y": 570, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_backtrack_mid", "x": 17810, "y": 490, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
-    {"id": "crew_backtrack_high", "x": 17660, "y": 415, "width": 120, "height": 24, "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"},
+    {
+      "id": "depot_patrol_deck",
+      "x": 6550,
+      "y": 550,
+      "width": 220,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_patrol_deck",
+      "x": 12530,
+      "y": 570,
+      "width": 210,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_patrol_deck",
+      "x": 19450,
+      "y": 530,
+      "width": 200,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_collective_lower",
+      "x": 18690,
+      "y": 345,
+      "width": 210,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_collective_upper",
+      "x": 18920,
+      "y": 265,
+      "width": 210,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_backtrack_low",
+      "x": 17960,
+      "y": 570,
+      "width": 120,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_backtrack_mid",
+      "x": 17810,
+      "y": 490,
+      "width": 120,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_backtrack_high",
+      "x": 17660,
+      "y": 415,
+      "width": 120,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "depot_permanent_return",
+      "x": 8230,
+      "y": 500,
+      "width": 150,
+      "height": 24,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_collective_return",
+      "x": 14390,
+      "y": 500,
+      "width": 130,
+      "height": 24,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_exit_descent_high",
+      "x": 15760,
+      "y": 350,
+      "width": 100,
+      "height": 370,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_exit_descent_mid",
+      "x": 15860,
+      "y": 425,
+      "width": 100,
+      "height": 295,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_exit_descent_low",
+      "x": 15960,
+      "y": 500,
+      "width": 100,
+      "height": 220,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_exit_descent_last",
+      "x": 16060,
+      "y": 575,
+      "width": 140,
+      "height": 145,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_exit_return_low",
+      "x": 19660,
+      "y": 570,
+      "width": 120,
+      "height": 150,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_upper_call_landing",
+      "x": 4310,
+      "y": 350,
+      "width": 160,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "storage_upper_call_landing",
+      "x": 9630,
+      "y": 335,
+      "width": 120,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "dispatch_upper_call_landing",
+      "x": 14420,
+      "y": 335,
+      "width": 140,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "crew_upper_call_landing",
+      "x": 16720,
+      "y": 345,
+      "width": 120,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
     {
       "id": "ground_arrival",
       "x": 0,
@@ -126,7 +336,7 @@
       "id": "production_step_two",
       "x": 4580,
       "y": 500,
-      "width": 280,
+      "width": 140,
       "height": 220,
       "required": true,
       "route_tags": [],
@@ -135,9 +345,9 @@
     {
       "id": "production_upper",
       "x": 4860,
-      "y": 425,
+      "y": 350,
       "width": 480,
-      "height": 295,
+      "height": 370,
       "required": true,
       "route_tags": [],
       "art_style": "column_supported"
@@ -145,9 +355,9 @@
     {
       "id": "production_descent",
       "x": 5340,
-      "y": 500,
+      "y": 425,
       "width": 320,
-      "height": 220,
+      "height": 295,
       "required": true,
       "route_tags": [],
       "art_style": "column_supported"
@@ -155,18 +365,18 @@
     {
       "id": "production_return",
       "x": 5660,
-      "y": 575,
+      "y": 500,
       "width": 300,
-      "height": 145,
+      "height": 220,
       "required": true,
       "route_tags": [],
       "art_style": "column_supported"
     },
     {
       "id": "ground_checkpoint_one",
-      "x": 5960,
+      "x": 6180,
       "y": 650,
-      "width": 440,
+      "width": 220,
       "height": 70,
       "required": true,
       "route_tags": [],
@@ -285,9 +495,9 @@
     {
       "id": "storage_step_three",
       "x": 10210,
-      "y": 425,
+      "y": 410,
       "width": 240,
-      "height": 295,
+      "height": 24,
       "required": true,
       "route_tags": [],
       "art_style": "column_supported"
@@ -297,7 +507,7 @@
       "x": 10450,
       "y": 350,
       "width": 540,
-      "height": 370,
+      "height": 24,
       "required": true,
       "route_tags": [],
       "art_style": "column_supported"
@@ -490,18 +700,6 @@
       "required": false,
       "route_tags": [
         "current_use_observation"
-      ],
-      "art_style": "column_supported"
-    },
-    {
-      "id": "platform_disputed_mill",
-      "x": 5460,
-      "y": 420,
-      "width": 190,
-      "height": 24,
-      "required": false,
-      "route_tags": [
-        "title_claim_dispute"
       ],
       "art_style": "column_supported"
     },
@@ -826,6 +1024,554 @@
         "baseline_bypass"
       ],
       "art_style": "column_supported"
+    },
+    {
+      "id": "part_two_factory_floor",
+      "x": 19900,
+      "y": 650,
+      "width": 1200,
+      "height": 70,
+      "required": true,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_step_one",
+      "x": 21100, "y": 575, "width": 120, "height": 145,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_step_two",
+      "x": 21220, "y": 500, "width": 120, "height": 220,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_step_three",
+      "x": 21340, "y": 425, "width": 120, "height": 295,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_gallery",
+      "x": 21460, "y": 350, "width": 760, "height": 370,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_return_high",
+      "x": 22220, "y": 425, "width": 120, "height": 295,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_return_mid",
+      "x": 22340, "y": 500, "width": 120, "height": 220,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_assembly_return_low",
+      "x": 22460, "y": 575, "width": 120, "height": 145,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_factory_continuation",
+      "x": 22580, "y": 650, "width": 5620, "height": 70,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_police_entry_deck",
+      "x": 20470,
+      "y": 570,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_flank_intro_deck",
+      "x": 21570,
+      "y": 270,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_maintenance_walkway",
+      "x": 22580,
+      "y": 495,
+      "width": 220,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_collective_entry_cover",
+      "x": 22820,
+      "y": 570,
+      "width": 120,
+      "height": 150,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_collective_deck",
+      "x": 22970,
+      "y": 570,
+      "width": 480,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_raiders_deck",
+      "x": 24470,
+      "y": 570,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_flank_vertical_deck",
+      "x": 25870,
+      "y": 570,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_police_exit_deck",
+      "x": 27270,
+      "y": 570,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "part_three_factory_floor",
+      "x": 28200,
+      "y": 650,
+      "width": 1800,
+      "height": 70,
+      "required": true,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_pulse_intro_lower",
+      "x": 28720,
+      "y": 570,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_flank_vertical_lower",
+      "x": 30120,
+      "y": 500,
+      "width": 120,
+      "height": 220,
+      "required": true,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_flank_vertical_upper",
+      "x": 30450,
+      "y": 270,
+      "width": 250,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_climb_entry",
+      "x": 30000, "y": 575, "width": 120, "height": 145,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_climb_high",
+      "x": 30240, "y": 425, "width": 120, "height": 295,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_transfer_gallery",
+      "x": 30360, "y": 350, "width": 700, "height": 370,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_descent_high",
+      "x": 31060, "y": 425, "width": 120, "height": 295,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_descent_mid",
+      "x": 31180, "y": 500, "width": 120, "height": 220,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_descent_low",
+      "x": 31300, "y": 575, "width": 120, "height": 145,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_factory_continuation",
+      "x": 31420, "y": 650, "width": 8880, "height": 70,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_ammo_return",
+      "x": 30680, "y": 190, "width": 140, "height": 24,
+      "required": false, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_collective_lower",
+      "x": 31570,
+      "y": 570,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_collective_upper",
+      "x": 31850,
+      "y": 490,
+      "width": 250,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_raiders_lower",
+      "x": 33170,
+      "y": 570,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_raiders_upper",
+      "x": 33450,
+      "y": 490,
+      "width": 250,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_pulse_advanced_lower",
+      "x": 34670,
+      "y": 570,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_pulse_advanced_upper",
+      "x": 34950,
+      "y": 490,
+      "width": 250,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_pulse_exit_gallery",
+      "x": 35200,
+      "y": 490,
+      "width": 360,
+      "height": 230,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_pulse_exit_return",
+      "x": 35560,
+      "y": 570,
+      "width": 180,
+      "height": 150,
+      "required": true,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p3_police_lower",
+      "x": 36020,
+      "y": 570,
+      "width": 260,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_marker_post",
+      "x": 37710,
+      "y": 490,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": ["baseline_bypass"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_lower",
+      "x": 37590,
+      "y": 570,
+      "width": 560,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_exit_gallery",
+      "x": 38470,
+      "y": 490,
+      "width": 500,
+      "height": 230,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_exit_return",
+      "x": 38970,
+      "y": 570,
+      "width": 180,
+      "height": 150,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_upper",
+      "x": 38170,
+      "y": 490,
+      "width": 300,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "coalition_service_perch",
+      "x": 37940,
+      "y": 410,
+      "width": 240,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_heavy_cache",
+      "x": 26350,
+      "y": 410,
+      "width": 110,
+      "height": 24,
+      "required": false,
+      "route_tags": ["optional_salvage"],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_flank_exit_riser",
+      "x": 26380,
+      "y": 490,
+      "width": 200,
+      "height": 230,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_flank_exit_return",
+      "x": 26580,
+      "y": 570,
+      "width": 180,
+      "height": 150,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p2_flank_vertical_upper",
+      "x": 26200,
+      "y": 490,
+      "width": 180,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "baseline_bypass"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_climb_middle",
+      "x": 4720,
+      "y": 425,
+      "width": 140,
+      "height": 295,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "production_descent_last",
+      "x": 5960,
+      "y": 575,
+      "width": 220,
+      "height": 145,
+      "required": true,
+      "route_tags": [],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p1_archive_office_floor",
+      "x": 4970,
+      "y": 200,
+      "width": 210,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "optional_salvage"
+      ],
+      "art_style": "column_supported"
+    },
+    {
+      "id": "p1_salvage_underpass_entry",
+      "x": 10210, "y": 575, "width": 160, "height": 145,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p1_salvage_underpass",
+      "x": 10370, "y": 650, "width": 480, "height": 70,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "road"
+    },
+    {
+      "id": "p1_salvage_back_wall",
+      "x": 10850, "y": 374, "width": 140, "height": 346,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_raid_exit_riser",
+      "x": 33700, "y": 490, "width": 240, "height": 230,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_raid_exit_return",
+      "x": 33940, "y": 570, "width": 180, "height": 150,
+      "required": true, "route_tags": ["baseline_bypass"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_salvage_access",
+      "x": 34760, "y": 410, "width": 170, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p3_salvage_gallery",
+      "x": 34560, "y": 330, "width": 180, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_repair_cache_step",
+      "x": 23850, "y": 570, "width": 180, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_repair_cache",
+      "x": 23650, "y": 490, "width": 180, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_records_access",
+      "x": 26000, "y": 410, "width": 180, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_records_return",
+      "x": 25780, "y": 330, "width": 200, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p2_records_room",
+      "x": 25520, "y": 330, "width": 260, "height": 24,
+      "required": false, "route_tags": ["optional_salvage"], "art_style": "column_supported"
+    },
+    {
+      "id": "p1_archive_office_step",
+      "x": 4820,
+      "y": 275,
+      "width": 150,
+      "height": 24,
+      "required": false,
+      "route_tags": [
+        "optional_salvage"
+      ],
+      "art_style": "column_supported"
     }
   ],
   "actors": [
@@ -852,6 +1598,24 @@
       "archetype_id": "npc_mutualist_mechanic",
       "x": 16580,
       "y": 610
+    },
+    {
+      "id": "p2_maintenance_mutualist",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 22400,
+      "y": 480
+    },
+    {
+      "id": "p3_maintenance_mutualist",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 29570,
+      "y": 630
+    },
+    {
+      "id": "coalition_mutualist",
+      "archetype_id": "npc_mutualist_mechanic",
+      "x": 37300,
+      "y": 630
     }
   ],
   "encounters": [
@@ -868,7 +1632,7 @@
       "id": "encounter_production_pressure",
       "definition_id": "encounter_occupancy_dispute",
       "x": 5220,
-      "y": 405
+      "y": 330
     },
     {
       "id": "encounter_depot_patrol",
@@ -876,7 +1640,20 @@
       "x": 6400,
       "y": 630,
       "enemy_count": 3,
-      "enemy_positions": [{"x": 6480, "y": 630}, {"x": 6660, "y": 550}, {"x": 6970, "y": 575}],
+      "enemy_positions": [
+        {
+          "x": 6480,
+          "y": 630
+        },
+        {
+          "x": 6660,
+          "y": 550
+        },
+        {
+          "x": 6970,
+          "y": 575
+        }
+      ],
       "resolution_platform_ids": [
         "depot_service_walkway"
       ],
@@ -905,7 +1682,32 @@
       "x": 12450,
       "y": 630,
       "enemy_count": 6,
-      "enemy_positions": [{"x": 12480, "y": 650}, {"x": 12580, "y": 570}, {"x": 12690, "y": 570}, {"x": 12710, "y": 650}, {"x": 12810, "y": 490}, {"x": 12910, "y": 490}],
+      "enemy_positions": [
+        {
+          "x": 12480,
+          "y": 650
+        },
+        {
+          "x": 12580,
+          "y": 570
+        },
+        {
+          "x": 12690,
+          "y": 570
+        },
+        {
+          "x": 12710,
+          "y": 650
+        },
+        {
+          "x": 12810,
+          "y": 490
+        },
+        {
+          "x": 12910,
+          "y": 490
+        }
+      ],
       "resolution_platform_ids": [
         "dispatch_service_walkway"
       ],
@@ -953,7 +1755,36 @@
       "x": 18670,
       "y": 405,
       "enemy_count": 7,
-      "enemy_positions": [{"x": 18660, "y": 425}, {"x": 18730, "y": 345}, {"x": 18840, "y": 345}, {"x": 18960, "y": 265}, {"x": 19070, "y": 265}, {"x": 19000, "y": 400}, {"x": 19140, "y": 350}],
+      "enemy_positions": [
+        {
+          "x": 18660,
+          "y": 425
+        },
+        {
+          "x": 18730,
+          "y": 345
+        },
+        {
+          "x": 18840,
+          "y": 345
+        },
+        {
+          "x": 18960,
+          "y": 265
+        },
+        {
+          "x": 19070,
+          "y": 265
+        },
+        {
+          "x": 19000,
+          "y": 400
+        },
+        {
+          "x": 19140,
+          "y": 350
+        }
+      ],
       "required_for_completion": true,
       "resolution_platform_ids": [
         "crew_truce_walkway"
@@ -986,6 +1817,329 @@
       "enemy_count": 3,
       "resolution_gate_id": "gate_arrival_squad",
       "required_for_completion": true
+    },
+    {
+      "id": "p2_police_entry",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 20400,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 20400,
+          "y": 630
+        },
+        {
+          "x": 20520,
+          "y": 550
+        },
+        {
+          "x": 20640,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_police_entry"
+    },
+    {
+      "id": "p2_flank_intro",
+      "definition_id": "encounter_black_anarchy_flank",
+      "x": 21500,
+      "y": 330,
+      "enemy_count": 2,
+      "enemy_positions": [
+        {
+          "x": 21500,
+          "y": 330
+        },
+        {
+          "x": 21620,
+          "y": 250
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_flank_intro"
+    },
+    {
+      "id": "p2_collective",
+      "definition_id": "encounter_ancom_collective",
+      "x": 22900,
+      "y": 630,
+      "enemy_count": 4,
+      "enemy_positions": [
+        {
+          "x": 22900,
+          "y": 630
+        },
+        {
+          "x": 23020,
+          "y": 550
+        },
+        {
+          "x": 23140,
+          "y": 630
+        },
+        {
+          "x": 23260,
+          "y": 550
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_collective"
+    },
+    {
+      "id": "p2_raiders",
+      "definition_id": "encounter_egoist_raiders",
+      "x": 24400,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 24400,
+          "y": 630
+        },
+        {
+          "x": 24520,
+          "y": 550
+        },
+        {
+          "x": 24640,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_raiders"
+    },
+    {
+      "id": "p2_flank_vertical",
+      "definition_id": "encounter_black_anarchy_flank",
+      "x": 25800,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 25800,
+          "y": 630
+        },
+        {
+          "x": 25920,
+          "y": 550
+        },
+        {
+          "x": 26240,
+          "y": 470
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_flank_vertical"
+    },
+    {
+      "id": "p2_police_exit",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 27200,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 27200,
+          "y": 630
+        },
+        {
+          "x": 27320,
+          "y": 550
+        },
+        {
+          "x": 27440,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p2_police_exit"
+    },
+    {
+      "id": "p3_pulse_intro",
+      "definition_id": "encounter_left_libertarian_pulse",
+      "x": 28650,
+      "y": 630,
+      "enemy_count": 2,
+      "enemy_positions": [
+        {
+          "x": 28650,
+          "y": 630
+        },
+        {
+          "x": 28910,
+          "y": 550
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_pulse_intro"
+    },
+    {
+      "id": "p3_flank_vertical",
+      "definition_id": "encounter_black_anarchy_flank",
+      "x": 30100,
+      "y": 555,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 30100,
+          "y": 555
+        },
+        {
+          "x": 30300,
+          "y": 405
+        },
+        {
+          "x": 30530,
+          "y": 250
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_flank_vertical"
+    },
+    {
+      "id": "p3_collective",
+      "definition_id": "encounter_ancom_collective",
+      "x": 31500,
+      "y": 630,
+      "enemy_count": 5,
+      "enemy_positions": [
+        {
+          "x": 31500,
+          "y": 630
+        },
+        {
+          "x": 31620,
+          "y": 550
+        },
+        {
+          "x": 31745,
+          "y": 550
+        },
+        {
+          "x": 31865,
+          "y": 470
+        },
+        {
+          "x": 31985,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_collective"
+    },
+    {
+      "id": "p3_raiders",
+      "definition_id": "encounter_egoist_raiders",
+      "x": 33100,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 33100,
+          "y": 630
+        },
+        {
+          "x": 33320,
+          "y": 550
+        },
+        {
+          "x": 33520,
+          "y": 470
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_raiders"
+    },
+    {
+      "id": "p3_pulse_advanced",
+      "definition_id": "encounter_left_libertarian_pulse",
+      "x": 34600,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 34600,
+          "y": 630
+        },
+        {
+          "x": 34780,
+          "y": 550
+        },
+        {
+          "x": 35010,
+          "y": 470
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_pulse_advanced"
+    },
+    {
+      "id": "p3_police",
+      "definition_id": "encounter_occupancy_dispute",
+      "x": 35950,
+      "y": 630,
+      "enemy_count": 3,
+      "enemy_positions": [
+        {
+          "x": 35950,
+          "y": 630
+        },
+        {
+          "x": 36130,
+          "y": 550
+        },
+        {
+          "x": 36330,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_police"
+    },
+    {
+      "id": "p3_final_coalition",
+      "definition_id": "encounter_workshop_coalition",
+      "x": 37400,
+      "y": 630,
+      "enemy_count": 8,
+      "enemy_positions": [
+        {
+          "x": 37400,
+          "y": 630
+        },
+        {
+          "x": 37870,
+          "y": 550
+        },
+        {
+          "x": 37540,
+          "y": 630
+        },
+        {
+          "x": 38050,
+          "y": 550
+        },
+        {
+          "x": 37670,
+          "y": 550
+        },
+        {
+          "x": 38220,
+          "y": 470
+        },
+        {
+          "x": 37780,
+          "y": 470
+        },
+        {
+          "x": 38400,
+          "y": 630
+        }
+      ],
+      "required_for_completion": true,
+      "resolution_gate_id": "gate_p3_final_coalition"
     }
   ],
   "resources": [
@@ -1020,7 +2174,7 @@
     {
       "id": "pickup_depot_ammo",
       "kind": "supply",
-      "x": 6140,
+      "x": 6300,
       "y": 615,
       "ownership": "unowned_collectible"
     },
@@ -1105,6 +2259,124 @@
       "ownership": "permitted_salvage",
       "effect_id": "health_restore",
       "effect_amount": 30
+    },
+    {
+      "id": "pickup_part_two_health",
+      "kind": "pickup",
+      "x": 23720,
+      "y": 615,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 35
+    },
+    {
+      "id": "pickup_p3_health",
+      "kind": "pickup",
+      "x": 32720,
+      "y": 615,
+      "ownership": "permitted_salvage",
+      "effect_id": "health_restore",
+      "effect_amount": 40
+    },
+    {
+      "id": "pickup_p2_ammo",
+      "kind": "supply",
+      "x": 21280,
+      "y": 465,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_p2_ammo_late",
+      "kind": "supply",
+      "x": 25350,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_p3_ammo",
+      "kind": "supply",
+      "x": 28400,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p3_ammo_return_supply",
+      "kind": "supply", "x": 30750, "y": 155,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_p3_ammo_late",
+      "kind": "supply",
+      "x": 32850,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p2_maintenance_ammo",
+      "kind": "supply",
+      "x": 22660,
+      "y": 460,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p2_maintenance_parts",
+      "kind": "supply",
+      "x": 22280,
+      "y": 390,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p3_maintenance_parts",
+      "kind": "supply",
+      "x": 29650,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "coalition_service_parts",
+      "kind": "supply",
+      "x": 36900,
+      "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "pickup_p2_upper_reward",
+      "kind": "supply",
+      "x": 26400,
+      "y": 375,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p1_salvage_underpass_supply",
+      "kind": "supply", "x": 10750, "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "archive_niche_p3_reading_room_supply",
+      "kind": "supply", "x": 33610, "y": 615,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p3_salvage_gallery_supply",
+      "kind": "supply", "x": 34630, "y": 295,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "p2_repair_cache_supply",
+      "kind": "health_cache", "x": 23740, "y": 455,
+      "ownership": "permitted_salvage", "effect_id": "health_restore", "effect_amount": 25
+    },
+    {
+      "id": "archive_niche_p2_records_supply",
+      "kind": "supply", "x": 25590, "y": 295,
+      "ownership": "permitted_salvage"
+    },
+    {
+      "id": "archive_niche_p1_office_supply",
+      "kind": "supply",
+      "x": 5090,
+      "y": 165,
+      "ownership": "permitted_salvage"
     }
   ],
   "sections": [
@@ -1137,6 +2409,16 @@
       "id": "part_two_coordination",
       "from_x": 16200,
       "to_x": 19900
+    },
+    {
+      "id": "part_two_autonomous_workshop",
+      "from_x": 19900,
+      "to_x": 28200
+    },
+    {
+      "id": "part_three_access_workshop",
+      "from_x": 28200,
+      "to_x": 40300
     }
   ],
   "checkpoints": [
@@ -1167,6 +2449,41 @@
       "y": 630,
       "respawn_x": 16240,
       "respawn_y": 600
+    },
+    {
+      "id": "checkpoint_part_two_supply",
+      "x": 23600,
+      "y": 630,
+      "respawn_x": 23600,
+      "respawn_y": 610
+    },
+    {
+      "id": "checkpoint_part_three_entry",
+      "x": 28260,
+      "y": 630,
+      "respawn_x": 28230,
+      "respawn_y": 610
+    },
+    {
+      "id": "checkpoint_part_three_supply",
+      "x": 32600,
+      "y": 630,
+      "respawn_x": 32550,
+      "respawn_y": 610
+    },
+    {
+      "id": "checkpoint_final_safe",
+      "x": 39210,
+      "y": 630,
+      "respawn_x": 39210,
+      "respawn_y": 610
+    },
+    {
+      "id": "checkpoint_before_coalition",
+      "x": 37010,
+      "y": 630,
+      "respawn_x": 36980,
+      "respawn_y": 610
     }
   ],
   "gates": [
@@ -1192,7 +2509,7 @@
     {
       "id": "gate_dispatch",
       "x": 16090,
-      "y": 558,
+      "y": 503,
       "width": 42,
       "height": 144,
       "required_tag": "encounter_resolution",
@@ -1227,10 +2544,10 @@
     },
     {
       "id": "gate_encounter_storage_cache",
-      "x": 9700,
-      "y": 540,
+      "x": 9800,
+      "y": 503,
       "width": 42,
-      "height": 300,
+      "height": 144,
       "required_tag": "encounter_resolution",
       "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
     },
@@ -1245,19 +2562,19 @@
     },
     {
       "id": "gate_encounter_dispatch_egoist",
-      "x": 14500,
-      "y": 475,
+      "x": 14580,
+      "y": 503,
       "width": 42,
-      "height": 300,
+      "height": 144,
       "required_tag": "encounter_resolution",
       "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
     },
     {
       "id": "gate_crew_ancom",
       "x": 19740,
-      "y": 520,
+      "y": 498,
       "width": 42,
-      "height": 300,
+      "height": 144,
       "required_tag": "encounter_resolution",
       "label": "COLECTIVO · RESISTE O FUERZA UNA RENDICIÓN"
     },
@@ -1269,6 +2586,141 @@
       "height": 300,
       "required_tag": "encounter_resolution",
       "label": "SAQUEADORES · RESISTE O HAZLOS RENDIR"
+    },
+    {
+      "id": "gate_p2_police_entry",
+      "x": 21000,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "PUESTO POLICIAL · RESPONDE A LA AGRESIÓN"
+    },
+    {
+      "id": "gate_p2_flank_intro",
+      "x": 22100,
+      "y": 278,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "FLANQUEO · RESISTE O RINDE A CADA BALL"
+    },
+    {
+      "id": "gate_p2_collective",
+      "x": 23500,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "COLECTIVO · AVANZA HASTA EL CENTRO"
+    },
+    {
+      "id": "gate_p2_raiders",
+      "x": 25000,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "SAQUEO · ESQUIVA Y RECUPERA LO ROBADO"
+    },
+    {
+      "id": "gate_p2_flank_vertical",
+      "x": 26480,
+      "y": 418,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "FLANQUEO · RESISTE O RINDE A CADA BALL"
+    },
+    {
+      "id": "gate_p2_police_exit",
+      "x": 27800,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "PUESTO POLICIAL · RESPONDE A LA AGRESIÓN"
+    },
+    {
+      "id": "gate_p3_pulse_intro",
+      "x": 29430,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "PULSOS · ABANDONA LA MARCA"
+    },
+    {
+      "id": "gate_p3_flank_vertical",
+      "x": 30880,
+      "y": 278,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "FLANQUEO · RENDICIONES INDIVIDUALES"
+    },
+    {
+      "id": "gate_p3_collective",
+      "x": 32280,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "COLECTIVO · RETIRADA HACIA SUS CAMARADAS"
+    },
+    {
+      "id": "gate_p3_raiders",
+      "x": 33880,
+      "y": 418,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "SAQUEO · RESISTE O RÍNDELOS"
+    },
+    {
+      "id": "gate_p3_pulse_advanced",
+      "x": 35380,
+      "y": 418,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "PULSOS · ABANDONA LA MARCA"
+    },
+    {
+      "id": "gate_p3_police",
+      "x": 36730,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "POLICÍA · AGRE­SIÓN OBSERVABLE"
+    },
+    {
+      "id": "gate_p2_maintenance",
+      "x": 22700,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "mechanical_service",
+      "label": "SERVICIO MUTUALIST · PAGA EN LA TERMINAL"
+    },
+    {
+      "id": "gate_p3_maintenance",
+      "x": 29930,
+      "y": 578,
+      "width": 42,
+      "height": 144,
+      "required_tag": "mechanical_service",
+      "label": "SERVICIO MUTUALIST · PAGA EN LA TERMINAL"
+    },
+    {
+      "id": "gate_p3_final_coalition",
+      "x": 38820,
+      "y": 418,
+      "width": 42,
+      "height": 144,
+      "required_tag": "encounter_resolution",
+      "label": "ASOCIACIONES · RESUELVE LA TREGUA COMPARTIDA"
     }
   ],
   "rule_objects": [
@@ -1289,7 +2741,7 @@
       "id": "control_production_transfer",
       "hook_id": "occupancy_machine",
       "x": 5110,
-      "y": 405,
+      "y": 330,
       "initial_state": "abandoned",
       "target_platform_ids": [
         "production_transfer"
@@ -1408,6 +2860,93 @@
       "interaction_tag": "occupy_machine",
       "label": "ALIMENTACIÓN · EQUIPOS",
       "hint": "F / X: encender elevador y ambos equipos"
+    },
+    {
+      "id": "p2_maintenance_control",
+      "hook_id": "occupancy_machine",
+      "x": 22520,
+      "y": 555,
+      "initial_state": "abandoned",
+      "target_platform_ids": ["p2_maintenance_walkway"],
+      "interaction_tag": "occupy_machine",
+      "label": "MANTENIMIENTO · PASARELA Y MUNICIÓN",
+      "hint": "F / X: pagar · desplegar ruta alta y abrir compuerta",
+      "service_gate_id": "gate_p2_maintenance"
+    },
+    {
+      "id": "p3_maintenance_control",
+      "hook_id": "occupancy_machine",
+      "x": 29730,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [],
+      "interaction_tag": "occupy_machine",
+      "label": "MANTENIMIENTO · ABRIR COMPUERTA",
+      "hint": "F / X: pagar servicio y abrir el paso",
+      "service_gate_id": "gate_p3_maintenance"
+    },
+    {
+      "id": "coalition_service_control",
+      "hook_id": "occupancy_machine",
+      "x": 37150,
+      "y": 630,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "coalition_service_perch"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "APOYO MUTUALIST · BALCÓN",
+      "hint": "Servicio opcional: habilitar balcón de apoyo. No resuelve la tregua."
+    },
+    {
+      "id": "call_storage_lift_upper",
+      "hook_id": "occupancy_machine", "x": 9690, "y": 315,
+      "initial_state": "abandoned", "target_platform_ids": ["storage_lift"],
+      "interaction_tag": "occupy_machine", "label": "LLAMADA B · GALERÍA",
+      "hint": "F / X: traer montacargas a esta parada", "call_only": true,
+      "requires": ["machine_storage_feeder"]
+    },
+    {
+      "id": "call_dispatch_lift_upper",
+      "hook_id": "occupancy_machine", "x": 14480, "y": 315,
+      "initial_state": "abandoned", "target_platform_ids": ["dispatch_lift"],
+      "interaction_tag": "occupy_machine", "label": "LLAMADA C · GALERÍA",
+      "hint": "F / X: traer elevador a esta parada", "call_only": true,
+      "requires": ["machine_dispatch_feeder"]
+    },
+    {
+      "id": "call_crew_lift_lower",
+      "hook_id": "occupancy_machine", "x": 16280, "y": 610,
+      "initial_state": "abandoned", "target_platform_ids": ["crew_lift"],
+      "interaction_tag": "occupy_machine", "label": "LLAMADA D · EMBARQUE",
+      "hint": "F / X: traer elevador al embarque", "call_only": true,
+      "requires": ["crew_power"]
+    },
+    {
+      "id": "call_crew_lift_upper",
+      "hook_id": "occupancy_machine", "x": 16780, "y": 325,
+      "initial_state": "abandoned", "target_platform_ids": ["crew_lift"],
+      "interaction_tag": "occupy_machine", "label": "LLAMADA D · GALERÍA",
+      "hint": "F / X: traer elevador a esta parada", "call_only": true,
+      "requires": ["crew_power"]
+    },
+    {
+      "id": "call_production_lift_upper",
+      "hook_id": "occupancy_machine",
+      "x": 4380,
+      "y": 330,
+      "initial_state": "abandoned",
+      "target_platform_ids": [
+        "platform_restored_lift"
+      ],
+      "interaction_tag": "occupy_machine",
+      "label": "LLAMADA A · GALERÍA",
+      "hint": "F / X: traer ascensor a la galería",
+      "call_only": true,
+      "requires": [
+        "machine_production_feeder",
+        "control_production_transfer"
+      ]
     }
   ]
 }

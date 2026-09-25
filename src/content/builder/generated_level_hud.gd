@@ -104,6 +104,21 @@ func _ready() -> void:
 		apply_accessibility(_settings)
 
 
+func primary_magazine_text() -> String:
+	if _player.inventory == null:
+		return ""
+	var capacity := int(_player.inventory.profile.weapons[0].get("magazine_size", 0))
+	if capacity <= 0:
+		return ""
+	var launcher := _player.probe_launcher
+	var ready := launcher.magazine_remaining(0, capacity)
+	var segments := ""
+	for index: int in capacity:
+		segments += "[■]" if index < ready else "[ ]"
+	var remaining := launcher.reload_remaining(0)
+	return "ARMA 1 %s · %s" % [segments, "RECARGA %.1f s" % remaining if remaining > 0.0 else "LISTA"]
+
+
 func _process(delta: float) -> void:
 	if _spec == null or _telemetry == null or _player == null or _profile == null:
 		return
@@ -123,6 +138,7 @@ func _process(delta: float) -> void:
 		var inventory := _player.inventory
 		_status_label.text = _status_label.text.replace("PROBE ∞", "LIGERA %d · PESADA %d · BTC %d sats" % [inventory.count("light_ammo"), inventory.count("heavy_ammo"), inventory.satoshis])
 		_status_label.text += "\nI / VIEW: ESTADÍSTICAS E INVENTARIO"
+		_status_label.text += "\n" + primary_magazine_text()
 	var boss_visible := _boss != null and _boss.conflict_state.current_state in [
 		ConflictStateComponent.State.THREATENING,
 		ConflictStateComponent.State.AGGRESSOR,

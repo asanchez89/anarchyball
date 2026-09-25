@@ -1,5 +1,9 @@
 # Fases de desarrollo de Anarchyball
 
+Entrega activa: rediseño completo del nivel 1 según `LEVEL_01_VERTICAL_REDESIGN.md`.
+Incluye las tres partes y reservas de archivo; excluye jefe y sistema biográfico.
+La validación anterior no certifica esta nueva geometría ni sus mecánicas revisadas.
+
 Ampliación aprobada del nivel 1: `LEVEL_01_ECONOMY.md` autoriza inventario local,
 dos armas finitas, loot determinista, llaves y tienda mínima durante P7. No amplía
 el alcance a loot aleatorio, crafting, backend o simulación económica persistente.
@@ -240,6 +244,10 @@ Gate de producción de niveles:
 Un segundo nivel retenido explícitamente como `technical_prototype` no se promociona ni necesita simular escala de campaña. Debe conservar una ficha validada, producir el reporte de evidencia y apuntar a un `campaign_successor_id` distinto. Para World 0, `occupancy_workshop_draft` queda como fixture y `w0_03_occupancy_workshop` será una misión separada.
 
 ### Phase 7 - World 0: The Anarchist Frontier
+
+Entrega activa 2026-09-23: completar partes 2/3 conforme a
+`LEVEL_01_PARTS_2_3.md`, dos nuevas tiendas y arena conjunta previa al jefe.
+El jefe queda explícitamente fuera de alcance de esta implementación.
 
 Revisión 2026-09-22: producir el primer nivel compuesto de `LEVEL_01_COALITION.md`: taller Mutualist/Ancom/Egoist, comunidad BlackAnarchy, corredor LeftLibertarian y jefe estatista local con cinco apoyos. KraterocracyBall es candidato pendiente de aprobación. Presión policial en las tres partes; Agorist sigue siendo clase de Phase 8. El anterior paquete de siete misiones y su duración dejan de dirigir producción. Conservar prototipos/IDs, migrar progreso explícitamente y replanificar el resto de World 0. Rango inicial del nivel: 21–31 minutos, sujeto a playtest sin relleno.
 

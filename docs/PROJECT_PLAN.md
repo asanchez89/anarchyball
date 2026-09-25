@@ -1,5 +1,14 @@
 # Anarchyball: The Game
 
+Iteración vertical aprobada: `LEVEL_01_VERTICAL_REDESIGN.md` dirige ahora el
+rediseño de las tres partes, encuentros y exploración. Sustituye la geometría
+anterior, no incorpora jefe ni sistema de biografías.
+
+Revisión aprobada 2026-09-23: `LEVEL_01_PARTS_2_3.md` gobierna la implementación
+de partes 2/3. BlackAnarchy introduce flanqueo y tregua individual; LeftLibertarian
+marcas de peligro y evasión limpia. Mutualist concentra servicios mecánicos.
+Arena conjunta de las cinco balls antes de zona segura; jefe fuera de esta entrega.
+
 Ampliación aprobada del taller: `LEVEL_01_ECONOMY.md` y GR-ECON-002 definen dos
 armas, munición, llaves, mercancías apilables y bitcoin ficticio para comercio local.
 ## Documento de planificación de producto, diseño y arquitectura para implementación con Codex

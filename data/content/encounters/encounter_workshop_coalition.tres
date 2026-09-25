@@ -1,0 +1,65 @@
+[gd_resource type="Resource" script_class="EncounterDefinition" load_steps=8 format=3]
+[ext_resource type="Script" path="res://src/content/definitions/encounter_definition.gd" id="1"]
+[ext_resource type="Script" path="res://src/content/definitions/ceasefire_challenge_definition.gd" id="2"]
+[sub_resource type="Resource" id="Collective"]
+script = ExtResource("2")
+mode = 0
+title = "COLECTIVO"
+any_surrender_resolves = true
+tactical_retreat = true
+retreat_resolve_ratio = 0.9
+retreat_speed = 1200.0
+activation_range = 1200.0
+jump_speed = 720.0
+jump_gravity = 1800.0
+jump_horizontal_speed = 300.0
+[sub_resource type="Resource" id="Raid"]
+script = ExtResource("2")
+mode = 1
+title = "SAQUEO"
+any_surrender_resolves = false
+activation_range = 1000.0
+pursuit_radius = 850.0
+jump_speed = 720.0
+jump_gravity = 1800.0
+jump_horizontal_speed = 300.0
+[sub_resource type="Resource" id="Flank"]
+script = ExtResource("2")
+mode = 2
+title = "FLANQUEO"
+any_surrender_resolves = false
+activation_range = 1100.0
+pursuit_radius = 850.0
+jump_speed = 720.0
+jump_gravity = 1800.0
+jump_horizontal_speed = 300.0
+[sub_resource type="Resource" id="Pulse"]
+script = ExtResource("2")
+mode = 3
+title = "MARCAS"
+ceasefire_core_fraction = 0.1
+any_surrender_resolves = false
+activation_range = 1200.0
+[sub_resource type="Resource" id="Shared"]
+script = ExtResource("2")
+mode = 4
+title = "TALLER · TREGUA COMPARTIDA"
+compact_actor_hud = true
+duration = 65.0
+any_surrender_resolves = false
+ceasefire_core_fraction = 0.1
+group_profiles = Array[Resource]([SubResource("Collective"), SubResource("Raid"), SubResource("Flank"), SubResource("Pulse")])
+group_sizes = PackedInt32Array(2, 2, 2, 2)
+stage_delays = PackedFloat32Array(0, 12, 24, 36)
+reward_sats = 80
+[resource]
+script = ExtResource("1")
+content_id = &"encounter_workshop_coalition"
+display_name = "TALLER · CINCO ASOCIACIONES"
+objective = &"survive_or_defend_after_aggression"
+enemy_archetype_ids = Array[StringName]([&"enemy_ancom_collective", &"enemy_ancom_collective", &"enemy_egoist_raider", &"enemy_egoist_raider", &"enemy_black_anarchy_flanker", &"enemy_black_anarchy_flanker", &"enemy_left_libertarian_marker", &"enemy_left_libertarian_marker"])
+aggression_trigger_ids = Array[StringName]([&"attack_committed", &"forced_confiscation"])
+success_condition_ids = Array[StringName]([&"ceasefire_reached", &"defensive_surrender"])
+allowed_resolutions = Array[StringName]([&"survive_ceasefire", &"force_surrender"])
+neutralization_resolution = &"force_surrender"
+ceasefire_challenge = SubResource("Shared")

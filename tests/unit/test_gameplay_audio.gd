@@ -94,6 +94,29 @@ class RecordingEmitter extends GameplaySfxEmitter:
 		return true
 
 
+func test_enemy_projectiles_sound_at_launch_without_requiring_an_impact() -> void:
+	var arena := auto_free(Node2D.new()) as Node2D
+	add_child(arena)
+	var actor := load("res://src/debug/combat_target.tscn").instantiate() as CombatTarget
+	arena.add_child(actor)
+	actor.set_process(false)
+	var recorder := RecordingEmitter.new()
+	actor.add_child(recorder)
+	actor.sfx = recorder
+	# Presentation alone (including contact/theft actions) is not a gunshot.
+	actor._begin_attack_visual()
+	actor.player_path = NodePath("MissingPlayer")
+	actor._launch_hostile_bolt()
+	assert_array(recorder.played).is_empty()
+	for direction: Vector2 in [Vector2.LEFT, Vector2.RIGHT]:
+		actor._launch_bolt_direction(direction)
+		var bolt := arena.get_child(arena.get_child_count() - 1) as HostileBolt
+		assert_object(bolt).is_not_null()
+		assert_vector(bolt.direction).is_equal(direction)
+	# Both shots miss: there is no player or impact callback in this fixture.
+	assert_array(recorder.played).contains_exactly([&"fire", &"fire"])
+
+
 func test_state_transitions_sound_once_and_restore_is_silent() -> void:
 	var actor := auto_free(load("res://src/debug/combat_target.tscn").instantiate()) as CombatTarget
 	add_child(actor)

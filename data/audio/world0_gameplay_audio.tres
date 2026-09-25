@@ -29,6 +29,8 @@
 script = ExtResource("1_profile")
 jump = ExtResource("2_jump")
 fire = ExtResource("3_fire")
+reload = ExtResource("11_rule")
+pulse_warning = ExtResource("17_dispute")
 hurt = ExtResource("4_allowed")
 impact_allowed = ExtResource("4_allowed")
 impact_blocked = ExtResource("5_blocked")

@@ -10,6 +10,54 @@ func _build() -> LevelBuilder:
 	return builder
 
 
+func test_part_two_flankers_use_real_content_and_gate_resolution() -> void:
+	var builder := _build()
+	var observer := builder.get_node("Generated/EncounterObservers/p2_flank_intro") as EncounterRuntimeObserver
+	var challenge := observer.challenge
+	assert_int(observer._actors.size()).is_equal(2)
+	assert_int(challenge.definition.mode).is_equal(CeasefireChallengeDefinition.AttackMode.AUTONOMOUS_FLANK)
+	assert_bool(challenge.definition.any_surrender_resolves).is_false()
+	for actor: CombatTarget in observer._actors:
+		assert_object(actor._ball_visual).is_not_null()
+		assert_float(actor.resolve.maximum_resolve).is_equal(75.0)
+	var gate := builder.get_node("Generated/Gates/gate_p2_flank_intro") as AccessGate
+	assert_bool(gate.try_open()).is_false()
+	builder._player.global_position = Vector2(21560, 330)
+	challenge.advance(challenge.definition.warning_seconds + 0.01)
+	assert_bool(challenge.started).is_true()
+	challenge.remaining = 0.01
+	challenge.advance(0.02)
+	assert_bool(observer.is_resolved()).is_true()
+	assert_bool(gate.is_open()).is_true()
+	assert_float(gate.position.y + 72.0).is_equal(350.0 + World0ArtMetrics.COLLISION_SURFACE_DEPTH)
+	var economy := builder.get_node("Generated/Economy") as WorkshopEconomy
+	assert_object(builder.get_node("Generated/shop_part_two")).is_not_null()
+	assert_int(economy.shops.size()).is_equal(3)
+
+
+func test_left_libertarian_resource_has_four_frames_per_state_and_single_frame_briefing() -> void:
+	var definition := load("res://assets/art/actors/balls/world_0/runtime/left_libertarian_ball_visual.tres") as BallVisualDefinition
+	assert_bool(definition.is_valid()).is_true()
+	var source := (definition.animation_atlas as AtlasTexture).atlas
+	assert_str(source.resource_path).is_equal("res://assets/art/actors/balls/world_0/runtime/left_libertarian_animation_v2.png")
+	for state: StringName in [&"idle", &"move", &"jump", &"action", &"hurt", &"surrendering"]:
+		assert_int(definition.frame_count_for(state)).is_equal(4)
+	var flow := auto_free(SliceFlowController.new()) as SliceFlowController
+	var frame := flow._briefing_texture({"image_path": source.resource_path, "image_columns": 4, "image_rows": 4, "image_frame": 0}) as AtlasTexture
+	assert_float(frame.region.size.x).is_equal(frame.region.size.y)
+	assert_float(frame.region.size.y).is_less(float(definition.animation_atlas.get_height()))
+	var spec := LevelSpecLoader.load_file("res://data/levels/w0_01_coalition_workshop.json").spec
+	for card: Dictionary in spec.data.slice.briefing_cards:
+		if not card.has("image_path"):
+			continue
+		assert_bool(ResourceLoader.exists(String(card.image_path))).is_true()
+		if String(card.image_path).contains("left_libertarian"):
+			assert_str(String(card.image_path)).is_equal(source.resource_path)
+		var portrait := flow._briefing_texture(card)
+		assert_object(portrait).is_not_null()
+		assert_float(float(portrait.get_width())).is_equal(float(portrait.get_height()))
+
+
 func test_scenery_sits_above_terrain_and_unused_stations_are_removed() -> void:
 	var builder := _build()
 	var presentation := builder.get_node("Generated/Presentation")
@@ -45,11 +93,13 @@ func test_dispatch_gate_blocks_transition_and_panel_releases_it() -> void:
 	var builder := _build()
 	var gate := builder.get_node("Generated/Gates/gate_dispatch") as AccessGate
 	var bridge := builder.get_node("Generated/Platforms/dispatch_exit_bridge") as DebugPlatform
+	var step := builder.get_node("Generated/Platforms/dispatch_exit_descent_last") as DebugPlatform
+	var surface_y := step.position.y - step.size.y * 0.5 + step.collision_surface_depth
 	assert_float(gate.position.x).is_greater(bridge.position.x + bridge.size.x * 0.5)
-	assert_float(gate.position.y + 72.0).is_equal(662.0)
+	assert_float(gate.position.y + gate.size.y * 0.5).is_equal(surface_y)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
-	var query := PhysicsRayQueryParameters2D.create(Vector2(16030, 620), Vector2(16150, 620), 1)
+	var query := PhysicsRayQueryParameters2D.create(Vector2(gate.position.x - 25.0, surface_y - 24.0), Vector2(gate.position.x + 60.0, surface_y - 24.0), 1)
 	var space := gate.get_world_2d().direct_space_state
 	assert_bool(space.intersect_ray(query).get("collider") == gate).is_true()
 	var feeder := builder.get_node("Generated/RuleObjects/machine_dispatch_feeder") as RuleStateObject
@@ -137,7 +187,15 @@ func test_industrial_art_contains_no_forest_tiles_and_lift_uses_matching_deck() 
 
 
 func test_black_sheet_has_alpha_and_four_frames_per_state_with_stable_foot() -> void:
-	var definition := load("res://assets/art/actors/balls/world_0/runtime/black_anarchy_ball_visual.tres") as BallVisualDefinition
+	_assert_calibrated_sheet("black_anarchy")
+
+
+func test_left_sheet_has_alpha_and_four_distinct_frames_with_stable_foot() -> void:
+	_assert_calibrated_sheet("left_libertarian")
+
+
+func _assert_calibrated_sheet(id: String) -> void:
+	var definition := load("res://assets/art/actors/balls/world_0/runtime/" + id + "_ball_visual.tres") as BallVisualDefinition
 	assert_bool(definition.is_valid()).is_true()
 	var visual := auto_free(BallVisual.new()) as BallVisual
 	visual.definition = definition

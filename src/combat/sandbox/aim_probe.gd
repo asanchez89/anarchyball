@@ -18,7 +18,11 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	global_position += direction * speed * delta
+	var destination := global_position + direction * speed * delta
+	if not ProjectileTerrain.obstruction(get_world_2d(), global_position, destination).is_empty():
+		queue_free()
+		return
+	global_position = destination
 	_animation_elapsed += delta
 	missile_sprite.frame = int(_animation_elapsed * 12.0) % missile_sprite.hframes
 	lifetime -= delta

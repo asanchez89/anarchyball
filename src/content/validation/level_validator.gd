@@ -30,11 +30,11 @@ const RESOURCE_FIELDS: PackedStringArray = ["id", "kind", "x", "y", "ownership",
 const SECTION_FIELDS: PackedStringArray = ["id", "from_x", "to_x"]
 const CHECKPOINT_FIELDS: PackedStringArray = ["id", "x", "y", "respawn_x", "respawn_y"]
 const GATE_FIELDS: PackedStringArray = ["id", "x", "y", "width", "height", "required_tag", "key_resource_id", "label"]
-const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag", "targets_enabled_before_interaction", "requires", "label", "hint", "visual_kind", "call_only"]
+const RULE_OBJECT_FIELDS: PackedStringArray = ["id", "hook_id", "x", "y", "initial_state", "target_platform_ids", "interaction_tag", "targets_enabled_before_interaction", "requires", "label", "hint", "visual_kind", "call_only", "service_gate_id"]
 const CONTRACT_FIELDS: PackedStringArray = ["id", "definition_id", "x", "y", "acceptance_gate_id", "resolution_gate_id", "encounter_id", "performance_x", "resolution_x", "resolution_y", "counterparty_escape_x"]
 const ACTOR_FIELDS: PackedStringArray = ["id", "archetype_id", "x", "y"]
 const SLICE_FIELDS: PackedStringArray = ["title", "objective", "intro", "completion", "briefing_cards"]
-const BRIEFING_CARD_FIELDS: PackedStringArray = ["title", "body", "image_path", "image_columns", "image_frame"]
+const BRIEFING_CARD_FIELDS: PackedStringArray = ["title", "body", "image_path", "image_columns", "image_rows", "image_frame"]
 const LOCAL_ID_COLLECTIONS: PackedStringArray = ["platforms", "encounters", "resources", "sections", "checkpoints", "gates", "rule_objects", "contracts", "actors"]
 const RULE_OBJECT_STATES: PackedStringArray = ["inactive", "available", "occupied", "disabled", "abandoned", "disputed"]
 const RESOURCE_OWNERSHIP: PackedStringArray = [
@@ -364,6 +364,12 @@ static func _validate_encounters(spec: LevelSpec, registry: ContentRegistry, res
 		var definition := registry.get_definition(ContentRegistry.Kind.ENCOUNTER_DEFINITION, StringName(String(definition_id))) as EncounterDefinition
 		if definition == null:
 			continue
+		if definition.ceasefire_challenge != null and definition.ceasefire_challenge.mode == CeasefireChallengeDefinition.AttackMode.MIXED_STAGES:
+			var group_total := 0
+			for count: int in definition.ceasefire_challenge.group_sizes:
+				group_total += count
+			if group_total != int(encounter_data.get("enemy_count", definition.enemy_archetype_ids.size())):
+				result.add_error(&"invalid_group_roster", path, "la composición no coincide con los grupos de tregua")
 		if encounter_data.has("enemy_positions"):
 			var points: Variant = encounter_data.enemy_positions
 			_validate_array_shapes(points, path + ".enemy_positions", POINT_FIELDS, result)
@@ -507,6 +513,14 @@ static func _validate_gates(spec: LevelSpec, registry: ContentRegistry, result: 
 			if not encounter_gate_ids.has(gate_id):
 				result.add_error(&"orphan_encounter_gate", path + ".id", "ningún encuentro resuelve esta barrera")
 			continue
+		if required_tag == &"mechanical_service":
+			var linked := false
+			for machine: Dictionary in spec.data.get("rule_objects", []):
+				if String(machine.get("service_gate_id", "")) == String(gate.id):
+					linked = true
+			if not linked:
+				result.add_error(&"orphan_service_gate", path, "compuerta sin terminal")
+			continue
 		if required_tag not in counterplay_tags:
 			result.add_error(&"missing_counterplay", path + ".required_tag", "el tag no está declarado por la regla activa")
 
@@ -550,7 +564,15 @@ static func _validate_rule_objects(spec: LevelSpec, registry: ContentRegistry, r
 		if initial_state not in RULE_OBJECT_STATES:
 			result.add_error(&"invalid_rule_state", path + ".initial_state", "estado no soportado '%s'" % initial_state)
 		var target_ids: Variant = data.get("target_platform_ids")
-		if not target_ids is Array or (target_ids as Array).is_empty():
+		var service_gate := String(data.get("service_gate_id", ""))
+		if not service_gate.is_empty():
+			var found := false
+			for gate: Dictionary in spec.data.get("gates", []):
+				if String(gate.id) == service_gate and String(gate.required_tag) == "mechanical_service":
+					found = true
+			if not found:
+				result.add_error(&"unknown_service_gate", path, "compuerta mecánica no declarada")
+		if not target_ids is Array or ((target_ids as Array).is_empty() and service_gate.is_empty()):
 			result.add_error(&"missing_targets", path + ".target_platform_ids", "se requiere al menos una plataforma objetivo")
 		else:
 			for target_index: int in (target_ids as Array).size():

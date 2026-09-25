@@ -12,21 +12,19 @@ var retired: Dictionary = {}
 func configure(service: WorkshopEconomy) -> void:
 	economy = service
 	for observer: EncounterRuntimeObserver in economy.builder.get_node("Generated/EncounterObservers").get_children():
-		if observer.challenge != null and observer.challenge.definition.mode == CeasefireChallengeDefinition.AttackMode.CONTACT_RAID:
-			var recovery_id := "restitution:" + String(observer.encounter_id)
-			rewards[recovery_id] = {"items": {}, "restitution": true}
-			actors[recovery_id] = observer._actors[0]
-			legacy_tokens[recovery_id] = recovery_id
-			_create_pickup(recovery_id)
-			observer.resolved.connect(func(_encounter: StringName, _resolution: StringName) -> void:
-				if observer.challenge.stolen.is_empty() or economy.player.inventory.claimed.has(recovery_id):
-					return
-				rewards[recovery_id]["items"] = observer.challenge.stolen.duplicate(true)
-				var pickup := drops[recovery_id] as DebugPickup
-				pickup.inventory_reward = rewards[recovery_id]
-				pickup.display_text = "RECUPERA TUS OBJETOS · " + economy.reward_text(rewards[recovery_id])
-				release(recovery_id)
-			)
+		if observer.challenge != null and (observer.challenge.definition.mode == CeasefireChallengeDefinition.AttackMode.CONTACT_RAID or observer.challenge.definition.mode == CeasefireChallengeDefinition.AttackMode.MIXED_STAGES):
+			for index: int in observer._actors.size():
+				var thief := observer._actors[index]
+				# Keep the original pickup ID for saves of the first thief.
+				var recovery_id := "restitution:" + String(observer.encounter_id)
+				if index > 0:
+					recovery_id += ":" + String(thief.stable_id)
+				rewards[recovery_id] = {"items": {}, "restitution": true}
+				actors[recovery_id] = thief
+				legacy_tokens[recovery_id] = recovery_id
+				_create_pickup(recovery_id)
+				thief.conflict_state.state_changed.connect(_on_restitution_actor_state_changed.bind(observer, thief, recovery_id))
+			observer.resolved.connect(_on_restitution_encounter_resolved.bind(observer))
 		var eligible: Array[CombatTarget] = []
 		for actor: CombatTarget in observer._actors:
 			if economy.profile.actor_drop_rewards.has(String(actor.archetype_id)):
@@ -53,6 +51,41 @@ func configure(service: WorkshopEconomy) -> void:
 			if bool(reward.get("cede_on_resolution", false)):
 				# Voluntary abandoned goods, never permission to loot a neutral actor.
 				observer.resolved.connect(func(_encounter: StringName, _resolution: StringName) -> void: release(id))
+
+
+func _on_restitution_actor_state_changed(_previous: ConflictStateComponent.State, current: ConflictStateComponent.State, _reason: ConflictStateComponent.AggressorReason, observer: EncounterRuntimeObserver, actor: CombatTarget, id: String) -> void:
+	if observer.challenge.restoring or current not in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
+		return
+	_release_restitution_for_actor(observer, actor, id)
+
+
+func _on_restitution_encounter_resolved(_encounter: StringName, _resolution: StringName, observer: EncounterRuntimeObserver) -> void:
+	if observer.challenge.stolen_by_actor.is_empty():
+		# Old checkpoints kept only the encounter total and used one package.
+		var legacy_id := "restitution:" + String(observer.encounter_id)
+		_prepare_restitution(legacy_id, observer.challenge.stolen)
+		return
+	for index: int in observer._actors.size():
+		var actor := observer._actors[index]
+		var id := "restitution:" + String(observer.encounter_id)
+		if index > 0:
+			id += ":" + String(actor.stable_id)
+		_release_restitution_for_actor(observer, actor, id)
+
+
+func _release_restitution_for_actor(observer: EncounterRuntimeObserver, actor: CombatTarget, id: String) -> void:
+	var goods: Dictionary = observer.challenge.stolen_by_actor.get(String(actor.stable_id), {})
+	_prepare_restitution(id, goods)
+
+
+func _prepare_restitution(id: String, goods: Dictionary) -> void:
+	if goods.is_empty() or retired.has(id) or economy.player.inventory.claimed.has(id) or not drops.has(id):
+		return
+	rewards[id]["items"] = goods.duplicate(true)
+	var pickup := drops[id] as DebugPickup
+	pickup.inventory_reward = rewards[id]
+	pickup.display_text = "RECUPERA TUS OBJETOS · " + economy.reward_text(rewards[id])
+	release(id)
 
 
 func _create_pickup(id: String) -> DebugPickup:

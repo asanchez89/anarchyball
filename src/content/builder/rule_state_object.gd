@@ -108,7 +108,7 @@ func interact() -> bool:
 		return false
 	if call_only:
 		for platform: DebugPlatform in target_platforms:
-			platform.reset_motion()
+			platform.call_to_nearest_stop(global_position.y)
 		return true
 	if current_state != State.AVAILABLE and current_state != State.ABANDONED:
 		return false
@@ -207,7 +207,7 @@ func _update_label() -> void:
 
 func interaction_caption() -> String:
 	if call_only:
-		return "DOWN"
+		return target_platforms[0].call_caption(global_position.y) if not target_platforms.is_empty() else "CALL"
 	if current_state == State.OCCUPIED:
 		return "ACTIVE"
 	return "ACTIVATE" if current_state in [State.AVAILABLE, State.ABANDONED] else "LOCKED"

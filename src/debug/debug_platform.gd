@@ -24,6 +24,21 @@ func motion_distance_y() -> float:
 	return _motion_distance_y
 
 
+func allows_projectile_passage(origin: Vector2, destination: Vector2, normal: Vector2) -> bool:
+	if _collision_shape == null or not _collision_shape.one_way_collision:
+		return false
+	var local_origin := to_local(origin)
+	var local_destination := to_local(destination)
+	if local_destination.y <= local_origin.y:
+		return false
+	var local_normal := global_transform.basis_xform_inv(normal)
+	if local_normal.y < -0.5:
+		return true
+	# Subsequent small steps can start inside a deck already entered from above.
+	var bounds := Rect2(Vector2(-size.x * 0.5, collision_surface_depth - size.y * 0.5), size)
+	return normal.is_zero_approx() and bounds.has_point(local_origin)
+
+
 func motion_speed() -> float:
 	return _motion_speed
 
@@ -64,6 +79,22 @@ func reset_motion() -> void:
 	position.y = _motion_origin_y
 	_motion_direction = -1.0
 	_stop_remaining = stop_duration
+
+
+func call_to_nearest_stop(world_y: float) -> void:
+	if not is_moving_platform() or not _rule_enabled:
+		return
+	var origin_world := to_global(Vector2(0.0, _motion_origin_y - position.y)).y
+	var other_world := origin_world + _motion_distance_y
+	_motion_direction = -1.0 if absf(world_y - other_world) < absf(world_y - origin_world) else 1.0
+	_stop_remaining = 0.0
+
+
+func call_caption(world_y: float) -> String:
+	var origin_world := to_global(Vector2(0.0, _motion_origin_y - position.y)).y
+	var other_world := origin_world + _motion_distance_y
+	var target := other_world if absf(world_y - other_world) < absf(world_y - origin_world) else origin_world
+	return "UP" if target < (origin_world + other_world) * 0.5 else "DOWN"
 
 
 func configure_motion(distance_y: float, speed: float, art_texture: Texture2D = null) -> void:

@@ -3,6 +3,7 @@ extends CharacterBody2D
 ## Physical traversal for an externally driven ball. Combat remains on its Area2D.
 
 const FEET: float = 24.0
+const WALK_SURFACE_TOLERANCE: float = 12.0
 var actor: CombatTarget
 var settings: CeasefireChallengeDefinition
 var platforms: Array[DebugPlatform] = []
@@ -163,11 +164,13 @@ func _ballistic_edge(source_y: float, destination_y: float, takeoff_x: float, la
 	# crossed upwards; the body still lands on them through normal physics.
 	var query := PhysicsShapeQueryParameters2D.new()
 	var circle := CircleShape2D.new()
-	circle.radius = FEET - 2.0
+	# Validate with the same radius as the body. A smaller probe can approve
+	# a launch that clips a stair corner and loses its horizontal velocity.
+	circle.radius = FEET
 	query.shape = circle
 	query.collision_mask = 1
-	for sample: int in range(1, 20):
-		var time := duration * float(sample) / 20.0
+	for sample: int in range(1, 32):
+		var time := duration * float(sample) / 32.0
 		query.transform = Transform2D(0.0, Vector2(takeoff_x + horizontal * time, source_y - settings.jump_speed * time + 0.5 * settings.jump_gravity * time * time))
 		for hit: Dictionary in get_world_2d().direct_space_state.intersect_shape(query):
 			var surface := hit.collider as DebugPlatform
@@ -182,8 +185,12 @@ func route_to(goal: Vector2, bounds: Vector2) -> Dictionary:
 	var destination := _closest(goal, surfaces)
 	if source < 0 or destination < 0:
 		return {}
-	if source == destination:
-		return {"walk": clampf(goal.x, surfaces[source].left, surfaces[source].right)}
+	# Overlapping decks with a small authored height difference are one walkable
+	# connection. Jumping onto the lower one otherwise lands on the upper deck
+	# repeatedly. try_grounded_step still checks the real floor and walls.
+	var walk_connected: bool = absf(float(surfaces[source].y) - float(surfaces[destination].y)) <= WALK_SURFACE_TOLERANCE and maxf(float(surfaces[source].left), float(surfaces[destination].left)) <= minf(float(surfaces[source].right), float(surfaces[destination].right))
+	if source == destination or walk_connected:
+		return {"walk": clampf(goal.x, surfaces[destination].left, surfaces[destination].right)}
 	var queue: Array[int] = [source]
 	var parents: Dictionary = {source: -1}
 	var edges: Dictionary = {}

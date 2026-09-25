@@ -1,5 +1,10 @@
 # ADR-0010: inventario local y puertas con llave
 
+Extensión compatible del rediseño vertical: `world_rule_state.weapon_state`
+guarda cargadores, recargas pendientes por índice y cooldown. Claves de índices
+serializadas como strings para JSON; snapshots anteriores sin este campo cargan
+armas listas. Restaurar no reproduce sonidos ni consume munición adicional.
+
 - Estado: aceptado como parte de la ampliación de gameplay aprobada.
 
 `RunEconomyDefinition` configura inventario, armas, premios, iconos, costes y

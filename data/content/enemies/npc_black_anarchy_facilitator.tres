@@ -13,4 +13,4 @@ maximum_resolve = 40.0
 behavior_id = &"static"
 initial_conflict_state = 0
 visual_definition = ExtResource("2")
-dialogue_lines = Array[String](["Los dos equipos esperan una sola señal. Si interrumpen el puesto central, se paran ambos.", "Acércate a cada terminal y pulsa F / X para delegar un relevo local. Cada equipo conservará su propia señal.", "Mutualist mantiene la máquina. Ante las patrullas Ancom puedes resistir o forzar una rendición; ante saqueadores Egoist, evita el contacto. Coordinar no sustituye esos desafíos."])
+dialogue_lines = Array[String](["Aquí nadie manda: cada equipo conserva su señal.", "Usa F / X en cada terminal para coordinar el relevo."])

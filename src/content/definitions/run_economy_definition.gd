@@ -17,9 +17,14 @@ extends Resource
 @export_range(1.0, 4.0, 1.0) var loot_art_scale: float = 2.0
 @export var loot_horizontal_offset: float = 56.0
 @export var machine_costs: Dictionary = {}
+## Paid mechanical access, deliberately independent of combat resolution gates.
+@export var service_gates: Dictionary = {}
 @export var key_gates: Dictionary = {}
 @export var offers: Dictionary = {}
 @export var shop_position := Vector2.ZERO
+## Additional terminals share the player's existing inventory and offers.
+## Keys are stable placement IDs; values are world-space Vector2 positions.
+@export var additional_shops: Dictionary = {}
 @export var emergency_ammo: int = 20
 @export var pickup_atlas: Texture2D
 @export var pickup_regions: Dictionary = {}
@@ -37,8 +42,35 @@ func validation_errors(spec: LevelSpec) -> PackedStringArray:
 		if not items.has(item) or not item_art[item] is Texture2D:
 			errors.append("Arte de objeto inválido: " + item)
 	var bounds: Dictionary = spec.data.get("bounds", {})
-	if shop_position.x < 0 or shop_position.y < 0 or shop_position.x > float(bounds.get("width", 0)) or shop_position.y > float(bounds.get("height", 0)):
-		errors.append("Tienda fuera del nivel")
+	var gate_ids: Array[String] = []
+	var combat_gate_ids: Array[String] = []
+	for gate: Dictionary in spec.data.get("gates", []):
+		gate_ids.append(String(gate.id))
+	for encounter: Dictionary in spec.data.get("encounters", []):
+		combat_gate_ids.append(String(encounter.get("resolution_gate_id", "")))
+	for machine_id: String in service_gates:
+		var target := String(service_gates[machine_id])
+		if not machine_costs.has(machine_id) or target not in gate_ids or target in combat_gate_ids:
+			errors.append("Compuerta de servicio inválida o vinculada a combate: " + machine_id)
+	for machine: Dictionary in spec.data.get("rule_objects", []):
+		if machine.has("service_gate_id") and String(service_gates.get(String(machine.id), "")) != String(machine.service_gate_id):
+			errors.append("Compuerta sin servicio económico: " + String(machine.id))
+	var shop_locations: Dictionary = {"WorkshopShop": shop_position}
+	for id: String in additional_shops:
+		if id.is_empty() or id != id.to_snake_case() or not id.is_valid_identifier() or shop_locations.has(id):
+			errors.append("ID de tienda inválido: " + id)
+		if not additional_shops[id] is Vector2:
+			errors.append("Posición de tienda inválida: " + id)
+			continue
+		shop_locations[id] = additional_shops[id]
+	var occupied: Array[Vector2] = []
+	for id: String in shop_locations:
+		var location: Vector2 = shop_locations[id]
+		if not location.is_finite() or location.x < 0 or location.y < 0 or location.x > float(bounds.get("width", 0)) or location.y > float(bounds.get("height", 0)):
+			errors.append("Tienda fuera del nivel: " + id)
+		if location in occupied:
+			errors.append("Tiendas superpuestas: " + id)
+		occupied.append(location)
 	if emergency_ammo <= 0:
 		errors.append("Reserva de emergencia inválida")
 	if not is_finite(loot_art_scale) or loot_art_scale <= 0.0:

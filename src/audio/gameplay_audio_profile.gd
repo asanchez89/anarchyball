@@ -3,6 +3,8 @@ extends Resource
 
 @export var jump: AudioStream
 @export var fire: AudioStream
+@export var reload: AudioStream
+@export var pulse_warning: AudioStream
 @export var hurt: AudioStream
 @export var impact_allowed: AudioStream
 @export var impact_blocked: AudioStream
@@ -53,6 +55,8 @@ func stream_for(cue_id: StringName) -> AudioStream:
 	match cue_id:
 		&"jump": return jump
 		&"fire": return fire
+		&"reload": return reload
+		&"pulse_warning": return pulse_warning
 		&"hurt": return hurt
 		&"impact_allowed": return impact_allowed
 		&"impact_blocked": return impact_blocked

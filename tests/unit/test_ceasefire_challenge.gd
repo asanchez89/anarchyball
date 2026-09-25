@@ -34,6 +34,405 @@ func _challenge(level: LevelBuilder, id: String) -> CeasefireChallenge:
 	return (level.get_node("Generated/EncounterObservers/" + id) as EncounterRuntimeObserver).challenge
 
 
+func test_autonomous_flank_warns_caps_projectiles_and_persists_individual_bonus() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "encounter_dispatch_ancom")
+	challenge.definition = challenge.definition.duplicate(true) as CeasefireChallengeDefinition
+	challenge.definition.mode = CeasefireChallengeDefinition.AttackMode.AUTONOMOUS_FLANK
+	challenge.definition.any_surrender_resolves = false
+	challenge.definition.pursuit_radius = 900.0
+	level._player.global_position = Vector2(12700, 628)
+	challenge.advance(challenge.definition.warning_seconds * 0.5)
+	assert_bool(challenge.started).is_false()
+	assert_int(challenge.active_projectile_count()).is_equal(0)
+	challenge.advance(challenge.definition.warning_seconds)
+	challenge.advance(challenge.definition.turn_interval)
+	assert_bool(challenge.started).is_true()
+	assert_int(challenge.active_projectile_count()).is_equal(2)
+	challenge.advance(challenge.definition.turn_interval)
+	assert_int(challenge.active_projectile_count()).is_equal(2)
+	var actor := challenge.observer._actors[0]
+	assert_bool(actor.conflict_state.begin_surrender()).is_true()
+	var before := challenge.remaining
+	challenge.advance(0.0)
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.surrender_time_bonus)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+	var snapshot := challenge.capture_runtime_state()
+	challenge.restore_runtime_state(snapshot)
+	challenge.advance(0.0)
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.surrender_time_bonus)
+
+
+func test_encirclement_break_requires_crossing_caps_bonus_and_survives_restore() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p2_flank_intro")
+	var actors := challenge.observer._actors
+	var origin := Vector2(21600, 330)
+	for actor: CombatTarget in actors:
+		challenge._commit(actor, ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	var before := challenge.remaining
+	for attempt: int in 4:
+		level._player.global_position = origin
+		actors[0].global_position = origin - Vector2(80, 0)
+		actors[1].global_position = origin + Vector2(80, 0)
+		challenge._advance_encirclement(challenge.definition.encirclement_cooldown, actors)
+		challenge._advance_encirclement(challenge.definition.encirclement_hold, actors)
+		assert_bool(challenge._encirclements[actors[0].stable_id].armed).is_true()
+		var snapshot := challenge.capture_runtime_state()
+		challenge.restore_runtime_state(snapshot)
+		level._player.global_position.x += 180.0
+		challenge._advance_encirclement(0.0, actors)
+		assert_bool(challenge._encirclements[actors[0].stable_id].armed).is_false()
+		assert_float(float(challenge._raid_warnings[actors[0].stable_id])).is_equal(0.0)
+		var after := challenge.remaining
+		challenge._advance_encirclement(0.0, actors)
+		assert_float(challenge.remaining).is_equal(after)
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.encirclement_bonus_cap)
+
+
+func test_flankers_physically_form_and_player_runs_out_of_encirclement() -> void:
+	await _assert_physical_encirclement("p2_flank_intro", Vector2(21800, 358))
+
+
+func test_advanced_flanks_form_and_allow_physical_escape_across_heights() -> void:
+	await _assert_physical_encirclement("p2_flank_vertical", Vector2(26080, 578), 12)
+	await _assert_physical_encirclement("p3_flank_vertical", Vector2(30480, 358))
+
+
+func _assert_physical_encirclement(encounter_id: String, origin: Vector2, jump_frame: int = -1) -> void:
+	var level := _build()
+	var challenge := _challenge(level, encounter_id)
+	var player := level._player
+	player.reset_at(origin)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var actors := challenge.observer._actors
+	var key := actors[0].stable_id
+	for frame: int in 300:
+		challenge._advance_flankers(1.0 / 60.0, [], false)
+		await get_tree().physics_frame
+		if bool(challenge._encirclements.get(key, {}).get("armed", false)):
+			break
+	assert_bool(challenge._encirclements.get(key, {}).get("armed", false)).override_failure_message("Actual flank movement did not form a bracket").is_true()
+	for first: int in actors.size():
+		for second: int in range(first + 1, actors.size()):
+			assert_float(actors[first].position.distance_to(actors[second].position)).override_failure_message(encounter_id + ": overlapping flank posts").is_greater_equal(challenge.definition.personal_space * 0.8)
+	var formation_snapshot := challenge.capture_runtime_state()
+	challenge.restore_runtime_state(formation_snapshot)
+	assert_dict(challenge._encirclements[key].anchors).is_equal(formation_snapshot.encirclements[key].anchors)
+	var before := challenge.remaining
+	for frame: int in 65:
+		if frame == jump_frame:
+			player.velocity.y = -player.movement_profile.jump_velocity
+		player.velocity.x = move_toward(player.velocity.x, player.movement_profile.run_speed, player.movement_profile.run_acceleration / 60.0)
+		player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, player.movement_profile, 1.0 / 60.0)
+		player.move_and_slide()
+		challenge._advance_flankers(1.0 / 60.0, [], false)
+		await get_tree().physics_frame
+		if float(challenge._encirclements[key].bonus) > 0.0:
+			break
+	assert_float(float(challenge._encirclements[key].bonus)).override_failure_message("Escape at %s with formation %s, actors %s / %s" % [player.position, challenge._encirclements[key], actors[0].position, actors[1].position]).is_equal(challenge.definition.encirclement_bonus)
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.encirclement_bonus)
+
+
+func test_stationary_player_does_not_earn_encirclement_escape_bonus() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p2_flank_intro")
+	var actors := challenge.observer._actors
+	level._player.global_position = Vector2(21600, 330)
+	for actor: CombatTarget in actors:
+		challenge._commit(actor, ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	actors[0].global_position = Vector2(21520, 330)
+	actors[1].global_position = Vector2(21680, 330)
+	challenge._advance_encirclement(1.0, actors)
+	var before := challenge.remaining
+	actors[0].global_position.x -= 300.0
+	actors[1].global_position.x -= 300.0
+	challenge._advance_encirclement(1.0, actors)
+	assert_float(challenge.remaining).is_equal(before)
+
+
+func test_marked_pulse_preserves_telegraph_across_restore_and_rewards_dodge_once() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "encounter_dispatch_ancom")
+	challenge.definition = challenge.definition.duplicate(true) as CeasefireChallengeDefinition
+	challenge.definition.mode = CeasefireChallengeDefinition.AttackMode.MARKED_PULSE
+	challenge.definition.any_surrender_resolves = false
+	var actor := challenge.observer._actors[0]
+	var recorder := auto_free(RelaySoundRecorder.new()) as RelaySoundRecorder
+	actor.sfx = recorder
+	level._player.global_position = actor.global_position
+	assert_dict(challenge.pulse.safe_mark(actor)).is_not_empty()
+	challenge.advance(challenge.definition.warning_seconds)
+	assert_bool(challenge.started).is_true()
+	assert_dict(challenge.pulse.pending).is_not_empty()
+	assert_bool(recorder.cues.has(&"pulse_warning")).is_true()
+	var warning_count := recorder.cues.count(&"pulse_warning")
+	var before_health := level._player.health.current_health
+	var snapshot := challenge.capture_runtime_state()
+	challenge.restore_runtime_state(snapshot)
+	assert_int(recorder.cues.count(&"pulse_warning")).is_equal(warning_count)
+	assert_float(level._player.health.current_health).is_equal(before_health)
+	assert_float(float(challenge.pulse.pending.time)).is_equal(challenge.definition.pulse_warning)
+	level._player.global_position.x += 180.0
+	var before := challenge.remaining
+	challenge.pulse.advance(challenge.definition.pulse_warning)
+	assert_dict(challenge.pulse.pending).is_empty()
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.clean_dodge_bonus)
+	var resolved_snapshot := challenge.capture_runtime_state()
+	challenge.restore_runtime_state(resolved_snapshot)
+	challenge.pulse.advance(0.0)
+	assert_float(challenge.remaining).is_equal(before - challenge.definition.clean_dodge_bonus)
+	assert_float(level._player.health.current_health).is_equal(before_health)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+
+
+func test_upper_safe_lane_uses_base_jump_and_rejects_disabled_or_blocked_platform() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_pulse_intro")
+	var actor := challenge.observer._actors[0]
+	var source := level.get_node("Generated/Platforms/part_three_factory_floor") as DebugPlatform
+	var target := level.get_node("Generated/Platforms/p3_pulse_intro_lower") as DebugPlatform
+	var origin := Vector2(28725, 638)
+	level._player.reset_at(origin)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var lanes := challenge.pulse.safe_jump_lanes(actor, origin, source)
+	assert_int(lanes.size()).is_equal(1)
+	assert_float(float(lanes[0].right) - float(lanes[0].left)).is_equal(120.0)
+	var player := level._player
+	player.velocity.y = -player.movement_profile.jump_velocity
+	var landed := false
+	for frame: int in 65:
+		var target_x := (float(lanes[0].left) + float(lanes[0].right)) * 0.5
+		var desired_x := clampf((target_x - player.global_position.x) * 10.0, -player.movement_profile.run_speed, player.movement_profile.run_speed)
+		player.velocity.x = move_toward(player.velocity.x, desired_x, player.movement_profile.air_acceleration * player.movement_profile.air_control / 60.0)
+		player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, player.movement_profile, 1.0 / 60.0)
+		player.move_and_slide()
+		await get_tree().physics_frame
+		if player.is_on_floor() and absf(player.global_position.y - float(lanes[0].y)) < 3.0:
+			landed = true
+			break
+	assert_bool(landed).is_true()
+	assert_float(player.global_position.x).is_between(float(lanes[0].left), float(lanes[0].right))
+	target.set_rule_enabled(false)
+	assert_array(challenge.pulse.safe_jump_lanes(actor, origin, source)).is_empty()
+	target.set_rule_enabled(true)
+	var ceiling := auto_free(StaticBody2D.new()) as StaticBody2D
+	ceiling.position = Vector2(28820, 520)
+	var shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(200, 20)
+	shape.shape = rectangle
+	ceiling.add_child(shape)
+	add_child(ceiling)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	assert_array(challenge.pulse.safe_jump_lanes(actor, origin, source)).is_empty()
+
+
+func test_safe_lane_stops_before_physical_wall() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_pulse_intro")
+	level._player.global_position = Vector2(28650, 638)
+	var wall := auto_free(StaticBody2D.new()) as StaticBody2D
+	wall.position = Vector2(28750, 620)
+	wall.collision_layer = 1
+	var collision := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(20, 120)
+	collision.shape = rectangle
+	wall.add_child(collision)
+	add_child(wall)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var mark := challenge.pulse.safe_mark(challenge.observer._actors[0])
+	assert_dict(mark).is_not_empty()
+	assert_float(float(mark.right)).is_less_equal(28740.0 - BallTacticalMotor.FEET)
+
+
+func test_pulse_scales_to_upper_deck_and_damage_cancels_only_clean_bonus() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_pulse_intro")
+	var deck := level.get_node("Generated/Platforms/p3_pulse_intro_lower") as DebugPlatform
+	level._player.global_position = Vector2(deck.global_position.x, deck.global_position.y - deck.size.y * 0.5 + deck.collision_surface_depth - BallTacticalMotor.FEET)
+	var mark := challenge.pulse.safe_mark(challenge.observer._actors[0])
+	assert_dict(mark).is_not_empty()
+	assert_float(float(mark.radius)).is_less(challenge.definition.pulse_radius)
+	challenge.advance(challenge.definition.warning_seconds)
+	assert_dict(challenge.pulse.pending).is_not_empty()
+	var before := challenge.remaining
+	challenge.damage_events += 1
+	level._player.global_position.y -= 100.0
+	challenge.pulse.advance(challenge.definition.pulse_warning)
+	assert_float(challenge.remaining).is_equal(before)
+	assert_float(challenge.pulse.bonus_used).is_equal(0.0)
+	assert_object(challenge.definition.pulse_vfx).is_not_null()
+	assert_int(challenge.definition.pulse_vfx.get_width()).is_equal(315)
+	assert_int(challenge.definition.pulse_vfx_frames).is_equal(5)
+	assert_float(challenge.pulse.burst_radius).is_equal(float(mark.radius))
+	assert_float(challenge.pulse.burst_remaining).is_equal(challenge.definition.pulse_burst_seconds)
+
+
+func test_mixed_arena_stages_limit_attacks_and_collective_surrender_to_subgroup() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_final_coalition")
+	level._player.global_position = Vector2(37900, 658)
+	assert_int(challenge.observer._actors.size()).is_equal(8)
+	challenge.advance(2.0)
+	assert_bool(challenge.started).is_true()
+	for index: int in range(2, 8):
+		assert_int(challenge.observer._actors[index].conflict_state.current_state).is_equal(ConflictStateComponent.State.NEUTRAL)
+	assert_bool(challenge.observer._actors[0].conflict_state.begin_surrender()).is_true()
+	challenge.advance(0.0)
+	assert_int(challenge.observer._actors[1].conflict_state.current_state).is_equal(ConflictStateComponent.State.SURRENDERING)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+	challenge._stage_elapsed = 37.0
+	for step: int in 5:
+		challenge.advance(0.2)
+		assert_int(challenge.active_attack_count()).is_less_equal(2)
+	assert_dict(challenge.pulse.pending).is_not_empty()
+	var snapshot := challenge.capture_runtime_state()
+	var remaining := challenge.remaining
+	challenge.restore_runtime_state(snapshot)
+	assert_float(challenge.remaining).is_equal(remaining)
+	assert_float(challenge._stage_elapsed).is_equal(float(snapshot.stage_elapsed))
+	var economy := level.get_node("Generated/Economy") as WorkshopEconomy
+	assert_bool(economy.loot.drops.has("restitution:p3_final_coalition")).is_true()
+	assert_bool(level._player.inventory.spend("light_ammo", 4)).is_true()
+	challenge.stolen = {"light_ammo": 4}
+	var ammunition := level._player.inventory.count("light_ammo")
+	challenge.remaining = 0.01
+	challenge.advance(0.02)
+	assert_bool(challenge.observer.is_resolved()).is_true()
+	assert_bool((level.get_node("Generated/Gates/gate_p3_final_coalition") as AccessGate).is_open()).is_true()
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(ammunition)
+	var package := economy.loot.drops["restitution:p3_final_coalition"] as DebugPickup
+	assert_bool(package.is_available()).is_true()
+	package.advance_drop(package.presentation.drop_arc_seconds)
+	package._on_body_entered(level._player)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(ammunition + 4)
+	package._on_body_entered(level._player)
+	assert_int(level._player.inventory.count("light_ammo")).is_equal(ammunition + 4)
+
+
+func test_mixed_arena_forms_and_breaks_flank_with_live_pulses_and_raid_budget() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_final_coalition")
+	var player := level._player
+	player.reset_at(Vector2(37900, 578))
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	challenge._stage_elapsed = 36.0
+	var key := challenge.observer._actors[4].stable_id
+	var saw_pulse := false
+	var saw_projectile := false
+	for frame: int in 360:
+		challenge.advance(1.0 / 60.0)
+		saw_pulse = saw_pulse or not challenge.pulse.pending.is_empty()
+		saw_projectile = saw_projectile or challenge.active_projectile_count() > 0
+		assert_int(challenge.active_attack_count()).is_less_equal(2)
+		await get_tree().physics_frame
+		if bool(challenge._encirclements.get(key, {}).get("armed", false)):
+			break
+	assert_bool(saw_pulse).is_true()
+	assert_bool(saw_projectile).is_true()
+	assert_bool(challenge._encirclements.get(key, {}).get("armed", false)).override_failure_message("Mixed flank never formed with the other groups active").is_true()
+	challenge._update_hud()
+	assert_str(challenge._label.text).contains("CERCO CERRADO")
+	assert_dict(challenge.stolen).is_not_empty()
+	for frame: int in 100:
+		player.velocity.x = move_toward(player.velocity.x, player.movement_profile.run_speed, player.movement_profile.run_acceleration / 60.0)
+		player.velocity.y = MovementMath.vertical_velocity(player.velocity.y, player.movement_profile, 1.0 / 60.0)
+		player.move_and_slide()
+		challenge.advance(1.0 / 60.0)
+		assert_int(challenge.active_attack_count()).is_less_equal(2)
+		await get_tree().physics_frame
+		if float(challenge._encirclements.get(key, {}).get("bonus", 0.0)) > 0.0:
+			break
+	assert_float(float(challenge._encirclements.get(key, {}).get("bonus", 0.0))).is_greater(0.0)
+	challenge._update_hud()
+	assert_str(challenge._label.text).contains("CERCO ROTO")
+	# After the escape, the elevated member is nearest the player; its rear
+	# comrade offers a refuge away from the player rather than toward them.
+	var wounded := challenge.observer._actors[1]
+	wounded.receiver.receive_effect(player.get_node("Identity"), EffectContext.offensive(), 10.0)
+	var resolve_before := wounded.resolve.current_resolve
+	challenge.advance(1.0 / 60.0)
+	assert_bool(challenge._goals.has(wounded.stable_id)).override_failure_message("Mixed collective has no free refuge").is_true()
+	if challenge._goals.has(wounded.stable_id):
+		var refuge: Vector2 = challenge._goals[wounded.stable_id]
+		for frame: int in 180:
+			challenge.advance(1.0 / 60.0)
+			assert_int(challenge.active_attack_count()).is_less_equal(2)
+			await get_tree().physics_frame
+			if wounded.global_position.distance_to(refuge) < challenge.definition.home_tolerance:
+				break
+		assert_float(wounded.global_position.distance_to(refuge)).override_failure_message("Mixed retreat did not reach its refuge").is_less(challenge.definition.home_tolerance + 1.0)
+	assert_float(wounded.resolve.current_resolve).is_equal(resolve_before)
+	assert_float(player.health.current_health).is_greater(0.0)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+
+
+func test_mixed_checkpoint_restores_each_stage_and_pending_mark_without_grants() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_final_coalition")
+	level._player.global_position = Vector2(37900, 658)
+	for stage: float in [2.0, 14.0, 26.0, 38.0]:
+		challenge._stage_elapsed = stage
+		challenge.advance(2.0)
+		challenge.stolen = {"light_ammo": 4}
+		var remaining := challenge.remaining
+		var elapsed := challenge._stage_elapsed
+		var mark := challenge.pulse.pending.duplicate(true)
+		var inventory := level._player.inventory.count("light_ammo")
+		var sats := level._player.inventory.satoshis
+		var states: Array[int] = []
+		for actor: CombatTarget in challenge.observer._actors:
+			states.append(actor.conflict_state.current_state)
+		level.activate_checkpoint(&"mixed_stage", level._player.global_position)
+		challenge.finish(&"survive_ceasefire")
+		level.retry_from_checkpoint()
+		assert_bool(challenge.observer.is_resolved()).is_false()
+		assert_float(challenge.remaining).is_equal(remaining)
+		assert_float(challenge._stage_elapsed).is_equal(elapsed)
+		assert_dict(challenge.pulse.pending).is_equal(mark)
+		assert_int(int(challenge.stolen.light_ammo)).is_equal(4)
+		assert_int(level._player.inventory.count("light_ammo")).is_equal(inventory)
+		assert_int(level._player.inventory.satoshis).is_equal(sats)
+		for index: int in states.size():
+			assert_int(challenge.observer._actors[index].conflict_state.current_state).is_equal(states[index])
+		assert_bool((level.get_node("Generated/Gates/gate_p3_final_coalition") as AccessGate).is_open()).is_false()
+	assert_dict(challenge.pulse.pending).is_not_empty()
+
+
+func test_mixed_defensive_surrender_requires_every_subgroup_and_rewards_once() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "p3_final_coalition")
+	level._player.global_position = Vector2(37900, 658)
+	var context := EffectContext.offensive(EffectContext.EffectType.KINETIC_DAMAGE)
+	var identity := level._player.get_node("Identity") as CombatIdentityComponent
+	for actor: CombatTarget in challenge.observer._actors:
+		assert_bool(TargetValidity.evaluate(identity, actor.receiver, context).allowed).is_false()
+	challenge.advance(2.0)
+	for index: int in challenge.observer._actors.size():
+		var actor := challenge.observer._actors[index]
+		# Emit the same committed attack used by each subgroup before defending.
+		if actor.conflict_state.current_state not in [ConflictStateComponent.State.SURRENDERING, ConflictStateComponent.State.NEUTRALIZED]:
+			assert_bool(challenge._commit(actor, ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)).is_true()
+			assert_bool(actor.receiver.receive_effect(identity, context, actor.resolve.maximum_resolve).allowed).is_true()
+		challenge.advance(0.0)
+		if index < challenge.observer._actors.size() - 1:
+			assert_bool(challenge.observer.is_resolved()).is_false()
+	assert_bool(challenge.observer.is_resolved()).is_true()
+	assert_str(String(challenge.observer.capture_runtime_state().resolution)).is_equal("force_surrender")
+	var sats := level._player.inventory.satoshis
+	challenge.finish(&"force_surrender")
+	assert_int(level._player.inventory.satoshis).is_equal(sats)
+	for actor: CombatTarget in challenge.observer._actors:
+		assert_bool(TargetValidity.evaluate(identity, actor.receiver, context).allowed).is_false()
+
+
 func test_dispatch_collective_all_fire_from_left_edge_and_share_close_supported_tiers() -> void:
 	var level := _build()
 	var challenge := _challenge(level, "encounter_dispatch_ancom")
@@ -144,6 +543,16 @@ func test_crew_lower_has_physical_return_without_power_or_coordination() -> void
 				landed = true
 				break
 		assert_bool(landed).is_true()
+
+
+func test_ancom_encounters_use_fifteen_seconds_without_shortening_mixed_arena() -> void:
+	var level := _build()
+	for id: String in ["encounter_depot_patrol", "encounter_dispatch_ancom", "crew_ancom", "p2_collective", "p3_collective"]:
+		var challenge := _challenge(level, id)
+		assert_float(challenge.definition.duration).is_equal(15.0)
+		assert_float(challenge.remaining).is_equal(15.0)
+	var mixed := load("res://data/content/encounters/encounter_workshop_coalition.tres") as EncounterDefinition
+	assert_float(mixed.ceasefire_challenge.duration).is_equal(65.0)
 
 
 func test_collective_starts_only_after_attack_and_one_surrender_releases_group() -> void:
@@ -333,6 +742,58 @@ func test_contact_theft_is_limited_protects_keys_and_returns_property() -> void:
 	assert_int(inventory.satoshis).is_equal(40)
 
 
+func test_each_egoist_releases_only_its_own_stolen_goods() -> void:
+	var level := _build()
+	var challenge := _challenge(level, "encounter_dispatch_egoist")
+	var inventory := level._player.inventory
+	inventory.grant_once("theft_test", {"trade_parts": 20})
+	var before_ammo := inventory.count("light_ammo")
+	var before_parts := inventory.count("trade_parts")
+	var thieves := challenge.observer._actors
+	var loot := (level.get_node("Generated/Economy") as WorkshopEconomy).loot
+	var first_id := "restitution:encounter_dispatch_egoist"
+	var second_id := first_id + ":" + String(thieves[1].stable_id)
+	var third_id := first_id + ":" + String(thieves[2].stable_id)
+	for index: int in [1, 2]:
+		var thief := thieves[index]
+		level._player.global_position = thief.global_position
+		level._player.health._invulnerability_remaining = 0.0
+		challenge._commit(thief, ConflictStateComponent.AggressorReason.FORCED_CONFISCATION)
+		assert_bool(challenge.try_contact(thief)).is_true()
+	assert_int(inventory.count("light_ammo")).is_equal(before_ammo - 16)
+	assert_int(inventory.count("trade_parts")).is_equal(before_parts - 4)
+	assert_dict(challenge.stolen_by_actor[String(thieves[1].stable_id)]).is_equal({"light_ammo": 8, "trade_parts": 2})
+	assert_dict(challenge.stolen_by_actor[String(thieves[2].stable_id)]).is_equal({"light_ammo": 8, "trade_parts": 2})
+	assert_bool((loot.drops[first_id] as DebugPickup).is_available()).is_false()
+	assert_bool(thieves[1].conflict_state.begin_surrender()).is_true()
+	assert_bool((loot.drops[second_id] as DebugPickup).is_available()).is_true()
+	assert_bool((loot.drops[third_id] as DebugPickup).is_available()).is_false()
+	assert_bool(challenge.observer.is_resolved()).is_false()
+	var second_package := loot.drops[second_id] as DebugPickup
+	assert_vector(second_package._drop_start).is_equal(thieves[1].global_position)
+	second_package.advance_drop(second_package.presentation.drop_arc_seconds)
+	second_package._on_body_entered(level._player)
+	assert_int(inventory.count("light_ammo")).is_equal(before_ammo - 8)
+	assert_int(inventory.count("trade_parts")).is_equal(before_parts - 2)
+	# Retry preserves who holds the remaining goods and does not respawn a
+	# collected package when the other thief surrenders later.
+	level.activate_checkpoint(&"egoist_split", level._player.position)
+	challenge.finish(&"survive_ceasefire")
+	level.retry_from_checkpoint()
+	assert_bool(loot.drops.has(second_id)).is_false()
+	assert_bool((loot.drops[third_id] as DebugPickup).is_available()).is_false()
+	assert_int(inventory.count("light_ammo")).is_equal(before_ammo - 8)
+	assert_bool(thieves[2].conflict_state.begin_surrender()).is_true()
+	var third_package := loot.drops[third_id] as DebugPickup
+	assert_bool(third_package.is_available()).is_true()
+	assert_vector(third_package._drop_start).is_equal(thieves[2].global_position)
+	third_package.advance_drop(third_package.presentation.drop_arc_seconds)
+	third_package._on_body_entered(level._player)
+	assert_int(inventory.count("light_ammo")).is_equal(before_ammo)
+	assert_int(inventory.count("trade_parts")).is_equal(before_parts)
+	assert_bool((loot.drops[first_id] as DebugPickup).is_available()).is_false()
+
+
 func test_theft_feedback_only_on_successful_transfer_and_cleans_up() -> void:
 	var level := _build()
 	var challenge := _challenge(level, "encounter_storage_cache")
@@ -469,11 +930,74 @@ func test_defending_does_not_restart_timer_and_pause_stops_processing() -> void:
 	get_tree().paused = false
 
 
+func test_collective_assigns_two_separated_coverers_and_restores_cooldown() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	var challenge := _challenge(level, "encounter_dispatch_ancom")
+	var wounded := challenge.observer._actors[0]
+	level._player.global_position = wounded.global_position - Vector2(100, 0)
+	for actor: CombatTarget in challenge.observer._actors:
+		challenge._commit(actor, ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+	wounded.receiver.receive_effect(level._player.get_node("Identity"), EffectContext.offensive(), 10.0)
+	var resolve_before := wounded.resolve.current_resolve
+	challenge._advance_retreat(0.0)
+	assert_str(challenge._roles.get(wounded.stable_id, "")).is_equal("retreat")
+	var covers: Array[Vector2] = []
+	for id: Variant in challenge._roles:
+		if challenge._roles[id] == "cover":
+			covers.append(challenge._goals[id])
+	assert_int(covers.size()).is_equal(2)
+	if covers.size() == 2:
+		assert_float(covers[0].distance_to(covers[1])).is_greater_equal(challenge.definition.personal_space)
+	var saved := challenge.capture_runtime_state()
+	challenge.restore_runtime_state(saved)
+	assert_float(challenge._cover_cooldown).is_equal(challenge.definition.retreat_cover_cooldown)
+	assert_dict(challenge._roles).is_equal(saved.roles)
+	assert_float(wounded.resolve.current_resolve).is_equal(resolve_before)
+	assert_bool(challenge.observer.is_resolved()).is_false()
+
+
+func test_collective_cover_and_wounded_physically_reach_their_positions() -> void:
+	var level := _build()
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for encounter_id: String in ["encounter_depot_patrol", "encounter_dispatch_ancom", "crew_ancom", "p2_collective", "p3_collective"]:
+		var challenge := _challenge(level, encounter_id)
+		var wounded := challenge.observer._actors[0]
+		level._player.global_position = wounded.global_position - Vector2(100, 0)
+		for actor: CombatTarget in challenge.observer._actors:
+			challenge._commit(actor, ConflictStateComponent.AggressorReason.ATTACK_COMMITTED)
+		wounded.receiver.receive_effect(level._player.get_node("Identity"), EffectContext.offensive(), 10.0)
+		var health_before := wounded.resolve.current_resolve
+		challenge._advance_retreat(0.0)
+		if not challenge._goals.has(wounded.stable_id):
+			assert_bool(false).override_failure_message(encounter_id + ": no retreat goal").is_true()
+			continue
+		assert_str(challenge._roles.get(wounded.stable_id, "")).is_equal("retreat")
+		var goals: Dictionary = challenge._goals.duplicate()
+		var covers: Array[CombatTarget] = []
+		for actor: CombatTarget in challenge.observer._actors:
+			if challenge._roles.get(actor.stable_id, "") == "cover":
+				covers.append(actor)
+		assert_int(covers.size()).is_equal(2)
+		for frame: int in 180:
+			challenge._advance_retreat(1.0 / 60.0)
+			await get_tree().physics_frame
+		for actor: CombatTarget in covers:
+			assert_float(actor.global_position.distance_to(goals[actor.stable_id])).override_failure_message(encounter_id + ": cover did not arrive").is_less(challenge.definition.home_tolerance + 1.0)
+			assert_bool(challenge._is_relocating(actor)).is_false()
+		assert_float(wounded.global_position.distance_to(goals[wounded.stable_id])).override_failure_message("%s: retreat %s -> %s, airborne=%s" % [encounter_id, wounded.global_position, goals[wounded.stable_id], wounded.tactical_airborne]).is_less(challenge.definition.home_tolerance + 1.0)
+		assert_float(wounded.resolve.current_resolve).is_equal(health_before)
+		assert_bool(challenge.observer.is_resolved()).is_false()
+
+
 func test_wounded_collective_retreats_to_far_comrade_without_replacement_or_healing() -> void:
 	var level := _build()
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	var challenge := _challenge(level, "encounter_depot_patrol")
+	challenge.definition = challenge.definition.duplicate(true) as CeasefireChallengeDefinition
+	challenge.definition.retreat_cover_count = 0
 	var wounded := challenge.observer._actors[0]
 	level._player.global_position = wounded.global_position - Vector2(100, 0)
 	challenge.advance(1.3)

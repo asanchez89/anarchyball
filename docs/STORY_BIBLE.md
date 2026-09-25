@@ -1,5 +1,10 @@
 # Anarchyball: biblia narrativa de campaña
 
+Iteración aprobada: `LEVEL_01_VERTICAL_REDESIGN.md` modifica encuentros y recorrido
+del taller, no el arco narrativo. Los nichos de futuros archivos no asignan todavía
+autores ni implementan biografías. BlackAnarchy expresa autonomía táctica y Ancom
+protección colectiva en estos encuentros; ninguna afiliación autoriza atacar.
+
 **Estado:** desarrollo narrativo v0.1; canon de planificación, no evidencia de implementación
 **Última revisión:** 2026-09-22
 **Alcance:** campaña, personajes y diálogos; nivel 1 reagrupado en tres partes y jefe. El conteo anterior de 44 misiones queda como presupuesto histórico por recalcular.
@@ -110,11 +115,20 @@ Arco: convierte The Agora en una federación de talleres autónomos y diseña la
 
 ## 3.6 LeftLibertarianBall — cartógrafa de acceso
 
+Adaptación jugable aprobada 2026-09-23: las patrullas que escalan a agresión
+usan marcas espaciales y pulsos anunciados; esquivarlos acelera la tregua.
+La cartógrafa aliada conserva su identidad. No atribuir agresión automática a
+la ideología. `LEVEL_01_PARTS_2_3.md` reemplaza el corredor como reto principal.
+
 Estudia apropiación original, servidumbres y efectos sobre terceros. Discute tanto con AnarchyBall como con MutualistBall. No se une porque una teoría “venza”, sino porque el Leviatán borra precisamente la posibilidad de probar arreglos diferentes.
 
 Arco: comienza como crítica de claims demasiado simples y termina diseñando corredores de acceso que ninguna comunidad puede cerrar unilateralmente sin activar arbitraje.
 
 ## 3.7 BlackAnarchyBall — organizadora sin cargo
+
+Adaptación jugable aprobada 2026-09-23: patrullas con iniciativa autónoma,
+flanqueo y rendición individual aceleran su tregua. La organizadora amistosa
+no se vuelve enemiga por esa revisión; coordinación permanece variante secundaria.
 
 Identidad visual confirmada: bandera negra lisa sobre el cuerpo, con una A blanca
 encerrada en un círculo, separada de los ojos blancos sin pupilas. Mantener volumen
@@ -1164,7 +1178,7 @@ Las recompensas proceden de misión, restitución, donación, salvage permitido 
 ## 18.1 Estado de implementación a esta revisión
 
 - `w0_01_first_aggression`, `w0_02_contract_bridge` y `w0_03_occupancy_workshop` existen como candidatos técnicos de Phase 7 y siguen pendientes de evidencia humana según `PHASE_7_PLAN.md`.
-- Las partes BlackAnarchy y LeftLibertarian y el jefe del nivel 1 son diseño, no contenido jugable. `w0_04` a `w0_07` conservan briefs fuente, no una secuencia obligatoria.
+- Las partes BlackAnarchy y LeftLibertarian y la arena conjunta tienen una integración jugable provisional en `w0_01_coalition_workshop`, pendiente de revisión final y playtest humano. El jefe del nivel 1 sigue fuera de esta entrega. `w0_04` a `w0_07` conservan briefs fuente, no una secuencia obligatoria.
 - Worlds 1-6, Leviathan y Panarchy son planificación para Phases 9-10; este documento no autoriza producción simultánea.
 - Los diálogos son fuente narrativa para futura implementación. Al integrarlos deberán ajustarse a longitud, localización, actuación visual, accesibilidad y playtest.
 

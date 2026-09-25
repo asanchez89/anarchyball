@@ -1,0 +1,16 @@
+{
+  "level_id": "w0_01_coalition_workshop",
+  "editorial_only": true,
+  "routes": [
+    {"id": "p1_ammo_balcony", "status": "prototype_placed", "reward_id": "pickup_lift_ammo", "purpose": "Recompensa visible del montacargas; embarque, ascenso, recogida y retorno probados físicamente.", "evidence": "tests/unit/test_elevator_calls.gd:test_first_lift_can_be_boarded_ridden_and_collect_its_real_rewards"},
+    {"id": "p1_salvage_underpass", "status": "prototype_placed", "reward_id": "p1_salvage_underpass_supply", "platform_id": "p1_salvage_underpass", "access": ["storage_step_two", "p1_salvage_underpass_entry", "p1_salvage_underpass"], "return": "Mismos escalones hacia la izquierda; pared de soporte impide bypass."},
+    {"id": "archive_niche_p1_office", "status": "prototype_placed", "reward_id": "archive_niche_p1_office_supply", "platform_id": "p1_archive_office_floor"},
+    {"id": "p2_heavy_overlook", "status": "prototype_placed", "reward_id": "pickup_p2_upper_reward", "platform_id": "p2_heavy_cache", "access": ["p2_flank_vertical_upper", "p2_heavy_cache"]},
+    {"id": "p2_repair_cache", "status": "prototype_placed", "reward_id": "p2_repair_cache_supply", "platform_id": "p2_repair_cache", "access": ["p2_factory_continuation", "p2_repair_cache_step", "p2_repair_cache"]},
+    {"id": "archive_niche_p2_records", "status": "prototype_placed", "reward_id": "archive_niche_p2_records_supply", "platform_id": "p2_records_room", "access": ["p2_flank_vertical_upper", "p2_records_access", "p2_records_return", "p2_records_room"]},
+    {"id": "p3_ammo_return", "status": "prototype_placed", "reward_id": "p3_ammo_return_supply", "platform_id": "p3_ammo_return"},
+    {"id": "p3_salvage_gallery", "status": "prototype_placed", "reward_id": "p3_salvage_gallery_supply", "platform_id": "p3_salvage_gallery", "access": ["p3_pulse_advanced_upper", "p3_salvage_access", "p3_salvage_gallery"]},
+    {"id": "archive_niche_p3_reading_room", "status": "prototype_placed", "reward_id": "archive_niche_p3_reading_room_supply", "platform_id": "p3_factory_continuation", "ceiling_platform_id": "p3_raiders_upper", "return": "Salir hacia la izquierda bajo la galería y volver al escalón p3_raiders_lower."}
+  ],
+  "constraints": ["No recursos obligatorios ocultos", "No abre compuertas de encuentro", "Retorno con movimiento base", "Sin sistema biográfico runtime", "Playtest humano pendiente"]
+}

@@ -6,6 +6,8 @@ signal opened(gate_id: StringName)
 const GATE_CLOSED_TEXTURE := preload("res://assets/art/props/access_gate/warped_gate_closed.png")
 const GATE_OPENING_TEXTURE := preload("res://assets/art/props/access_gate/warped_gate_opening.png")
 const GATE_OPEN_TEXTURE := preload("res://assets/art/props/access_gate/warped_gate_open.png")
+const FIELD_REGION := Rect2(12, 12, 14, 16)
+const ART_SCALE := 3.0
 
 var gate_id: StringName = &"access_gate"
 var required_tag: StringName = &""
@@ -20,6 +22,8 @@ var _is_open: bool = false
 var _shape_node: CollisionShape2D
 var _label: Label
 var _art_sprite: AnimatedSprite2D
+var _barrier_art: Node2D
+var _barrier_phase: float = 0.0
 
 
 func _ready() -> void:
@@ -33,6 +37,7 @@ func _ready() -> void:
 	_shape_node.position.y = -(effective_height - size.y) * 0.5
 	add_child(_shape_node)
 	_build_warped_art()
+	_build_barrier_art(effective_height)
 	var sensor := Area2D.new()
 	sensor.collision_layer = 0
 	sensor.collision_mask = 2
@@ -62,7 +67,10 @@ func _ready() -> void:
 	_update_label()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _barrier_art != null and not _is_open:
+		_barrier_phase = fmod(_barrier_phase + delta * 3.0, TAU)
+		_barrier_art.modulate.a = 0.55 + 0.12 * sin(_barrier_phase)
 	if _player_nearby and InputActions.is_interact_just_pressed():
 		try_open()
 	if _player_nearby and not required_key.is_empty():
@@ -107,6 +115,8 @@ func _set_open(value: bool, animate: bool = true) -> void:
 
 
 func _apply_open_state(animate: bool) -> void:
+	if _barrier_art != null:
+		_barrier_art.visible = not _is_open
 	if _shape_node != null:
 		_shape_node.set_deferred("disabled", _is_open)
 	set_deferred("collision_layer", 0 if _is_open else 1)
@@ -119,6 +129,32 @@ func _apply_open_state(animate: bool) -> void:
 			_art_sprite.frame = 2
 	else:
 		_art_sprite.play(&"closed")
+
+
+func _build_barrier_art(effective_height: float) -> void:
+	_barrier_art = Node2D.new()
+	_barrier_art.name = "WarpedBarrierField"
+	_barrier_art.z_index = -1
+	_barrier_art.modulate.a = 0.55
+	add_child(_barrier_art)
+	var extent := Vector2(size.x, maxf(0.0, effective_height - size.y))
+	var origin := Vector2(-size.x * 0.5, size.y * 0.5 - effective_height)
+	var tile := FIELD_REGION.size * ART_SCALE
+	# Tile the original energy pixels, never stretch a door to the whole screen.
+	# The final cropped tile meets the visible door and matches the collider.
+	for row: int in ceili(extent.y / tile.y):
+		for column: int in ceili(extent.x / tile.x):
+			var offset := Vector2(column, row) * tile
+			var visible_size := (extent - offset).min(tile)
+			var sprite := Sprite2D.new()
+			sprite.texture = GATE_CLOSED_TEXTURE
+			sprite.region_enabled = true
+			sprite.region_rect = Rect2(FIELD_REGION.position, visible_size / ART_SCALE)
+			sprite.centered = false
+			sprite.position = origin + offset
+			sprite.scale = Vector2.ONE * ART_SCALE
+			sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			_barrier_art.add_child(sprite)
 
 
 func _build_warped_art() -> void:
@@ -161,5 +197,7 @@ func _update_label() -> void:
 		_label.text = "%s\nF / X: presentar contrato" % rule_text
 	elif required_tag == &"encounter_resolution":
 		_label.text = "%s\nResuelve el desafío para abrir" % rule_text
+	elif required_tag == &"mechanical_service":
+		_label.text = "%s\nPaga el servicio en la terminal ACTIVATE" % rule_text
 	else:
 		_label.text = "%s\nBusca el bypass superior" % rule_text
